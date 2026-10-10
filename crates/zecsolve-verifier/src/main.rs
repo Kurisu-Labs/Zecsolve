@@ -1,3 +1,5 @@
+mod normalize_cli;
+
 use gp_core::{
     ensure_transaction_id, ock_from_bytes, parse_transaction, recover_orchard, recover_sapling,
 };
@@ -245,6 +247,14 @@ fn verify(receipt_path: &Path, tx_path: &Path) -> Report {
 
 fn main() -> ExitCode {
     let args: Vec<_> = std::env::args_os().skip(1).collect();
+    if args.len() == 3 && args[0] == "normalize-address" && args[1] == "--input" {
+        let report = normalize_cli::run(Path::new(&args[2]));
+        println!(
+            "{}",
+            serde_json::to_string(&report).expect("serializable report")
+        );
+        return ExitCode::SUCCESS;
+    }
     if args.len() == 1 && args[0] == "--version" {
         println!(
             "zecsolve-verifier {} glasspane:{}",
@@ -255,6 +265,7 @@ fn main() -> ExitCode {
     }
     if args.len() != 4 || args[0] != "--receipt" || args[2] != "--raw-tx" {
         eprintln!("Usage: zecsolve-verifier --receipt FILE --raw-tx HEX_FILE");
+        eprintln!("       zecsolve-verifier normalize-address --input REQUEST_JSON_FILE");
         return ExitCode::from(64);
     }
     let report = verify(Path::new(&args[1]), Path::new(&args[3]));
