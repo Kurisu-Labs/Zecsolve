@@ -15,3 +15,4 @@ data/
 .coverage
 coverage.xml
 artifacts/
+.DS_Store
