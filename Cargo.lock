@@ -1489,6 +1489,7 @@ dependencies = [
  "gp-core",
  "gp-types",
  "hex",
+ "orchard",
  "sapling-crypto",
  "serde",
  "serde_json",
