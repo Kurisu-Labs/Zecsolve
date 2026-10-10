@@ -127,3 +127,18 @@ fn rejects_invalid_inner_receiver_even_with_valid_outer_checksum() {
         "INVALID_RECEIVER"
     );
 }
+
+#[test]
+fn rejects_altered_checksum_and_whitespace_in_a_valid_address() {
+    let (orchard, _) = receivers();
+    let address = unified(NetworkType::Main, vec![Receiver::Orchard(orchard)]);
+    let mut altered = address.clone();
+    let last = altered.pop().unwrap();
+    altered.push(if last == 'q' { 'p' } else { 'q' });
+    for input in [altered, format!(" {address}"), format!("{address}\n")] {
+        assert_eq!(
+            normalize(&input, "mainnet", "orchard").unwrap_err(),
+            "INVALID_ADDRESS"
+        );
+    }
+}

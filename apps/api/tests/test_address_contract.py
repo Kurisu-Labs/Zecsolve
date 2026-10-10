@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from pydantic import ValidationError
 
@@ -8,6 +10,7 @@ def test_address_contract_rejects_untrusted_fields_and_invalid_requests():
     for fields in (
         {"address": ""},
         {"address": "x" * 1025},
+        {"address": "é" * 513},
         {"address": "\ud800"},
         {"address": "address", "receiver_hex": "00" * 43},
         {"address": "address", "network": "testnet"},
@@ -42,3 +45,15 @@ def test_address_result_requires_receiver_only_for_success():
     ):
         with pytest.raises(ValidationError):
             AddressNormalizationReport.model_validate({**valid, **change})
+
+
+def test_address_json_schemas_match_runtime_contracts(root):
+    from zecsolve.schemas.address import AddressNormalizationReport, NormalizeAddressRequest
+
+    for name, model in (
+        ("normalize-address-request", NormalizeAddressRequest),
+        ("normalize-address-result", AddressNormalizationReport),
+    ):
+        assert json.loads((root / f"contracts/{name}.schema.json").read_text()) == (
+            model.model_json_schema()
+        )
