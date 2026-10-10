@@ -14,7 +14,7 @@ gh pr list --state open
 
 An active branch can represent work that has no PR yet. Check its recent commits and coordinate with its contributor if the scope overlaps. A branch name signals work in progress; it does not lock files or prevent conflicts.
 
-Use one clearly named branch per task, such as `feat/recipient-normalization`, `fix/credential-expiry`, or `docs/setup-guide`. Coding agents may use `codex/<task>`.
+Use one branch per task, named for the kind of change and the actual work: `feat/recipient-normalization`, `fix/credential-expiry`, or `docs/contribution-workflow`. The same convention applies to people and coding agents; do not use an agent name such as `codex/` as the prefix.
 
 From a clean checkout, update `main`, create the branch, and **push it before editing or coding**:
 
