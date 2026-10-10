@@ -3,6 +3,7 @@ import threading
 from contextlib import asynccontextmanager
 from typing import Annotated
 
+from alembic.script import ScriptDirectory
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -12,8 +13,11 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from zecsolve import __version__
 from zecsolve.adapters.verifier import VerifierAdapter
+from zecsolve.auth.credentials import MerchantPrincipal
+from zecsolve.auth.dependencies import require_merchant
 from zecsolve.config import Settings
 from zecsolve.db.session import make_engine
+from zecsolve.schemas.auth import MerchantIdentity
 from zecsolve.schemas.verification import VerificationReport, VerifyRequest
 
 
@@ -52,6 +56,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     engine = make_engine(settings)
     verifier = VerifierAdapter(settings.verifier_path, settings.verifier_timeout_seconds)
     slots = threading.BoundedSemaphore(2)
+    migration_head = ScriptDirectory(str(settings.migrations_path.resolve())).get_current_head()
 
     @asynccontextmanager
     async def lifespan(app):
@@ -59,6 +64,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         engine.dispose()
 
     app = FastAPI(title="zecsolve", version=__version__, lifespan=lifespan)
+    app.state.engine = engine
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 
@@ -97,13 +103,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         database = False
         try:
             with engine.connect() as connection:
-                database = (
-                    connection.scalar(text("SELECT version_num FROM alembic_version")) == "0001"
-                )
+                database = tuple(
+                    connection.scalars(text("SELECT version_num FROM alembic_version"))
+                ) == (migration_head,)
         except SQLAlchemyError:
             pass
         checks = {"database_migrated": database, "verifier_available": verifier.available()}
         return JSONResponse(status_code=200 if all(checks.values()) else 503, content=checks)
+
+    @app.get("/api/auth/me", response_model=MerchantIdentity)
+    def merchant_identity(principal: Annotated[MerchantPrincipal, Depends(require_merchant)]):
+        return MerchantIdentity(
+            merchant_id=principal.merchant_id, credential_id=principal.credential_id
+        )
 
     @app.post(
         "/api/poc/verify",

@@ -1,6 +1,8 @@
 # zecsolve foundation security boundaries
 
-The current service is a development proof of concept with one configured bearer token. It is not a multi-merchant deployment. Health and OpenAPI routes are public; verification requires the token and is disabled when no token is configured. Do not expose it publicly until merchant identity and case-scoped authorization exist.
+The current verification service is a development proof of concept with one configured POC bearer token. Health and OpenAPI routes are public; POC verification requires that token and is disabled when none is configured. Operator-provisioned merchant credentials now protect the separate identity endpoint, but case-scoped workflow authorization is not yet implemented. Do not expose the POC publicly before the scoped workflow is complete.
+
+Merchant tokens contain 256 random bits, expire after a configured 1–365 days, and are stored only as SHA-256 digests. The operator CLI discloses a token once, only after a successful database commit, and can revoke individual credentials. `/api/auth/me` checks expiry and revocation against the database on every request and returns only the authenticated merchant/credential IDs. The application derives identity from that credential; it does not accept merchant identity from request fields. This increment does not provide customer/reviewer grants, browser login sessions, or authorization for future case endpoints.
 
 The API limits request bodies to 4,200,000 bytes, receipt files to 16,384 UTF-8 bytes, transaction hex to 4,000,002 bytes, subprocess output to 32,768 bytes, and simultaneous verifiers to two per API process. The default subprocess timeout is ten seconds. Container/process-level memory limits and ingress rate limits remain deployment work.
 
