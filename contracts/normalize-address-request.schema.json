@@ -1,0 +1,31 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "address": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Address",
+      "type": "string"
+    },
+    "network": {
+      "const": "mainnet",
+      "title": "Network",
+      "type": "string"
+    },
+    "pool": {
+      "enum": [
+        "orchard",
+        "sapling"
+      ],
+      "title": "Pool",
+      "type": "string"
+    }
+  },
+  "required": [
+    "address",
+    "network",
+    "pool"
+  ],
+  "title": "NormalizeAddressRequest",
+  "type": "object"
+}

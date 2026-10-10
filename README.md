@@ -75,6 +75,29 @@ Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or autho
 
 Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Merchant case endpoints, customer/reviewer grants, browser sessions, and private evidence storage remain future increments.
 
+## Normalize an invoice recipient
+
+The next M1 increment validates mainnet Orchard/Sapling recipients before invoice creation. It selects the requested receiver from a Unified Address, or decodes a standalone Sapling address, and returns the same receiver bytes used by the receipt verifier. It checks the address encoding, network, and inner receiver validity. It does not prove ownership, payment, receiver uniqueness, or chain confirmation.
+
+Build the binary with `make build`. A request file contains only `address`, `network`, and `pool`; normalized bytes are derived by Rust, never accepted from the caller. This example uses the public historical fixture:
+
+```sh
+python3 - <<'PY'
+import json
+from pathlib import Path
+manifest = json.loads(Path("fixtures/manifest.json").read_text())
+request = {"address": manifest["expected"]["receiver_address"], "network": "mainnet", "pool": "orchard"}
+Path("/tmp/zecsolve-address-request.json").write_text(json.dumps(request))
+PY
+target/debug/zecsolve-verifier normalize-address --input /tmp/zecsolve-address-request.json
+```
+
+Expected: `state=VALID`, `reason_code=ADDRESS_NORMALIZED`, and a `receiver` containing `network`, `pool`, and 43 bytes encoded as lowercase `receiver_hex`. The result binds the exact request file with `input_sha256`. Selecting `sapling` for this Orchard-only fixture returns `INVALID / RECEIVER_MISSING`, with no receiver.
+
+Addresses are limited to 1,024 UTF-8 bytes, with no surrounding whitespace; the JSON request is limited to 8,192 bytes. Mainnet is the only supported requested network. Unknown fields, invalid checksums, wrong networks, missing receivers, and invalid inner receivers are rejected. Completed checks exit zero even for rejected input; bad CLI usage exits 64. Read `state` and `reason_code`, not just the exit code.
+
+Python services can call `AddressNormalizer(settings.verifier_path, settings.verifier_timeout_seconds).normalize(NormalizeAddressRequest(address=address, network="mainnet", pool="orchard"))`, importing the adapter from `zecsolve.adapters.address` and the request model from `zecsolve.schemas.address`. The adapter uses private temporary files, a bounded subprocess, and validated JSON results. Missing executables return `UNAVAILABLE`; timeouts, crashes, oversized output, or inconsistent results return `ERROR`. No public normalization or invoice endpoint is added in this increment.
+
 ## Verify changes
 
 ```sh
@@ -88,11 +111,11 @@ Database tests create and remove only a uniquely named test schema. Point them a
 ZECSOLVE_TEST_DATABASE_URL='postgresql+psycopg://zecsolve:zecsolve@127.0.0.1:54329/zecsolve' make test-db
 ```
 
-`make test` includes the real Rust binary, historical fixture, negative evidence, rule calculations, subprocess limits, and API behavior. `make test-db` covers migrations, immutable records, merchant/invoice consistency, and concurrent output allocation. CI runs both sets. Regenerate the verifier contract with `make schema` when changing its Pydantic model.
+`make test` includes the real Rust binary, historical fixture, negative evidence, recipient normalization, rule calculations, subprocess limits, and API behavior. `make test-db` covers migrations, immutable records, merchant/invoice consistency, and concurrent output allocation. CI runs both sets. Regenerate the verifier and normalization contracts with `make schema` when changing their Pydantic models.
 
 ## Current boundary
 
-Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials with expiry/revocation and identity endpoint; tests; development container configuration.
+Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials with expiry/revocation and identity endpoint; mainnet recipient normalization CLI and Python adapter; tests; development container configuration.
 
 Next: merchant-scoped case endpoints, customer/reviewer authentication and permissions, private evidence storage, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
 

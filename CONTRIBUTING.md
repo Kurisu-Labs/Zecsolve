@@ -39,6 +39,8 @@ git push
 
 Keep unrelated changes on separate branches. Coordinate changes to shared API contracts, migrations, and modules before editing them. Never commit secrets, `.env`, build output, or private customer evidence.
 
+Make each commit the smallest coherent, reviewable change, including its related tests. For example, a feature branch may contain separate commits for its contract, decoder, CLI, adapter, integration coverage, and documentation. Commit and push each completed increment during implementation instead of collecting all work into one final commit. There is no fixed commit count, and a tiny change does not need artificial splitting.
+
 ## When the task is complete
 
 Review your diff and run the relevant checks. For application changes, run `make test` and `make lint`. Also run `make test-db` against a disposable database for model, migration, or allocation changes, and regenerate the verifier schema with `make schema` when its contract changes. For documentation-only changes, check the content, links, and `git diff --check`; CI still runs on the PR.
@@ -53,6 +55,8 @@ gh pr create --base main
 ## Review, merge, and cleanup
 
 Maintainers check the final diff, CI, and mergeability. Ready PRs can be merged directly after that review. Resolve any conflicts on the feature branch, rerun affected checks, and push the resolution before merging. Do not push changes directly to `main` or bypass required checks.
+
+Use **Create a merge commit** (or `gh pr merge --merge`) rather than squash merging, so the branch's incremental commits remain visible in history.
 
 Once the PR is confirmed merged and the branch contains no unmerged work, delete its remote branch using GitHub's **Delete branch** button. Then update your local checkout and remove your local feature branch:
 

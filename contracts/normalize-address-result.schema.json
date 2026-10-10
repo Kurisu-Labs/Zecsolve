@@ -1,0 +1,90 @@
+{
+  "$defs": {
+    "NormalizedReceiver": {
+      "additionalProperties": false,
+      "properties": {
+        "network": {
+          "const": "mainnet",
+          "title": "Network",
+          "type": "string"
+        },
+        "pool": {
+          "enum": [
+            "orchard",
+            "sapling"
+          ],
+          "title": "Pool",
+          "type": "string"
+        },
+        "receiver_hex": {
+          "pattern": "^[0-9a-f]{86}$",
+          "title": "Receiver Hex",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "pool",
+        "receiver_hex"
+      ],
+      "title": "NormalizedReceiver",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "VALID",
+        "INVALID",
+        "UNSUPPORTED",
+        "UNAVAILABLE",
+        "ERROR"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "reason_code": {
+      "maxLength": 80,
+      "pattern": "^[A-Z_]+$",
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "input_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Sha256"
+    },
+    "receiver": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NormalizedReceiver"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "state",
+    "reason_code"
+  ],
+  "title": "AddressNormalizationReport",
+  "type": "object"
+}
