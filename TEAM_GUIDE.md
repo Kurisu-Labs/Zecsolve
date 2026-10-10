@@ -40,6 +40,9 @@ The POC runs without PostgreSQL; readiness requires a migrated database. Databas
 | `apps/api/src/zecsolve/main.py` | FastAPI assembly, POC authentication, health endpoints, request limit and concurrency bound |
 | `apps/api/src/zecsolve/config.py` | Typed environment settings; secret values use `SecretStr` |
 | `apps/api/src/zecsolve/auth/` | Merchant credential issuance/revocation CLI and server-derived authentication dependency |
+| `crates/zecsolve-verifier/src/address.rs`, `src/normalize_cli.rs` | Mainnet shielded receiver decoding/validation and bounded normalization CLI |
+| `apps/api/src/zecsolve/adapters/address.py`, `schemas/address.py` | Python normalizer adapter and versioned request/result contracts |
+| `apps/api/src/zecsolve/adapters/process.py` | Shared subprocess timeout, output cap, and environment isolation |
 | `apps/api/src/zecsolve/adapters/verifier.py` | Isolated temporary files, subprocess timeout, output limit and result validation |
 | `apps/api/src/zecsolve/schemas/verification.py` | Python request/result contracts, integer amounts and result consistency checks |
 | `apps/api/src/zecsolve/domain/` | Pure rules and independent status enums; no I/O or database mutation |
