@@ -1,0 +1,17 @@
+[package]
+name = "zecsolve-verifier"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+gp-core.workspace = true
+gp-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hex.workspace = true
+sha2.workspace = true
+sapling-crypto.workspace = true
+zcash_protocol.workspace = true
+zcash_address.workspace = true

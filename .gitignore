@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.venv/
+.cache/
+target/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+node_modules/
+dist/
+data/
+.coverage
+coverage.xml
+artifacts/

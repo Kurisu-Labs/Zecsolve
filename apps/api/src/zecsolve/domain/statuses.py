@@ -1,0 +1,24 @@
+from enum import StrEnum
+
+
+class ReceiptState(StrEnum):
+    NONE = "NONE"
+    VALID = "VALID"
+    INVALID = "INVALID"
+    UNSUPPORTED = "UNSUPPORTED"
+    UNAVAILABLE = "UNAVAILABLE"
+    ERROR = "ERROR"
+
+
+class ChainState(StrEnum):
+    CONFIRMED = "CONFIRMED"
+    UNCONFIRMED = "UNCONFIRMED"
+    UNAVAILABLE = "UNAVAILABLE"
+
+
+class CaseState(StrEnum):
+    OPEN = "OPEN"
+    AWAITING_EVIDENCE = "AWAITING_EVIDENCE"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    RESOLVED = "RESOLVED"
+    CLOSED_UNRESOLVED = "CLOSED_UNRESOLVED"

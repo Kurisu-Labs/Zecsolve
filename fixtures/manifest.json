@@ -1,0 +1,41 @@
+{
+  "schema_version": "1",
+  "upstream": "https://github.com/dolepee/glasspane",
+  "revision": "f6468e6d08a7adad53bf2991a311358dc84e869b",
+  "license": "MIT",
+  "files": [
+    {
+      "path": "fixtures/mainnet/receipt.json",
+      "upstream_path": "examples/mainnet-receipt.json",
+      "sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4"
+    },
+    {
+      "path": "fixtures/mainnet/transaction.hex",
+      "upstream_path": "examples/mainnet-tx.hex",
+      "sha256": "a8e89cb90511d6bf54beb26eb73cd980e676301fea9ce3f7464fe79931c72e39"
+    },
+    {
+      "path": "fixtures/negative/tampered-ock.json",
+      "upstream_path": "examples/rooms/zechub-demo/receipts/mainnet-receipt-tampered.json",
+      "sha256": "57025034d2d5e54e7dddd4a0f83d25ac6592e39bc1afc0bac32eb0e751ea0ca2"
+    },
+    {
+      "path": "third_party/glasspane/LICENSE",
+      "upstream_path": "LICENSE",
+      "sha256": "44f231cab575574d56d6382686ffa28d88d3331352cde5cc45a7e651995feb25"
+    }
+  ],
+  "chain_observation": {
+    "state": "UNAVAILABLE",
+    "source": "bundled upstream fixture",
+    "note": "No live chain inclusion or confirmation check is performed."
+  },
+  "expected": {
+    "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+    "pool": "orchard",
+    "output_index": 1,
+    "amount_zat": 100000,
+    "memo_text": "glasspane first receipt",
+    "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu"
+  }
+}

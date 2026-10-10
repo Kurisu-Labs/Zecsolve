@@ -1,0 +1,33 @@
+name: zecsolve
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: zecsolve
+      POSTGRES_PASSWORD: zecsolve
+      POSTGRES_DB: zecsolve
+    ports:
+      - "127.0.0.1:54329:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zecsolve -d zecsolve"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+  api:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    environment:
+      ZECSOLVE_DATABASE_URL: postgresql+psycopg://zecsolve:zecsolve@db:5432/zecsolve
+      ZECSOLVE_VERIFIER_PATH: /usr/local/bin/zecsolve-verifier
+      ZECSOLVE_POC_TOKEN: ${ZECSOLVE_POC_TOKEN:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["sh", "-c", "alembic upgrade head && exec uvicorn zecsolve.main:app --host 0.0.0.0 --port 8000 --no-access-log"]
+volumes:
+  postgres_data:
