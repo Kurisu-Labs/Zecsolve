@@ -119,6 +119,8 @@ These are suggested teammate boundaries; no teammates have been assigned or mess
 
 ## Before handing off a change
 
+Follow [CONTRIBUTING.md](CONTRIBUTING.md) from the start of each task: inspect active branches/PRs, publish a clearly named task branch before implementation, and push progress on that branch. Open a PR when the task is complete; review and merge it into `main`, then delete the merged branch. Coordinate overlapping scope before editing shared code.
+
 Run `make test` and `make lint`. Run `make test-db` with a disposable PostgreSQL URL for model, migration, or allocation changes. Regenerate the schema with `make schema` after changing the verification contract. Check that exports/logs/errors do not expose tokens, wallet keys or unnecessary receipt content.
 
 Commit source and lockfiles, not `.env`, `.venv`, `.cache`, `target`, or real customer evidence. Fixtures in this repository are already-public upstream demo artifacts. The original specification files should remain reference inputs; document implementation changes here or in architecture notes.
