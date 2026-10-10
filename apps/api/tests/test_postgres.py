@@ -1,6 +1,5 @@
 """Run against PostgreSQL, with a fresh, randomly named schema per test."""
 
-import os
 import threading
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -11,7 +10,8 @@ from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.config import Config
 from alembic.migration import MigrationContext
-from sqlalchemy import create_engine, func, insert, select, text, update
+from alembic.script import ScriptDirectory
+from sqlalchemy import func, insert, select, text, update
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from zecsolve.db.models import (
     Base,
@@ -33,34 +33,6 @@ def migration_config(root, connection):
     config.set_main_option("script_location", str(root / "apps/api/migrations"))
     config.attributes["connection"] = connection
     return config
-
-
-@pytest.fixture
-def database(root):
-    url = os.getenv("ZECSOLVE_TEST_DATABASE_URL")
-    if not url:
-        pytest.skip("Set ZECSOLVE_TEST_DATABASE_URL to a disposable PostgreSQL database")
-    schema = "zecsolve_test_" + uuid.uuid4().hex
-    admin = create_engine(url, connect_args={"connect_timeout": 3})
-    with admin.begin() as connection:
-        connection.execute(text(f'CREATE SCHEMA "{schema}"'))
-    engine = create_engine(
-        url,
-        connect_args={
-            "options": f"-csearch_path={schema}",
-            "connect_timeout": 3,
-        },
-    )
-    try:
-        with engine.begin() as connection:
-            command.upgrade(migration_config(root, connection), "head")
-        yield engine
-    finally:
-        engine.dispose()
-        with admin.begin() as connection:
-            # Only the unique schema created by this test is dropped.
-            connection.execute(text(f'DROP SCHEMA "{schema}" CASCADE'))
-        admin.dispose()
 
 
 def seed(engine):
@@ -149,7 +121,8 @@ def test_migration_roundtrip_and_metadata(database, root):
         assert compare_metadata(MigrationContext.configure(connection), Base.metadata) == []
         command.downgrade(migration_config(root, connection), "base")
         command.upgrade(migration_config(root, connection), "head")
-        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0001"
+        head = ScriptDirectory.from_config(migration_config(root, connection)).get_current_head()
+        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == head
 
 
 def test_concurrent_output_claim_has_exactly_one_winner(database):

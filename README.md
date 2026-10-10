@@ -44,6 +44,7 @@ An existing PostgreSQL installation also works: create a dedicated database and 
 | `GET /health/live` | Process is running; does not claim dependencies are ready |
 | `GET /health/ready` | Checks migration revision and executable availability; returns 503 when incomplete |
 | `POST /api/poc/verify` | Bearer-token-protected, stateless verification of `receipt_json` and `raw_tx_hex` strings |
+| `GET /api/auth/me` | Returns merchant/credential IDs derived from an active merchant credential |
 | `GET /docs` | Interactive API contract; use **Authorize** to enter the POC token |
 
 Paste the contents of `fixtures/mainnet/receipt.json` into the `receipt_json` string and `fixtures/mainnet/transaction.hex` into `raw_tx_hex`. The endpoint accepts content, never server file paths or fetch URLs. It does not write evidence or recovered fields to the database.
@@ -55,6 +56,22 @@ docker compose up --build
 ```
 
 The backend image builds Rust in a separate stage, runs Python as an unprivileged user, and applies migrations before serving. Local ports bind only to loopback. Container runtime validation is separate from the native test suite.
+
+## Provision merchant identity
+
+The first M1 increment adds merchant credentials and an identity check. Apply migration `0002` with `make migrate`, then run the operator CLI from the repository root:
+
+```sh
+uv run --locked python -m zecsolve.auth.cli create-merchant --name "Demo merchant" --ttl-days 30
+uv run --locked python -m zecsolve.auth.cli issue-credential --merchant-id MERCHANT_UUID --ttl-days 30
+uv run --locked python -m zecsolve.auth.cli revoke-credential --credential-id CREDENTIAL_UUID
+```
+
+Creation/issuance returns one JSON object containing the merchant ID, credential ID, expiration time, and token after a successful commit. Save the token privately at that point; the database stores only its SHA-256 digest. Issuing a replacement does not revoke other credentials; explicitly revoke the old credential when rotating. Lifetimes range from 1 to 365 days, with a 30-day default.
+
+Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
+
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Merchant case endpoints, customer/reviewer grants, browser sessions, and private evidence storage remain future increments.
 
 ## Verify changes
 
@@ -73,9 +90,9 @@ ZECSOLVE_TEST_DATABASE_URL='postgresql+psycopg://zecsolve:zecsolve@127.0.0.1:543
 
 ## Current boundary
 
-Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migration; deterministic rule contracts; tests; development container configuration.
+Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials with expiry/revocation and identity endpoint; tests; development container configuration.
 
-Next: merchant/customer/reviewer authentication and permissions, case endpoints, private evidence storage, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
+Next: merchant-scoped case endpoints, customer/reviewer authentication and permissions, private evidence storage, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
 
 The current Rust wrapper accepts mainnet receipt v0 and v5 transaction branches NU5 through NU6.2. Orchard has a real historical fixture test. The Sapling recovery path uses the upstream library but does not yet have an end-to-end historical Sapling fixture in this repository. No Ironwood compatibility is claimed.
 

@@ -11,5 +11,6 @@ class Settings(BaseSettings):
         "postgresql+psycopg://zecsolve:zecsolve@127.0.0.1:54329/zecsolve"
     )
     poc_token: SecretStr = SecretStr("")
+    migrations_path: Path = Path("apps/api/migrations")
     verifier_path: Path = Path("target/debug/zecsolve-verifier")
     verifier_timeout_seconds: float = Field(default=10, gt=0, le=60)
