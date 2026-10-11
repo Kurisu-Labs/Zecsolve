@@ -13,7 +13,13 @@ from zecsolve.schemas.verification import Contract, HexDigest, VerificationRepor
 
 class UTCRecord(Contract):
     @field_validator(
-        "observed_at", "evaluated_at", "created_at", "generated_at", "at", check_fields=False
+        "observed_at",
+        "evaluated_at",
+        "created_at",
+        "generated_at",
+        "at",
+        "approved_at",
+        check_fields=False,
     )
     @classmethod
     def utc_time(cls, value):
@@ -141,7 +147,7 @@ class ClaimViewV1(UTCRecord):
     created_at: AwareDatetime
 
 
-class ResolutionViewV1(Contract):
+class ResolutionViewV1(UTCRecord):
     resolution_id: uuid.UUID
     outcome: str
     reason: str
