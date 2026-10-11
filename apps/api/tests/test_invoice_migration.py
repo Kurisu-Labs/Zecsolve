@@ -96,3 +96,25 @@ def test_invoice_cannot_reference_foreign_policy(database):
                     **legacy_invoice(second, uuid.uuid4()), policy_id=policy, snapshot_version="1"
                 )
             )
+
+
+def test_downgrade_refuses_to_erase_policy_evidence(database, root):
+    from zecsolve.db.models import InvoicePolicy
+
+    merchant, invoice, policy = uuid.uuid4(), uuid.uuid4(), uuid.uuid4()
+    with database.begin() as connection:
+        connection.execute(insert(Merchant).values(id=merchant, name="Owner"))
+        connection.execute(insert(InvoicePolicy).values(id=policy, merchant_id=merchant, config={}))
+        connection.execute(
+            insert(Invoice).values(
+                **legacy_invoice(merchant, invoice), policy_id=policy, snapshot_version="1"
+            )
+        )
+    config = Config(str(root / "alembic.ini"))
+    config.set_main_option("script_location", str(root / "apps/api/migrations"))
+    with pytest.raises(RuntimeError, match="forward migration"):
+        with database.begin() as connection:
+            config.attributes["connection"] = connection
+            command.downgrade(config, "0002")
+    with database.connect() as connection:
+        assert connection.scalar(select(Invoice.policy_id).where(Invoice.id == invoice)) == policy
