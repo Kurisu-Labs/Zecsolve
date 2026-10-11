@@ -12,7 +12,9 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from zecsolve import __version__
+from zecsolve.adapters.address import AddressNormalizer
 from zecsolve.adapters.verifier import VerifierAdapter
+from zecsolve.api.invoices import router as invoice_router
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
 from zecsolve.config import Settings
@@ -65,6 +67,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="zecsolve", version=__version__, lifespan=lifespan)
     app.state.engine = engine
+    app.state.normalizer = AddressNormalizer(
+        settings.verifier_path, settings.verifier_timeout_seconds
+    )
+    app.state.verifier_slots = slots
+    app.include_router(invoice_router)
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 

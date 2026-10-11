@@ -21,10 +21,10 @@ The originals were relocated without rewriting their contents. In particular, en
 | Area | Implemented now | Still needed |
 |---|---|---|
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
-| API | Health, readiness, token-protected stateless POC verification | Case/invoice/claim/evidence/resolve/export endpoints |
-| Database | Models, migration, output uniqueness, immutable records | Transactional workflow services, access grants, idempotency records |
-| Rules | Aggregate approved balances, candidate projection, mismatch and conflict findings | Persisted versioned policy, integration with real allocations and chain observations |
-| Access | Development POC token; operator-provisioned expiring/revocable merchant credentials and identity endpoint | Merchant-scoped workflow authorization, customer submission grants, reviewer consent and scoped evidence permissions |
+| API | Health, readiness, token-protected stateless POC verification, merchant invoice create/read | Case/claim/evidence/resolve/export endpoints |
+| Database | Models, migrations, output uniqueness, immutable invoice/policy snapshots, atomic invoice retries | Case/evidence/resolution services, access grants, broader workflow idempotency |
+| Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Integrate the stored policy with real allocations and chain observations |
+| Access | Development POC token; expiring/revocable merchant credentials, identity endpoint, owned invoice create/read | Merchant-scoped case authorization, customer submission grants, reviewer consent and scoped evidence permissions |
 | Frontend | Planned Vue 3 + TypeScript + Tailwind architecture | Dashboard, customer submission and reviewer report |
 | Export | Versioned verifier result and fixture manifest | Complete replayable case packet |
 
@@ -40,6 +40,8 @@ The POC runs without PostgreSQL; readiness requires a migrated database. Databas
 | `apps/api/src/zecsolve/main.py` | FastAPI assembly, POC authentication, health endpoints, request limit and concurrency bound |
 | `apps/api/src/zecsolve/config.py` | Typed environment settings; secret values use `SecretStr` |
 | `apps/api/src/zecsolve/auth/` | Merchant credential issuance/revocation CLI and server-derived authentication dependency |
+| `apps/api/src/zecsolve/api/invoices.py`, `services/invoices.py` | Merchant-owned invoice routes, atomic snapshot creation, and idempotent retries |
+| `apps/api/src/zecsolve/domain/snapshots.py` | Versioned deterministic serialization and invoice snapshot hashes |
 | `crates/zecsolve-verifier/src/address.rs`, `src/normalize_cli.rs` | Mainnet shielded receiver decoding/validation and bounded normalization CLI |
 | `apps/api/src/zecsolve/adapters/address.py`, `schemas/address.py` | Python normalizer adapter and versioned request/result contracts |
 | `apps/api/src/zecsolve/adapters/process.py` | Shared subprocess timeout, output cap, and environment isolation |
@@ -112,7 +114,7 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 
 | Work stream | First deliverable | Integration boundary |
 |---|---|---|
-| Backend workflow | Invoice snapshot creation, case ownership, evidence references and persisted verification attempts | FastAPI schemas + application services; no business logic in route handlers |
+| Backend workflow | Case ownership over the existing invoice snapshots, evidence references and persisted verification attempts | FastAPI schemas + application services; no business logic in route handlers |
 | Resolution and access | Integrate the merchant dependency, add scoped grants, idempotency and atomic allocation | PostgreSQL constraints and pure rules; avoid accepting actor/merchant identity from arbitrary request fields |
 | Frontend | Vue shell and the four independent status/balance displays | Generate TypeScript types from OpenAPI; work against explicit fixtures until routes exist |
 | Evidence and export | Authorized private storage and a packet containing snapshot, receipt, raw tx, provenance, versions and decision | Preserve original bytes; disclose only authorized case evidence |

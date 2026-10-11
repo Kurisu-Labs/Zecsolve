@@ -1,4 +1,4 @@
-"""Foundation schema. Case services and merchant authorization arrive in the next milestone."""
+"""Foundation and merchant invoice snapshots; case workflow services are the next increment."""
 
 import uuid
 from datetime import datetime
@@ -41,6 +41,7 @@ class Merchant(Identified, Timestamped, Base):
 class MerchantCredential(Identified, Timestamped, Base):
     __tablename__ = "merchant_credentials"
     __table_args__ = (
+        UniqueConstraint("id", "merchant_id", name="uq_credential_merchant"),
         UniqueConstraint("token_sha256", name="uq_merchant_credential_token"),
         CheckConstraint("token_sha256 ~ '^[0-9a-f]{64}$'", name="ck_credential_digest"),
         CheckConstraint("expires_at > created_at", name="ck_credential_expiry"),
@@ -51,9 +52,21 @@ class MerchantCredential(Identified, Timestamped, Base):
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class InvoicePolicy(Identified, Timestamped, Base):
+    __tablename__ = "invoice_policies"
+    __table_args__ = (UniqueConstraint("id", "merchant_id", name="uq_policy_merchant"),)
+    merchant_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("merchants.id"))
+    config: Mapped[dict] = mapped_column(JSON)
+
+
 class Invoice(Identified, Timestamped, Base):
     __tablename__ = "invoices"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["policy_id", "merchant_id"],
+            ["invoice_policies.id", "invoice_policies.merchant_id"],
+            name="fk_invoice_policy_merchant",
+        ),
         UniqueConstraint("id", "merchant_id", name="uq_invoice_merchant"),
         CheckConstraint(
             "expected_zat > 0 AND expected_zat <= 2100000000000000", name="ck_invoice_amount"
@@ -71,6 +84,35 @@ class Invoice(Identified, Timestamped, Base):
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     snapshot_hash: Mapped[str] = mapped_column(String(64))
     policy_version: Mapped[str] = mapped_column(String(40))
+    # Null only for historical snapshots; never infer a policy for those rows.
+    policy_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    snapshot_version: Mapped[str | None] = mapped_column(String(16))
+    expected_memo_text: Mapped[str | None] = mapped_column(Text)
+
+
+class InvoiceCreationRequest(Identified, Timestamped, Base):
+    __tablename__ = "invoice_creation_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id", "credential_id", "idempotency_key", name="uq_invoice_creation_key"
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_invoice_request_credential",
+        ),
+        ForeignKeyConstraint(
+            ["invoice_id", "merchant_id"],
+            ["invoices.id", "invoices.merchant_id"],
+            name="fk_invoice_request_owner",
+        ),
+        CheckConstraint("request_hash ~ '^[0-9a-f]{64}$'", name="ck_invoice_request_hash"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_hash: Mapped[str] = mapped_column(String(64))
+    invoice_id: Mapped[uuid.UUID] = mapped_column(Uuid)
 
 
 class Case(Identified, Timestamped, Base):
