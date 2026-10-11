@@ -90,7 +90,7 @@ def upgrade():
             "FOR EACH ROW EXECUTE FUNCTION zecsolve_reject_mutation()"
         )
     op.execute(
-        "CREATE TRIGGER immutable_content BEFORE UPDATE ON evidence_contents "
+        "CREATE TRIGGER immutable_content BEFORE UPDATE OR DELETE ON evidence_contents "
         "FOR EACH ROW EXECUTE FUNCTION zecsolve_reject_mutation()"
     )
 

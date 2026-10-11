@@ -185,3 +185,73 @@ def test_failed_commit_rolls_back_ciphertext_metadata_version_and_event(database
     assert counts(database) == [0, 0, 0, 1]
     with Session(database) as session:
         assert session.get(Case, case.case_id).version == 1
+
+
+def test_ciphertext_and_nonce_reservation_cannot_be_deleted(database, evidence_setup):
+    from sqlalchemy.exc import DBAPIError
+
+    service, principal, case, request = evidence_setup
+    stored, _ = service.submit(principal, case.case_id, request, "upload")
+    for operation in [
+        EvidenceContent.__table__.delete().where(EvidenceContent.evidence_id == stored.evidence_id),
+        Evidence.__table__.delete().where(Evidence.id == stored.evidence_id),
+    ]:
+        with pytest.raises(DBAPIError, match="immutable record"):
+            with database.begin() as connection:
+                connection.execute(operation)
+
+
+def test_nonce_collision_rolls_back_all_submission_side_effects(
+    database, evidence_setup, monkeypatch
+):
+    service, principal, case, request = evidence_setup
+    real_random = os.urandom
+    monkeypatch.setattr(
+        "zecsolve.adapters.evidence_crypto.os.urandom",
+        lambda size: bytes(12) if size == 12 else real_random(size),
+    )
+    service.submit(principal, case.case_id, request, "first")
+    with pytest.raises(WorkflowError) as error:
+        service.submit(principal, case.case_id, request, "second")
+    assert error.value.status == 409
+    assert counts(database) == [1, 1, 1, 2]
+    with Session(database) as session:
+        assert session.get(Case, case.case_id).version == 2
+
+
+def test_tampered_ciphertext_is_rejected_without_returning_content(database, evidence_setup):
+    service, principal, case, request = evidence_setup
+    stored, _ = service.submit(principal, case.case_id, request, "upload")
+    # Simulate corrupted storage through the test database administrator, not an API mutation.
+    with database.begin() as connection:
+        connection.execute(text("ALTER TABLE evidence_contents DISABLE TRIGGER immutable_content"))
+        raw = connection.scalar(
+            select(EvidenceContent.ciphertext).where(
+                EvidenceContent.evidence_id == stored.evidence_id
+            )
+        )
+        connection.execute(
+            update(EvidenceContent)
+            .where(EvidenceContent.evidence_id == stored.evidence_id)
+            .values(ciphertext=bytes([raw[0] ^ 1]) + raw[1:])
+        )
+        connection.execute(text("ALTER TABLE evidence_contents ENABLE TRIGGER immutable_content"))
+    with pytest.raises(WorkflowError) as error:
+        service.read_content(principal, case.case_id, stored.evidence_id)
+    assert (error.value.status, error.value.code) == (409, "EVIDENCE_INTEGRITY_ERROR")
+
+
+def test_revocation_during_decryption_prevents_plaintext_return(database, evidence_setup):
+    service, principal, case, request = evidence_setup
+    stored, _ = service.submit(principal, case.case_id, request, "upload")
+    decrypt = service.cipher.decrypt
+
+    def revoke_then_decrypt(*args, **kwargs):
+        with Session(database) as session, session.begin():
+            revoke_credential(session, principal.credential_id)
+        return decrypt(*args, **kwargs)
+
+    service.cipher.decrypt = revoke_then_decrypt
+    with pytest.raises(WorkflowError) as error:
+        service.read_content(principal, case.case_id, stored.evidence_id)
+    assert error.value.status == 401
