@@ -44,3 +44,11 @@ def test_evidence_event_continues_hash_chain_and_binds_case_version():
         validate_event_chain([first, second], uuid.uuid4(), 2)
     with pytest.raises(ValueError):
         validate_event_chain([first, second], case, 3)
+
+    from pydantic import ValidationError
+
+    for invalid in (None, 7, [], {}):
+        with pytest.raises(ValidationError):
+            type(second).model_validate(
+                {**second.model_dump(), "payload": {**second.payload, "evidence_id": invalid}}
+            )

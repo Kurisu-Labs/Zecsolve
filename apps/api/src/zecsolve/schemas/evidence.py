@@ -88,6 +88,8 @@ class EvidenceSubmittedEventV1(Contract):
     def submission_references_only(cls, value):
         if set(value) != {"evidence_id", "payload_sha256", "case_version", "case_state"}:
             raise ValueError("Invalid evidence audit payload")
+        if not isinstance(value["evidence_id"], str):
+            raise ValueError("Invalid evidence reference")
         uuid.UUID(value["evidence_id"])
         checksum = value["payload_sha256"]
         if (
