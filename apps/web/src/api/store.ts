@@ -15,6 +15,7 @@ import {
   type DemoCase,
 } from './fixtures'
 import { evaluate } from './rules'
+import { approvalState, latestObservation } from './workflow'
 import type { CaseReport, CaseState, ChainObservation, ResolveRequest, VerificationReport } from './types'
 
 export type Mode = 'demo' | 'live'
@@ -76,7 +77,7 @@ function demoCase(caseId: string): DemoCase {
 
 function summarize(report: CaseReport, title: string, customer: string): CaseListItem {
   const latest = report.verifications[report.verifications.length - 1]
-  const obs = report.chain_observations[report.chain_observations.length - 1]
+  const obs = latestObservation(report)
   const lastEvent = report.events[report.events.length - 1]
   return {
     caseId: report.case.case_id,
@@ -252,7 +253,7 @@ export const cases = {
     }
     const nextState: CaseState =
       request.action === 'APPROVE_OUTPUT'
-        ? 'RESOLVED'
+        ? approvalState(c.ledger.filter((a) => a.invoice_id === c.invoiceId).reduce((sum, a) => sum + a.amount_zat, 0), c.terms.expected_zat)
         : request.action === 'REQUEST_EVIDENCE'
           ? 'AWAITING_EVIDENCE'
           : request.action === 'CLOSE_UNRESOLVED'

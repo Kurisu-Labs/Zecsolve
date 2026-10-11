@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { approvalReady, decisionRequest, latestObservation } from '@/api/workflow'
 import { cases, session } from '@/api/store'
 import type { CaseReport, ResolveAction } from '@/api/types'
 import { formatZat } from '@/lib/money'
@@ -13,13 +14,11 @@ const actions: ResolveAction[] = ['APPROVE_OUTPUT', 'REQUEST_EVIDENCE', 'REJECT_
 const selected = computed(() =>
   props.report.verifications.find((v) => v.verification_id === props.report.selected_verification_id),
 )
-const observation = computed(() =>
-  [...props.report.chain_observations].reverse().find((o) => o.verification_id === selected.value?.verification_id),
-)
+const observation = computed(() => latestObservation(props.report))
 const closed = computed(() => props.report.case.state === 'RESOLVED' || props.report.case.state === 'CLOSED_UNRESOLVED')
-const eligible = computed(() => props.report.balances.eligible_for_credit === true)
+const eligible = computed(() => approvalReady(props.report, session.mode))
 const canRefreshChain = computed(
-  () => selected.value?.result.receipt_state === 'VALID' && observation.value?.state !== 'CONFIRMED' && !closed.value,
+  () => selected.value?.result.receipt_state === 'VALID',
 )
 
 const action = ref<ResolveAction>(eligible.value ? 'APPROVE_OUTPUT' : 'REQUEST_EVIDENCE')
@@ -34,6 +33,7 @@ watch(eligible, (now) => {
 
 function disabledReason(a: ResolveAction): string | null {
   if (a === 'APPROVE_OUTPUT' && !eligible.value) {
+    if (props.report.chain_review?.length) return 'An approved payment needs chain review.'
     if (!selected.value || selected.value.result.receipt_state !== 'VALID') return 'Needs a recovered output.'
     if (props.report.balances.findings.includes('DUPLICATE_CLAIM')) return 'This output already settled another invoice.'
     if (props.report.balances.findings.includes('ALREADY_ALLOCATED')) return 'Already credited to this invoice.'
@@ -64,12 +64,7 @@ async function decide() {
   busy.value = 'decide'
   error.value = null
   try {
-    await cases.resolve(props.report.case.case_id, {
-      action: action.value,
-      verification_id: selected.value?.verification_id ?? null,
-      expected_case_version: props.report.case.version,
-      reason: reason.value.trim(),
-    })
+    await cases.resolve(props.report.case.case_id, decisionRequest(props.report, action.value, reason.value))
     confirming.value = false
     reason.value = ''
     emit('changed', `${actionView[action.value].done}.`)
@@ -90,11 +85,9 @@ async function decide() {
       case to revisit it.
     </p>
 
-    <template v-else>
       <div v-if="canRefreshChain" class="chain">
         <p>
-          The receipt is valid, but nothing has confirmed the transaction on chain. Approval stays blocked until a trusted
-          source does.
+          Check the latest chain status. The server obtains a fresh observation and applies invoice policy before approving credit.
         </p>
         <button type="button" class="btn" :disabled="busy !== null" @click="refreshChain">
           {{ busy === 'chain' ? 'Checking chain…' : 'Check chain now' }}
@@ -102,6 +95,8 @@ async function decide() {
         <p v-if="session.mode === 'demo'" class="demo-note">Demo mode records a simulated confirmation, labelled as such.</p>
       </div>
 
+    <template v-if="!closed">
+      <p v-if="session.mode === 'live'">Approval requests are evaluated by the server; a recovered candidate is not approved credit.</p>
       <form class="form" @submit.prevent="confirming = true">
         <fieldset>
           <legend class="legend">Action</legend>
@@ -150,6 +145,7 @@ async function decide() {
       </form>
     </template>
 
+    <p v-if="observation" class="version">Latest observation: {{ observation.state }} · {{ observation.source }}</p>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
   </section>
 </template>

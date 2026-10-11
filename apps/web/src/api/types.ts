@@ -89,6 +89,7 @@ export interface ChainObservation {
   verification_id: string
   state: ChainState
   source: string
+  source_kind?: 'OFFLINE' | 'RPC' | 'SIMULATED'
   reason_code: string
   observed_at: string
   confirmations?: number | null
@@ -152,6 +153,8 @@ export interface CaseReport {
   evidence: EvidenceStored[]
   verifications: VerificationAttempt[]
   chain_observations: ChainObservation[]
+  decision_observations?: ChainObservation[]
+  chain_review?: { code: string; resolution_id: string; observation_id: string }[]
   selected_verification_id: string | null
   balances: Balances
   decisions?: ResolutionOutcome[]

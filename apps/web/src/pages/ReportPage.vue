@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { cases } from '@/api/store'
+import { latestObservation } from '@/api/workflow'
 import type { CaseReport } from '@/api/types'
 import { formatZat, formatZec } from '@/lib/money'
 import { actionView, caseStateLabel, chainView, findingView, formatWhen, memoPreview, receiptView } from '@/lib/status'
@@ -26,9 +27,8 @@ watch(
 const selected = computed(() =>
   report.value?.verifications.find((v) => v.verification_id === report.value?.selected_verification_id),
 )
-const observation = computed(() =>
-  [...(report.value?.chain_observations ?? [])].reverse().find((o) => o.verification_id === selected.value?.verification_id),
-)
+const observation = computed(() => report.value ? latestObservation(report.value) : undefined)
+const findingLabels = computed(() => report.value?.balances.findings.map((f) => findingView[f]?.label ?? f).join('; '))
 
 function download() {
   if (!report.value) return
@@ -47,7 +47,7 @@ function download() {
     <div class="toolbar shell">
       <RouterLink :to="`/cases/${id}`" class="btn btn-quiet">Back to case</RouterLink>
       <div class="row">
-        <button type="button" class="btn" @click="download">Download JSON packet</button>
+        <button type="button" class="btn" @click="download">Download report JSON</button>
         <button type="button" class="btn" onclick="window.print()">Print</button>
       </div>
     </div>
@@ -93,6 +93,7 @@ function download() {
         </dl>
       </section>
 
+      <p v-if="report.chain_review?.length" role="alert">An approved payment needs chain review. Historical credited balances remain unchanged.</p>
       <section>
         <h2>Balances</h2>
         <table>
@@ -103,7 +104,7 @@ function download() {
             <tr><th scope="row">Outstanding if approved</th><td class="mono">{{ formatZat(report.balances.projected_outstanding_zat) }}</td></tr>
           </tbody>
         </table>
-        <p class="small">All amounts in zatoshis. Rules {{ report.balances.rules_version }}. Findings: {{ report.balances.findings.map((f) => findingView[f].label).join('; ') }}.</p>
+        <p class="small">All amounts in zatoshis. Rules {{ report.balances.rules_version }}. Findings: {{ findingLabels }}.</p>
       </section>
 
       <section>

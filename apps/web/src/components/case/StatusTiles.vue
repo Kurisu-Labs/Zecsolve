@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { latestObservation } from '@/api/workflow'
 import type { CaseReport } from '@/api/types'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import { actionView, chainView, receiptView, shortHash } from '@/lib/status'
@@ -11,10 +12,7 @@ const selected = computed(() =>
   props.report.verifications.find((v) => v.verification_id === props.report.selected_verification_id),
 )
 const receipt = computed(() => receiptView[selected.value?.result.receipt_state ?? 'NONE'])
-const observation = computed(() => {
-  const id = selected.value?.verification_id
-  return [...props.report.chain_observations].reverse().find((o) => o.verification_id === id)
-})
+const observation = computed(() => latestObservation(props.report))
 const chain = computed(() => chainView[observation.value?.state ?? 'UNAVAILABLE'])
 const claim = computed(() => props.report.claims[0])
 const decision = computed(() => {
@@ -50,6 +48,8 @@ const decision = computed(() => {
       <StatusBadge :label="chain.label" :tone="chain.tone" :glyph="chain.glyph" />
       <p class="detail">{{ chain.detail }}</p>
       <p v-if="observation" class="meta">{{ observation.source }}</p>
+      <p v-if="report.chain_review?.length" role="alert">An approved payment needs chain review. Its historical credit has not been reversed.</p>
+      <p v-if="observation" class="meta">{{ observation.observed_at }} · {{ observation.confirmations ?? 'Unknown' }} confirmations</p>
       <p class="scope">What a named source reported, and when. Not the business decision.</p>
     </article>
 
