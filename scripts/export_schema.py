@@ -26,6 +26,7 @@ from zecsolve.schemas.resolution import (
     ResolutionOutcomeV1,
     ResolveRequest,
 )
+from zecsolve.schemas.session import SessionExchangeRequest, SessionInfoV1
 from zecsolve.schemas.verification import VerificationReport
 from zecsolve.schemas.workflow_verification import (
     CaseReportV1,
@@ -40,6 +41,8 @@ for name, model in (
     ("grant-create-request", GrantCreateRequest),
     ("grant-created", GrantCreatedV1),
     ("grant-list", GrantListV1),
+    ("session-exchange-request", SessionExchangeRequest),
+    ("session-info", SessionInfoV1),
     ("verifier-result", VerificationReport),
     ("normalize-address-request", NormalizeAddressRequest),
     ("normalize-address-result", AddressNormalizationReport),

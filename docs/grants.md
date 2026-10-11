@@ -28,6 +28,6 @@ Absent/invalid merchant credentials return 401; inaccessible cases/grants/eviden
 
 Creation holds the credential lock, then the owned case lock to serialize retry keys, and rechecks credential validity after waits and before commit. Grant/selection/retry rows commit together. Revoke locks the owned grant and preserves the first revocation time. Existing immutable/revoke-only database controls remain active.
 
-Person 1 next supplies secure browser sessions. Person 2 must enforce [access.md](access.md) section/evidence/export selections in explicit projections; a grant does not make the existing merchant report publicly readable. Person 3 supplies scoped customer submission and consent. This increment exposes no customer/reviewer data routes and no frontend changes.
+Person 1 now supplies [secure browser sessions](sessions.md). Person 2 must enforce [access.md](access.md) section/evidence/export selections in explicit projections; a grant does not make the existing merchant report publicly readable. Person 3 supplies scoped customer submission and consent. This increment exposes no customer/reviewer data routes and no frontend changes.
 
 Published schemas: [create request](../contracts/grant-create-request.schema.json), [creation result](../contracts/grant-created.schema.json), and [metadata list](../contracts/grant-list.schema.json).
