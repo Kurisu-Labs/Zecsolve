@@ -6,6 +6,7 @@ from zecsolve.domain.events import validate_event_chain
 from zecsolve.schemas.case import CaseOpeningEventV1
 from zecsolve.schemas.evidence import EvidenceSubmittedEventV1
 from zecsolve.schemas.resolution import ResolutionEventV1
+from zecsolve.schemas.submission import SubmissionEventV2
 from zecsolve.schemas.workflow_verification import VerificationEventV1
 from zecsolve.services.workflow import WorkflowError
 
@@ -22,6 +23,11 @@ def load_event_chain(session, case):
                 "VERIFICATION_RECORDED": VerificationEventV1,
                 "RESOLUTION_RECORDED": ResolutionEventV1,
             }.get(row.action)
+            if row.schema_version == "2" and row.action in (
+                "CLAIM_SUBMITTED",
+                "EVIDENCE_SUBMITTED",
+            ):
+                model = SubmissionEventV2
             if model is None:
                 raise ValueError("Unsupported audit event")
             events.append(

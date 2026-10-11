@@ -7,23 +7,34 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
 from zecsolve.adapters.evidence_crypto import EncryptedEvidence, EvidenceEncryptionError
+from zecsolve.auth.access import authorize_case_access
+from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.db.models import (
-    Case,
+    AccessSubmissionRequest,
     CaseEvent,
     Evidence,
+    EvidenceConsent,
     EvidenceContent,
     EvidenceSubmissionRequest,
-    Invoice,
 )
-from zecsolve.domain.events import submission_event
+from zecsolve.domain.events import scoped_submission_event, submission_event
 from zecsolve.domain.snapshots import canonical_bytes
 from zecsolve.schemas.evidence import (
     MAX_EVIDENCE_PAYLOAD_BYTES,
     EvidenceStoredV1,
+    EvidenceStoredV2,
     EvidenceSubmitRequest,
+    EvidenceSubmitRequestV2,
 )
 from zecsolve.services.audit import load_event_chain
 from zecsolve.services.cases import CaseService, load_owned_case
+from zecsolve.services.submissions import (
+    actor_columns,
+    actor_name,
+    find_submission,
+    lock_submission_case,
+    validate_claim_link,
+)
 from zecsolve.services.workflow import (
     WorkflowError,
     authorize_merchant,
@@ -47,10 +58,11 @@ def read_evidence_metadata(session, principal, case_id, evidence_id):
     )
     if row is None:
         raise WorkflowError(404, "EVIDENCE_NOT_FOUND")
-    if row.bundle_version != "1" or row.bundle_metadata is None:
+    if row.bundle_version not in ("1", "2") or row.bundle_metadata is None:
         raise WorkflowError(409, "LEGACY_EVIDENCE_UNAVAILABLE")
     try:
-        metadata = EvidenceStoredV1.model_validate(row.bundle_metadata)
+        model = EvidenceStoredV1 if row.bundle_version == "1" else EvidenceStoredV2
+        metadata = model.model_validate(row.bundle_metadata)
     except ValidationError:
         raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE") from None
     if (
@@ -60,6 +72,34 @@ def read_evidence_metadata(session, principal, case_id, evidence_id):
         metadata.submitted_by,
         metadata.payload_sha256,
     ) != (row.id, row.case_id, row.merchant_id, row.submitted_by, row.sha256):
+        raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE")
+    if isinstance(metadata, EvidenceStoredV2):
+        consent = session.get(EvidenceConsent, metadata.consent_id)
+        if consent is None or (
+            consent.evidence_id,
+            consent.case_id,
+            consent.merchant_id,
+            consent.credential_id,
+            consent.grant_id,
+            consent.disclosure_version,
+            consent.processing_authorized,
+            consent.share_with_reviewers,
+            consent.created_at,
+            row.actor_grant_id,
+        ) != (
+            row.id,
+            row.case_id,
+            row.merchant_id,
+            metadata.submitted_by,
+            metadata.actor_grant_id,
+            metadata.disclosure_version,
+            metadata.processing_authorized,
+            metadata.share_with_reviewers,
+            metadata.submitted_at,
+            metadata.actor_grant_id,
+        ):
+            raise WorkflowError(409, "EVIDENCE_CONSENT_UNAVAILABLE")
+    elif row.actor_grant_id is not None:
         raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE")
     return metadata
 
@@ -90,20 +130,30 @@ class EvidenceService:
         return read_evidence_metadata(session, principal, case_id, evidence_id)
 
     def replay(self, session, principal, case_id, key, request_hash):
-        record = session.scalar(
-            select(EvidenceSubmissionRequest).where(
-                EvidenceSubmissionRequest.merchant_id == principal.merchant_id,
-                EvidenceSubmissionRequest.credential_id == principal.credential_id,
-                EvidenceSubmissionRequest.case_id == case_id,
-                EvidenceSubmissionRequest.idempotency_key == key,
+        record = find_submission(session, principal, case_id, "evidence", key, request_hash)
+        if isinstance(principal, MerchantPrincipal):
+            legacy = session.scalar(
+                select(EvidenceSubmissionRequest).where(
+                    EvidenceSubmissionRequest.merchant_id == principal.merchant_id,
+                    EvidenceSubmissionRequest.credential_id == principal.credential_id,
+                    EvidenceSubmissionRequest.case_id == case_id,
+                    EvidenceSubmissionRequest.idempotency_key == key,
+                )
             )
-        )
+            if legacy is not None:
+                if record is not None:
+                    raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE")
+                record = legacy
         if record is None:
             return None
         if record.request_hash != request_hash:
             raise WorkflowError(409, "IDEMPOTENCY_CONFLICT")
         result = self.metadata(session, principal, case_id, record.evidence_id)
-        if result.event_id != record.event_id:
+        if (
+            result.event_id != record.event_id
+            or result.submitted_by != getattr(principal, "credential_id", None)
+            or getattr(result, "actor_grant_id", None) != getattr(principal, "grant_id", None)
+        ):
             raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE")
         return result
 
@@ -128,13 +178,33 @@ class EvidenceService:
                 sealed, merchant_id=principal.merchant_id, case_id=case_id, evidence_id=evidence_id
             )
         try:
-            request = EvidenceSubmitRequest.model_validate_json(plaintext)
+            model = (
+                EvidenceSubmitRequestV2
+                if isinstance(metadata, EvidenceStoredV2)
+                else EvidenceSubmitRequest
+            )
+            request = model.model_validate_json(plaintext)
         except ValueError:
             raise WorkflowError(409, "EVIDENCE_INTEGRITY_ERROR") from None
         if (
             hashlib.sha256(plaintext).hexdigest() != metadata.payload_sha256
             or content_hash(request.receipt_json) != metadata.receipt_sha256
             or content_hash(request.raw_tx_hex) != metadata.raw_tx_hex_sha256
+            or (
+                request.source,
+                request.source_kind,
+                request.disclosure_version,
+                request.processing_authorized,
+                request.share_with_reviewers,
+            )
+            != (
+                metadata.source,
+                metadata.source_kind,
+                metadata.disclosure_version,
+                metadata.processing_authorized,
+                metadata.share_with_reviewers,
+            )
+            or getattr(request, "claim_id", None) != getattr(metadata, "claim_id", None)
         ):
             raise WorkflowError(409, "EVIDENCE_INTEGRITY_ERROR")
         with transaction(self.engine) as session:
@@ -152,9 +222,14 @@ class EvidenceService:
             authorize_merchant(session, principal)
         return request
 
-    def submit(self, principal, case_id, request: EvidenceSubmitRequest, key):
+    def submit(
+        self, principal, case_id, request: EvidenceSubmitRequest | EvidenceSubmitRequestV2, key
+    ):
+        scoped = isinstance(request, EvidenceSubmitRequestV2)
         with transaction(self.engine) as session:
-            authorize_merchant(session, principal)
+            authorize_case_access(session, principal, case_id, "evidence:submit")
+            if not isinstance(principal, MerchantPrincipal) and not scoped:
+                raise WorkflowError(422, "CUSTOMER_DISCLOSURE_REQUIRED")
             key = validate_idempotency_key(key)
             payload = canonical_bytes(request.model_dump(mode="json"))
             if len(payload) > MAX_EVIDENCE_PAYLOAD_BYTES:
@@ -162,12 +237,13 @@ class EvidenceService:
             request_hash = hashlib.sha256(payload).hexdigest()
             previous = self.replay(session, principal, case_id, key, request_hash)
             if previous is not None:
-                authorize_merchant(session, principal)
+                authorize_case_access(session, principal, case_id, "evidence:submit")
                 return previous, True
             case = self.cases.load(session, principal, case_id)
+            validate_claim_link(session, principal, case_id, getattr(request, "claim_id", None))
             if case.state in ("RESOLVED", "CLOSED_UNRESOLVED"):
                 raise WorkflowError(409, "CASE_TERMINAL")
-            authorize_merchant(session, principal)
+            authorize_case_access(session, principal, case_id, "evidence:submit")
         identity = uuid.uuid4()
         with self.crypto_slot():
             sealed = self.cipher.encrypt(
@@ -175,36 +251,16 @@ class EvidenceService:
             )
         try:
             with transaction(self.engine) as session:
-                authorize_merchant(session, principal)
+                authorize_case_access(session, principal, case_id, "evidence:submit")
                 previous = self.replay(session, principal, case_id, key, request_hash)
                 if previous is not None:
-                    authorize_merchant(session, principal)
+                    authorize_case_access(session, principal, case_id, "evidence:submit")
                     return previous, True
-                case = self.cases.load(session, principal, case_id)
-                invoice = session.scalar(
-                    select(Invoice)
-                    .where(
-                        Invoice.id == case.invoice_id, Invoice.merchant_id == principal.merchant_id
-                    )
-                    .with_for_update()
-                )
-                case = session.scalar(
-                    select(Case)
-                    .where(Case.id == case_id, Case.merchant_id == principal.merchant_id)
-                    .with_for_update()
-                    .execution_options(populate_existing=True)
-                )
-                authorize_merchant(session, principal)
-                if (
-                    case is None
-                    or invoice is None
-                    or case.invoice_id != invoice.id
-                    or case.workflow_version != "1"
-                ):
-                    raise WorkflowError(409, "CASE_CONTEXT_UNAVAILABLE")
+                case = lock_submission_case(session, principal, case_id, "evidence:submit")
+                validate_claim_link(session, principal, case_id, getattr(request, "claim_id", None))
                 previous = self.replay(session, principal, case_id, key, request_hash)
                 if previous is not None:
-                    authorize_merchant(session, principal)
+                    authorize_case_access(session, principal, case_id, "evidence:submit")
                     return previous, True
                 if case.state in ("RESOLVED", "CLOSED_UNRESOLVED"):
                     raise WorkflowError(409, "CASE_TERMINAL")
@@ -217,29 +273,60 @@ class EvidenceService:
                         else "AWAITING_EVIDENCE"
                     )
                 now = session.scalar(select(func.clock_timestamp()))
-                event = submission_event(
-                    event_id=uuid.uuid4(),
-                    case_id=case_id,
-                    credential_id=principal.credential_id,
-                    evidence_id=identity,
-                    payload_sha256=request_hash,
-                    sequence=case.version,
-                    case_version=case.version,
-                    case_state=case.state,
-                    previous_hash=events[-1].event_hash,
-                    at=now,
+                consent_id = uuid.uuid4() if scoped else None
+                if scoped:
+                    event = scoped_submission_event(
+                        event_id=uuid.uuid4(),
+                        case_id=case_id,
+                        actor=actor_name(principal),
+                        action="EVIDENCE_SUBMITTED",
+                        sequence=case.version,
+                        at=now,
+                        previous_hash=events[-1].event_hash,
+                        payload={
+                            "evidence_id": str(identity),
+                            "payload_sha256": request_hash,
+                            "consent_id": str(consent_id),
+                            "claim_id": str(request.claim_id) if request.claim_id else None,
+                            "case_version": case.version,
+                            "case_state": case.state,
+                        },
+                    )
+                else:
+                    event = submission_event(
+                        event_id=uuid.uuid4(),
+                        case_id=case_id,
+                        credential_id=principal.credential_id,
+                        evidence_id=identity,
+                        payload_sha256=request_hash,
+                        sequence=case.version,
+                        case_version=case.version,
+                        case_state=case.state,
+                        previous_hash=events[-1].event_hash,
+                        at=now,
+                    )
+                model = EvidenceStoredV2 if scoped else EvidenceStoredV1
+                extra = (
+                    {
+                        "actor_grant_id": getattr(principal, "grant_id", None),
+                        "consent_id": consent_id,
+                        "claim_id": request.claim_id,
+                    }
+                    if scoped
+                    else {}
                 )
-                metadata = EvidenceStoredV1(
+                metadata = model(
+                    **extra,
                     evidence_id=identity,
                     case_id=case_id,
                     merchant_id=principal.merchant_id,
-                    submitted_by=principal.credential_id,
+                    submitted_by=getattr(principal, "credential_id", None),
                     submitted_at=now,
                     source=request.source,
                     source_kind=request.source_kind,
                     disclosure_version=request.disclosure_version,
                     processing_authorized=request.processing_authorized,
-                    share_with_reviewers=False,
+                    share_with_reviewers=request.share_with_reviewers,
                     receipt_sha256=content_hash(request.receipt_json),
                     raw_tx_hex_sha256=content_hash(request.raw_tx_hex),
                     payload_sha256=request_hash,
@@ -252,12 +339,13 @@ class EvidenceService:
                         id=identity,
                         case_id=case_id,
                         merchant_id=principal.merchant_id,
-                        submitted_by=principal.credential_id,
+                        submitted_by=getattr(principal, "credential_id", None),
                         type="encrypted_bundle",
                         source=request.source,
                         sha256=request_hash,
                         storage_ref=f"db:aesgcm:{identity}",
-                        bundle_version="1",
+                        actor_grant_id=getattr(principal, "grant_id", None),
+                        bundle_version=metadata.schema_version,
                         bundle_metadata=metadata.model_dump(mode="json"),
                         created_at=now,
                     )
@@ -283,34 +371,65 @@ class EvidenceService:
                         payload_hash=event.payload_hash,
                         previous_hash=event.previous_hash,
                         event_hash=event.event_hash,
-                        schema_version="1",
+                        schema_version=event.schema_version,
                     )
                 )
                 session.flush()
-                session.add(
-                    EvidenceSubmissionRequest(
-                        merchant_id=principal.merchant_id,
-                        credential_id=principal.credential_id,
-                        case_id=case_id,
-                        idempotency_key=key,
-                        request_hash=request_hash,
-                        evidence_id=identity,
-                        event_id=event.event_id,
+                if scoped:
+                    session.add(
+                        EvidenceConsent(
+                            id=consent_id,
+                            merchant_id=principal.merchant_id,
+                            case_id=case_id,
+                            evidence_id=identity,
+                            **actor_columns(principal),
+                            disclosure_version=request.disclosure_version,
+                            processing_authorized=True,
+                            share_with_reviewers=request.share_with_reviewers,
+                            created_at=now,
+                        )
                     )
-                )
+                    session.add(
+                        AccessSubmissionRequest(
+                            merchant_id=principal.merchant_id,
+                            case_id=case_id,
+                            **actor_columns(principal),
+                            operation="evidence",
+                            evidence_id=identity,
+                            event_id=event.event_id,
+                            idempotency_key=key,
+                            request_hash=request_hash,
+                        )
+                    )
+                else:
+                    session.add(
+                        EvidenceSubmissionRequest(
+                            merchant_id=principal.merchant_id,
+                            credential_id=principal.credential_id,
+                            case_id=case_id,
+                            idempotency_key=key,
+                            request_hash=request_hash,
+                            evidence_id=identity,
+                            event_id=event.event_id,
+                        )
+                    )
                 session.flush()
-                authorize_merchant(session, principal)
+                authorize_case_access(session, principal, case_id, "evidence:submit")
             return metadata, False
         except IntegrityError as error:
             constraint = getattr(getattr(error.orig, "diag", None), "constraint_name", None)
             if constraint == "uq_evidence_key_nonce":
                 raise WorkflowError(409, "RETRY_EVIDENCE_SUBMISSION") from None
-            if constraint != "uq_evidence_submission_key":
+            if constraint not in (
+                "uq_evidence_submission_key",
+                "uq_access_credential_retry",
+                "uq_access_grant_retry",
+            ):
                 raise
             with transaction(self.engine) as session:
-                authorize_merchant(session, principal)
+                authorize_case_access(session, principal, case_id, "evidence:submit")
                 previous = self.replay(session, principal, case_id, key, request_hash)
                 if previous is None:
                     raise WorkflowError(409, "RETRY_EVIDENCE_SUBMISSION") from None
-                authorize_merchant(session, principal)
+                authorize_case_access(session, principal, case_id, "evidence:submit")
                 return previous, True

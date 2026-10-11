@@ -85,3 +85,51 @@ def test_claim_defaults_and_minimal_acknowledgement():
         "submission_id",
         "accepted_at",
     }
+
+
+def test_scoped_audit_binds_actor_consent_and_legacy_history():
+    from zecsolve.domain.events import opening_event, scoped_submission_event, validate_event_chain
+    from zecsolve.schemas.submission import SubmissionEventV2
+
+    case = uuid.uuid4()
+    first = opening_event(
+        event_id=uuid.uuid4(),
+        case_id=case,
+        credential_id=uuid.uuid4(),
+        invoice_id=uuid.uuid4(),
+        invoice_snapshot_hash="ab" * 32,
+        policy_id=uuid.uuid4(),
+        at=datetime.now(UTC),
+    )
+    second = scoped_submission_event(
+        event_id=uuid.uuid4(),
+        case_id=case,
+        actor="grant:" + str(uuid.uuid4()),
+        action="CLAIM_SUBMITTED",
+        sequence=2,
+        at=datetime.now(UTC),
+        previous_hash=first.event_hash,
+        payload={
+            "claim_id": str(uuid.uuid4()),
+            "request_sha256": "cd" * 32,
+            "disclosure_version": "claim-disclosure-v1",
+            "processing_authorized": True,
+            "share_with_reviewers": False,
+            "case_version": 2,
+            "case_state": "OPEN",
+        },
+    )
+    validate_event_chain([first, second], case, 2)
+    for changed in (
+        second.model_copy(update={"actor": "credential:" + str(uuid.uuid4())}),
+        second.model_copy(update={"payload": {**second.payload, "share_with_reviewers": True}}),
+    ):
+        with pytest.raises(ValueError):
+            validate_event_chain([first, changed], case, 2)
+    for change in (
+        {"schema_version": "3"},
+        {"payload": {**second.payload, "note": "private"}},
+        {"payload": {**second.payload, "case_version": 3}},
+    ):
+        with pytest.raises(ValidationError):
+            SubmissionEventV2.model_validate({**second.model_dump(), **change})

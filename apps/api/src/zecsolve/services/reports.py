@@ -34,7 +34,7 @@ class CaseReportService:
                 .where(Evidence.case_id == case_id)
                 .order_by(Evidence.created_at, Evidence.id)
             ):
-                if row.merchant_id != principal.merchant_id or row.bundle_version != "1":
+                if row.merchant_id != principal.merchant_id or row.bundle_version not in ("1", "2"):
                     raise WorkflowError(409, "LEGACY_EVIDENCE_UNAVAILABLE")
                 evidence.append(read_evidence_metadata(session, principal, case_id, row.id))
             rows = list(
