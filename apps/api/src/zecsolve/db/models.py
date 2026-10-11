@@ -388,18 +388,155 @@ class CaseVerificationRequest(Identified, Timestamped, Base):
     verification_id: Mapped[uuid.UUID] = mapped_column(Uuid)
 
 
+class DecisionEvaluation(Identified, Timestamped, Base):
+    __tablename__ = "decision_evaluations"
+    __table_args__ = (
+        UniqueConstraint("id", "case_id", "merchant_id", name="uq_decision_evaluation_owner"),
+        ForeignKeyConstraint(
+            ["case_id", "merchant_id"], ["cases.id", "cases.merchant_id"], name="fk_decision_case"
+        ),
+        ForeignKeyConstraint(
+            ["invoice_id", "merchant_id"],
+            ["invoices.id", "invoices.merchant_id"],
+            name="fk_decision_invoice",
+        ),
+        ForeignKeyConstraint(
+            ["policy_id", "merchant_id"],
+            ["invoice_policies.id", "invoice_policies.merchant_id"],
+            name="fk_decision_policy",
+        ),
+        ForeignKeyConstraint(
+            ["verification_id", "case_id", "merchant_id"],
+            ["verifications.id", "verifications.case_id", "verifications.merchant_id"],
+            name="fk_decision_verification",
+        ),
+        ForeignKeyConstraint(
+            ["observation_id", "verification_id", "case_id", "merchant_id"],
+            [
+                "chain_observations.id",
+                "chain_observations.verification_id",
+                "chain_observations.case_id",
+                "chain_observations.merchant_id",
+            ],
+            name="fk_decision_observation",
+        ),
+    )
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    invoice_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    policy_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    verification_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    observation_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    snapshot: Mapped[dict] = mapped_column(JSON)
+
+
 class Resolution(Identified, Base):
     __tablename__ = "resolutions"
+    __table_args__ = (
+        UniqueConstraint("id", "case_id", "merchant_id", name="uq_resolution_owner"),
+        UniqueConstraint(
+            "id",
+            "invoice_id",
+            "verification_id",
+            "case_id",
+            "merchant_id",
+            name="uq_resolution_allocation_context",
+        ),
+        UniqueConstraint("evaluation_id", name="uq_resolution_evaluation"),
+        ForeignKeyConstraint(
+            ["case_id", "merchant_id"], ["cases.id", "cases.merchant_id"], name="fk_resolution_case"
+        ),
+        ForeignKeyConstraint(
+            ["invoice_id", "merchant_id"],
+            ["invoices.id", "invoices.merchant_id"],
+            name="fk_resolution_invoice",
+        ),
+        ForeignKeyConstraint(
+            ["actor_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_resolution_actor",
+        ),
+        ForeignKeyConstraint(
+            ["verification_id", "case_id", "merchant_id"],
+            ["verifications.id", "verifications.case_id", "verifications.merchant_id"],
+            name="fk_resolution_verification",
+        ),
+        ForeignKeyConstraint(
+            ["evaluation_id", "case_id", "merchant_id"],
+            [
+                "decision_evaluations.id",
+                "decision_evaluations.case_id",
+                "decision_evaluations.merchant_id",
+            ],
+            name="fk_resolution_evaluation",
+        ),
+        ForeignKeyConstraint(
+            ["event_id", "case_id"],
+            ["case_events.id", "case_events.case_id"],
+            name="fk_resolution_event",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
+    )
     case_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("cases.id"), index=True)
     outcome: Mapped[str] = mapped_column(String(40))
     reason: Mapped[str] = mapped_column(Text)
     approved_by: Mapped[str] = mapped_column(String(200))
     approved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    merchant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    invoice_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    actor_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    verification_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    evaluation_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    event_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    workflow_version: Mapped[str | None] = mapped_column(String(16))
+    outcome_snapshot: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
+
+
+class CaseResolutionRequest(Identified, Timestamped, Base):
+    __tablename__ = "case_resolution_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id",
+            "credential_id",
+            "case_id",
+            "idempotency_key",
+            name="uq_case_resolution_key",
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_resolve_request_credential",
+        ),
+        ForeignKeyConstraint(
+            ["resolution_id", "case_id", "merchant_id"],
+            ["resolutions.id", "resolutions.case_id", "resolutions.merchant_id"],
+            name="fk_resolve_request_owner",
+        ),
+        CheckConstraint("request_hash ~ '^[0-9a-f]{64}$'", name="ck_resolve_request_hash"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    resolution_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_hash: Mapped[str] = mapped_column(String(64))
 
 
 class OutputAllocation(Timestamped, Base):
     __tablename__ = "output_allocations"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["resolution_id", "invoice_id", "verification_id", "case_id", "merchant_id"],
+            [
+                "resolutions.id",
+                "resolutions.invoice_id",
+                "resolutions.verification_id",
+                "resolutions.case_id",
+                "resolutions.merchant_id",
+            ],
+            name="fk_allocation_resolution_context",
+        ),
         CheckConstraint(
             "amount_zat >= 0 AND amount_zat <= 2100000000000000", name="ck_allocation_amount"
         ),
@@ -417,6 +554,8 @@ class OutputAllocation(Timestamped, Base):
     invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("invoices.id"), index=True)
     verification_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("verifications.id"))
     resolution_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("resolutions.id"))
+    case_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    merchant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
     amount_zat: Mapped[int] = mapped_column(BigInteger)
 
 

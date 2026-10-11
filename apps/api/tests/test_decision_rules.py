@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from test_offline_evaluation import invoice_snapshot  # noqa: F401
+from test_offline_evaluation import invoice_snapshot as invoice_snapshot
 from zecsolve.schemas.resolution import DecisionObservationV1
 from zecsolve.schemas.workflow_verification import OwnedAllocationV1
 
