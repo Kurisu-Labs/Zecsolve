@@ -278,6 +278,9 @@ print(json.dumps(result))
             if service == "api":
                 assert not host["PortBindings"]
         passed("non-root containers enforce memory/CPU/PID limits and private API binding")
+        database = run(compose + ["ps", "-q", "db"]).strip()
+        database_host = json.loads(run(["docker", "inspect", database]))[0]["HostConfig"]
+        assert database_host["LogConfig"]["Type"] == "none"
         run(compose + ["stop", "db"])
         assert request("/health/ready")[0] == 503 and request("/health/live")[0] == 200
         run(compose + ["start", "db"])
@@ -288,7 +291,7 @@ print(json.dumps(result))
         else:
             raise AssertionError("Readiness did not recover")
         passed("readiness fails during database outage and recovers after restart")
-        logs = run(compose + ["logs", "--no-color"])
+        logs = run(compose + ["logs", "--no-color", "api", "ingress"])
         assert all(secret not in logs for secret in [marker, password, key, *session_secrets])
         passed("container logs exclude request codes, authorization and configured secrets")
         report = {
