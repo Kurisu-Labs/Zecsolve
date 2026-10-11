@@ -97,8 +97,8 @@ def upgrade():
 
 def downgrade():
     op.execute(
-        "LOCK TABLE evidence_submission_requests, cases, case_events, evidence, "
-        "evidence_contents IN ACCESS EXCLUSIVE MODE"
+        "LOCK TABLE evidence_submission_requests, case_creation_requests, cases, case_events, "
+        "evidence, evidence_contents IN ACCESS EXCLUSIVE MODE"
     )
     if op.get_bind().scalar(
         sa.text(
