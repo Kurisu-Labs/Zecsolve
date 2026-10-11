@@ -6,8 +6,9 @@ from pydantic import AwareDatetime, Field, StrictBool, field_validator
 
 from zecsolve.domain.statuses import CaseState
 from zecsolve.schemas.case import CaseOpeningEventV1, CaseSummaryV1
-from zecsolve.schemas.evidence import EvidenceStoredV1, EvidenceSubmittedEventV1
+from zecsolve.schemas.evidence import EvidenceStoredV1, EvidenceStoredV2, EvidenceSubmittedEventV1
 from zecsolve.schemas.invoice import InvoicePolicyV1, InvoiceSnapshotV1
+from zecsolve.schemas.submission import SubmissionEventV2
 from zecsolve.schemas.verification import Contract, HexDigest, VerificationReport, Zatoshis
 
 
@@ -164,11 +165,13 @@ class CaseReportV1(UTCRecord):
     invoice: InvoiceSnapshotV1
     policy: InvoicePolicyV1
     claims: list[ClaimViewV1]
-    evidence: list[EvidenceStoredV1]
+    evidence: list[EvidenceStoredV1 | EvidenceStoredV2]
     verifications: list[VerificationAttemptV1]
     chain_observations: list[OfflineObservationV1]
     evaluations: list[EvaluationSnapshotV1]
     selected_verification_id: uuid.UUID | None
     balances: OfflineEvaluationV1
     resolutions: list[ResolutionViewV1]
-    events: list[CaseOpeningEventV1 | EvidenceSubmittedEventV1 | VerificationEventV1]
+    events: list[
+        CaseOpeningEventV1 | EvidenceSubmittedEventV1 | VerificationEventV1 | SubmissionEventV2
+    ]

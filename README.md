@@ -58,7 +58,8 @@ An existing PostgreSQL installation also works: create a dedicated database and 
 | `POST /api/cases` | Opens one case per owned invoice and atomically records its opening event; requires `Idempotency-Key` |
 | `GET /api/cases` | Merchant summaries with bounded cursor pagination and optional state filter; see [list contract](docs/cases.md#list-merchant-cases) |
 | `GET /api/cases/{id}` | Returns current case state/version and its immutable opening event; merchant only |
-| `POST /api/cases/{id}/evidence` | Stores an encrypted optional receipt/raw-tx bundle and appends an audit event; merchant + `Idempotency-Key` required |
+| `POST /api/cases/{id}/claims` | Scoped merchant/customer claim with explicit disclosure and consent; minimal acknowledgement + `Idempotency-Key` ([guide](docs/customer-submissions.md)) |
+| `POST /api/cases/{id}/evidence` | Encrypted optional receipt/raw-tx bundle; merchant v1 remains compatible, merchant/customer v2 records consent and returns a minimal acknowledgement; `Idempotency-Key` required |
 | `GET /api/cases/{id}/evidence/{evidence_id}` | Returns owned evidence metadata only; never receipt/raw-tx content or ciphertext |
 | `POST /api/cases/{id}/verify` | Verifies owned encrypted evidence and atomically stores the attempt, offline observation, evaluation, and audit event; requires `Idempotency-Key` |
 | `GET /api/cases/{id}/report` | Returns merchant verification/decision history, current balances, and chain-review flags; optional `verification_id` selects a candidate |
@@ -98,7 +99,7 @@ Creation/issuance returns one JSON object containing the merchant ID, credential
 
 Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
 
-Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification, reports, and [merchant decisions](docs/resolutions.md) are available; case grants and secure browser sessions are available; customer submission and scoped reviewer reports remain separate increments. Credit approval remains blocked by default; see [trusted RPC configuration](docs/chain.md). Live-node validation is still pending.
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification, reports, and [merchant decisions](docs/resolutions.md) are available; case grants and secure browser sessions are available; scoped [customer submissions](docs/customer-submissions.md) are implemented, while scoped reviewer reports remain separate work. Credit approval remains blocked by default; see [trusted RPC configuration](docs/chain.md). Live-node validation is still pending.
 
 ## Create an invoice
 
@@ -152,7 +153,7 @@ Implemented: pinned verifier integration; fixture provenance; bounded subprocess
 
 The trusted read-only Zebra adapter, idempotent refresh route, and later reorganization review are implemented. [Live endpoint validation](docs/chain.md) remains pending.
 
-Current milestone status: **M1/M2 backend complete; M3 adapter implemented with live validation pending; M4 in progress with M4.0–M4.3 merged; M5 pending; M6 partially implemented by Person 4; M7 release incomplete.** Person 1's access foundation/grants/sessions and Person 3's case listing are merged. M4.4 customer submissions and M5.0 packet contracts have their prerequisites. M7.1 backend deployment preparation is locally validated; full browser and release acceptance remain outstanding. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
+Current milestone status: **M1/M2 backend complete; M3 adapter implemented with live validation pending; M4 in progress with M4.0–M4.3 merged; M5 pending; M6 partially implemented by Person 4; M7 release incomplete.** Person 1's access foundation/grants/sessions and Person 3's case listing are merged. M4.4 customer submissions are implemented pending PR integration; M5.0 packet contracts have their prerequisites. M7.1 backend deployment preparation is merged in PR #17; full browser and release acceptance remain outstanding. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
 
 The deployed app blocks credit approval while offline; a server-configured trusted RPC source enables the policy-gated path. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed. Assigning or merging a feature does not close the separate live-validation or full-release gates.
 

@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from zecsolve.domain.snapshots import digest
 from zecsolve.schemas.case import CaseOpeningEventV1
 from zecsolve.schemas.evidence import EvidenceSubmittedEventV1
+from zecsolve.schemas.submission import SubmissionEventV2
 from zecsolve.schemas.workflow_verification import VerificationEventV1
 
 
@@ -93,6 +94,25 @@ def validate_event_chain(events, case_id, case_version):
         if sequence > 1 and event.payload["case_version"] != sequence:
             raise ValueError("Event version mismatch")
         previous = event.event_hash
+
+
+def scoped_submission_event(
+    *, event_id, case_id, actor, action, sequence, at, previous_hash, payload
+):
+    event = SubmissionEventV2(
+        event_id=event_id,
+        case_id=case_id,
+        actor=actor,
+        action=action,
+        sequence=sequence,
+        at=at,
+        previous_hash=previous_hash,
+        payload=payload,
+        payload_hash=digest(payload),
+        event_hash="0" * 64,
+    )
+    header = event.model_dump(mode="json", exclude={"event_id", "payload", "event_hash"})
+    return event.model_copy(update={"event_hash": digest(header)})
 
 
 def verification_event(*, event_id, case_id, credential_id, sequence, at, previous_hash, payload):

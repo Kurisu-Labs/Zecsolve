@@ -1,5 +1,7 @@
 # Encrypted evidence submissions
 
+This page describes the preserved merchant v1 contract. M4.4 adds explicit [customer/merchant evidence v2 submissions](customer-submissions.md), recorded sharing consent, scoped attribution, and minimal acknowledgements. Existing v1 requests, encrypted payloads and responses retain the behavior below; they do not gain reviewer-sharing consent retroactively.
+
 Migration `0005` adds encrypted evidence bundles to merchant-owned cases. Receipt JSON and raw transaction hex are optional opaque UTF-8 strings: submission preserves exactly what was supplied, including whitespace, empty strings, and missing components. It does not verify receipts, decode transactions, trust source labels, or allocate credit.
 
 ## Configure the encryption key
@@ -86,4 +88,4 @@ Unauthenticated/revoked/expired credentials return 401, foreign or unknown objec
 
 Migration `0005` preserves existing evidence hashes/references without pretending old evidence is encrypted or inventing ownership metadata. Old records are not served as new encrypted bundles. New evidence metadata, content, and retry records reject ordinary edits/deletes. Downgrade serializes with creators and refuses to discard encrypted evidence. Database administrators can still alter those controls; the application does not claim protection from an administrator rewriting metadata or schema.
 
-Published contracts: [request](../contracts/evidence-submit-request.schema.json), [stored metadata](../contracts/evidence-stored.schema.json), and [audit event](../contracts/evidence-submitted-event.schema.json). The [persisted verification and initial report](verification.md) are now implemented. Customer/reviewer access, export, and purge/rotation workflows remain subsequent work.
+Published contracts: [request](../contracts/evidence-submit-request.schema.json), [stored metadata](../contracts/evidence-stored.schema.json), and [audit event](../contracts/evidence-submitted-event.schema.json). The [persisted verification and initial report](verification.md) are now implemented. Customer writes are covered by the v2 guide; reviewer projections, export, and purge/rotation remain subsequent work.

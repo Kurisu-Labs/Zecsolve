@@ -893,6 +893,170 @@
       "title": "EvidenceStoredV1",
       "type": "object"
     },
+    "EvidenceStoredV2": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "2",
+          "default": "2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "evidence_id": {
+          "format": "uuid",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "case_id": {
+          "format": "uuid",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "merchant_id": {
+          "format": "uuid",
+          "title": "Merchant Id",
+          "type": "string"
+        },
+        "submitted_by": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Submitted By"
+        },
+        "submitted_at": {
+          "format": "date-time",
+          "title": "Submitted At",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "source_kind": {
+          "enum": [
+            "public_fixture",
+            "merchant_submission",
+            "customer_submission"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "disclosure_version": {
+          "const": "evidence-disclosure-v2",
+          "title": "Disclosure Version",
+          "type": "string"
+        },
+        "processing_authorized": {
+          "const": true,
+          "title": "Processing Authorized",
+          "type": "boolean"
+        },
+        "share_with_reviewers": {
+          "title": "Share With Reviewers",
+          "type": "boolean"
+        },
+        "receipt_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Receipt Sha256"
+        },
+        "raw_tx_hex_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Raw Tx Hex Sha256"
+        },
+        "payload_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Payload Sha256",
+          "type": "string"
+        },
+        "case_version": {
+          "minimum": 2,
+          "title": "Case Version",
+          "type": "integer"
+        },
+        "case_state": {
+          "$ref": "#/$defs/CaseState"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "actor_grant_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor Grant Id"
+        },
+        "consent_id": {
+          "format": "uuid",
+          "title": "Consent Id",
+          "type": "string"
+        },
+        "claim_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Claim Id"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "case_id",
+        "merchant_id",
+        "submitted_by",
+        "submitted_at",
+        "source",
+        "source_kind",
+        "disclosure_version",
+        "processing_authorized",
+        "share_with_reviewers",
+        "receipt_sha256",
+        "raw_tx_hex_sha256",
+        "payload_sha256",
+        "case_version",
+        "case_state",
+        "event_id",
+        "actor_grant_id",
+        "consent_id",
+        "claim_id"
+      ],
+      "title": "EvidenceStoredV2",
+      "type": "object"
+    },
     "EvidenceSubmittedEventV1": {
       "additionalProperties": false,
       "properties": {
@@ -1645,6 +1809,84 @@
       "title": "ResolutionViewV1",
       "type": "object"
     },
+    "SubmissionEventV2": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "2",
+          "default": "2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "case_id": {
+          "format": "uuid",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 2,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "actor": {
+          "pattern": "^(credential|grant):[0-9a-f-]{36}$",
+          "title": "Actor",
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "CLAIM_SUBMITTED",
+            "EVIDENCE_SUBMITTED"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        },
+        "payload_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Payload Hash",
+          "type": "string"
+        },
+        "previous_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Previous Hash",
+          "type": "string"
+        },
+        "event_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Event Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "case_id",
+        "sequence",
+        "actor",
+        "action",
+        "at",
+        "payload",
+        "payload_hash",
+        "previous_hash",
+        "event_hash"
+      ],
+      "title": "SubmissionEventV2",
+      "type": "object"
+    },
     "VerificationAttemptV1": {
       "additionalProperties": false,
       "properties": {
@@ -1958,7 +2200,14 @@
     },
     "evidence": {
       "items": {
-        "$ref": "#/$defs/EvidenceStoredV1"
+        "anyOf": [
+          {
+            "$ref": "#/$defs/EvidenceStoredV1"
+          },
+          {
+            "$ref": "#/$defs/EvidenceStoredV2"
+          }
+        ]
       },
       "title": "Evidence",
       "type": "array"
@@ -2020,6 +2269,9 @@
           },
           {
             "$ref": "#/$defs/ResolutionEventV1"
+          },
+          {
+            "$ref": "#/$defs/SubmissionEventV2"
           }
         ]
       },

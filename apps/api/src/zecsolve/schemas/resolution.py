@@ -7,6 +7,7 @@ from zecsolve.domain.statuses import CaseState, ChainState
 from zecsolve.schemas.case import CaseOpeningEventV1
 from zecsolve.schemas.evidence import EvidenceSubmittedEventV1
 from zecsolve.schemas.invoice import InvoiceSnapshotV1
+from zecsolve.schemas.submission import SubmissionEventV2
 from zecsolve.schemas.verification import Contract, HexDigest, VerificationReport, Zatoshis
 from zecsolve.schemas.workflow_verification import (
     CaseReportV1,
@@ -183,5 +184,9 @@ class MerchantCaseReportV1(CaseReportV1):
     decision_evaluations: list[DecisionSnapshotV1] = Field(default_factory=list)
     decisions: list[ResolutionOutcomeV1] = Field(default_factory=list)
     events: list[
-        CaseOpeningEventV1 | EvidenceSubmittedEventV1 | VerificationEventV1 | ResolutionEventV1
+        CaseOpeningEventV1
+        | EvidenceSubmittedEventV1
+        | VerificationEventV1
+        | ResolutionEventV1
+        | SubmissionEventV2
     ]

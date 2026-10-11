@@ -106,24 +106,24 @@ The intended journey is **invoice → case → claim/evidence → verification �
 
 The chosen architecture is a modular monolith: a planned Vue 3/TypeScript/Tailwind frontend, a FastAPI application, PostgreSQL, and a local Rust verifier invoked through a bounded adapter. Retain PostgreSQL for the case workflow; the existing constraints and migration already target it. The offline verification POC can run without a database.
 
-| Area | Present as of October 11 | Remaining for the target MVP |
+| Area | Present as of October 12 | Remaining for the target MVP |
 |---|---|---|
 | Verification | Pinned Glasspane integration, historical Orchard/tampered fixtures, persisted real verification | Historical Sapling fixture before claiming equivalent demonstrated coverage |
-| API | Owned invoices/cases/evidence, paginated merchant case listing, persisted verification, reports, atomic merchant resolutions, chain refresh, health and stateless POC | Claims, customer/reviewer access, sessions and export |
-| Database | Migrations through `0008`, immutable snapshots/history, encrypted bundles, atomic retries/allocations/events | Access/session/consent and customer-attribution additions; retention/rotation workflows |
+| API | Owned invoices/cases/evidence, paginated merchant case listing, persisted verification, reports, atomic merchant resolutions, chain refresh, scoped customer claims/evidence, grants/sessions, health and stateless POC | Scoped reviewer reports and export; M4.4 PR integration |
+| Database | Migrations through `0009`, access/session/consent/attribution persistence, immutable snapshots/history, encrypted bundles, atomic retries/allocations/events | Retention/rotation workflows |
 | Rules | Approved aggregation, candidate projection, binding/conflict findings, stored policy/evaluation context and decision-time observation gates | Preserve historical context in scoped reports and replay packets |
-| Access | Operator-provisioned expiring/revocable merchant credentials and scoped merchant services | Case-scoped customer/reviewer grants, browser sessions and disclosure consent |
+| Access | Revocable merchant credentials, case grants, HTTPS sessions, explicit customer submission consent and scoped writes | Scoped reviewer reads and authorized export |
 | Chain observations | Offline default, trusted Zebra adapter, idempotent refresh/provenance and later loss-of-inclusion review | Actual trusted node validation and live merchant approval trace |
 | Frontend | Vue 3/TypeScript/Tailwind architecture selected; all work assigned to Person 4 | M6.0–M6.6; execution remains deferred |
 | Export | Verifier result schema and fixture provenance manifest | Complete, authorized, replayable case packet |
-| Delivery | Setup commands, tests, CI configuration, and development container configuration | Recorded release validation, deployment verification, demo, and evidence bundle |
+| Delivery | Setup/tests/CI, development containers and M7.1 backend TLS/session/limit preparation (PR #17) | Browser acceptance, full release/restore validation, demo and evidence bundle |
 
 This table reflects inspected source and [recorded development results](DEVELOPMENT.md), not a fresh execution of acceptance tests. The merchant approval service is implemented and demonstrated with isolated simulated confirmation; that does not establish live chain inclusion or full release readiness. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map and [assignment board](IMPLEMENTATION_PLAN.md#feature-board) for remaining work.
 
 ### 6.2 Verification and evidence flow
 
 1. Authenticate the caller and authorize access to the invoice/case before accepting or returning private evidence.
-2. Store permitted evidence privately, preserving the submitted bytes, input hashes, source, and submission context. Encrypted merchant evidence storage is implemented; scoped customer consent/submission remains planned. The separate POC endpoint stays stateless.
+2. Store permitted evidence privately, preserving the submitted bytes, input hashes, source, and submission context. Encrypted merchant evidence storage is implemented; scoped customer consent/submission is implemented in M4.4, pending PR integration ([handoff](customer-submissions.md)). The separate POC endpoint stays stateless.
 3. Invoke the configured Rust executable with explicit arguments, isolated temporary files, size limits, and a timeout. User input must not select server paths, executable commands, or arbitrary fetch URLs.
 4. Validate the returned result contract and input bindings. Interpret `receipt_state` and `reason_code`, not process exit zero alone.
 5. Obtain any chain observation through a trusted application integration and record its source and observation time separately. Never accept a customer's claimed confirmation state as authoritative.
