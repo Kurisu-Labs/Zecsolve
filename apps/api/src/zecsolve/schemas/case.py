@@ -30,6 +30,18 @@ class CaseOpeningEventV1(Contract):
     def utc_time(cls, value):
         return value.astimezone(UTC)
 
+    @field_validator("payload")
+    @classmethod
+    def opening_references_only(cls, value):
+        if set(value) != {"invoice_id", "invoice_snapshot_hash", "policy_id"}:
+            raise ValueError("Opening payload must contain only invoice and policy references")
+        uuid.UUID(value["invoice_id"])
+        uuid.UUID(value["policy_id"])
+        checksum = value["invoice_snapshot_hash"]
+        if len(checksum) != 64 or any(char not in "0123456789abcdef" for char in checksum):
+            raise ValueError("Invalid invoice snapshot hash")
+        return value
+
 
 class CaseSummaryV1(Contract):
     schema_version: Literal["1"] = "1"

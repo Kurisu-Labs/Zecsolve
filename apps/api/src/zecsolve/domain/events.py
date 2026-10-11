@@ -15,6 +15,8 @@ def opening_event(
     policy_id: uuid.UUID,
     at: datetime,
 ) -> CaseOpeningEventV1:
+    if at.tzinfo is None or at.utcoffset() is None:
+        raise ValueError("Event time must include a timezone")
     payload = {
         "invoice_id": str(invoice_id),
         "invoice_snapshot_hash": invoice_snapshot_hash,

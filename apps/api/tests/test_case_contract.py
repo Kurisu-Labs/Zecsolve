@@ -64,3 +64,9 @@ def test_opening_event_hashes_bind_payload_actor_time_and_case():
         assert opening_event(**{**fields, **change}).event_hash != event.event_hash
     shifted = opening_event(**{**fields, "at": datetime.fromisoformat("2026-10-11T07:00:00+07:00")})
     assert shifted.event_hash == event.event_hash
+    with pytest.raises(ValueError):
+        opening_event(**{**fields, "at": datetime(2026, 10, 11)})
+    with pytest.raises(ValidationError):
+        type(event).model_validate(
+            {**event.model_dump(), "payload": {**event.payload, "memo": "unnecessary disclosure"}}
+        )
