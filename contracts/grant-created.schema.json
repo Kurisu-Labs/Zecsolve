@@ -1,0 +1,148 @@
+{
+  "$defs": {
+    "GrantMetadataV1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "grant_id": {
+          "format": "uuid",
+          "title": "Grant Id",
+          "type": "string"
+        },
+        "case_id": {
+          "format": "uuid",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "merchant_id": {
+          "format": "uuid",
+          "title": "Merchant Id",
+          "type": "string"
+        },
+        "issued_by": {
+          "format": "uuid",
+          "title": "Issued By",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/GrantScopeV1"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "revoked_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Revoked At"
+        }
+      },
+      "required": [
+        "grant_id",
+        "case_id",
+        "merchant_id",
+        "issued_by",
+        "scope",
+        "created_at",
+        "expires_at",
+        "revoked_at"
+      ],
+      "title": "GrantMetadataV1",
+      "type": "object"
+    },
+    "GrantScopeV1": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "customer",
+            "reviewer"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "report_sections": {
+          "items": {
+            "enum": [
+              "case",
+              "invoice",
+              "claims",
+              "evidence",
+              "verifications",
+              "observations",
+              "evaluations",
+              "balances",
+              "decisions",
+              "events"
+            ],
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Report Sections",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "allow_export": {
+          "default": false,
+          "title": "Allow Export",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "role"
+      ],
+      "title": "GrantScopeV1",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "grant": {
+      "$ref": "#/$defs/GrantMetadataV1"
+    },
+    "access_code": {
+      "anyOf": [
+        {
+          "pattern": "^zsg_[A-Za-z0-9_-]{43}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Access Code"
+    }
+  },
+  "required": [
+    "grant"
+  ],
+  "title": "GrantCreatedV1",
+  "type": "object"
+}

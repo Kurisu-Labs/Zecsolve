@@ -1,6 +1,7 @@
 from pathlib import Path
+from urllib.parse import urlsplit
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,3 +24,25 @@ class Settings(BaseSettings):
     rpc_allow_private_http: bool = False
     rpc_timeout_seconds: float = Field(default=10, gt=0, le=30)
     rpc_tip_max_age_seconds: int = Field(default=900, ge=75, le=3600)
+
+    browser_origins: list[str] = Field(default_factory=list)
+
+    @field_validator("browser_origins")
+    @classmethod
+    def exact_https_origins(cls, values):
+        for value in values:
+            parsed = urlsplit(value)
+            if (
+                parsed.scheme != "https"
+                or not parsed.hostname
+                or parsed.username is not None
+                or parsed.password is not None
+                or parsed.path
+                or parsed.query
+                or parsed.fragment
+                or "*" in value
+                or any(c.isspace() for c in value)
+            ):
+                raise ValueError("Browser origins must be exact HTTPS origins without paths")
+            _ = parsed.port
+        return values

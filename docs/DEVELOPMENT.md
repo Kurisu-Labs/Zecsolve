@@ -286,7 +286,27 @@ Final local validation (Linux, Python 3.14.7, Rust 1.99.0, disposable PostgreSQL
 
 Contracts and consumer guidance are in [access.md](access.md). Next Person 1 tasks are M4.1 grant lifecycle and M4.2 browser sessions; Person 2's projections and Person 3's submission writers must consume this foundation without treating client-supplied contexts as authority.
 
-## Item 11 — M7.1 backend deployment preparation
+## Item 11 — case grant lifecycle (M4.1)
+
+Implemented over `87adfe3` after M4.0 merged. Merchant-only create/list/revoke endpoints issue case-scoped customer/reviewer grants, preserve explicit report/evidence/export scope, and require actual sharing consent for selected evidence. Grant codes have 256 random bits, are stored only as digests, and are returned once after commit; creation replay and metadata never redisclose the code. Case locking serializes concurrent retry creation, and revocation preserves its original timestamp. No customer/reviewer data route or browser session exchange is enabled in this increment.
+
+Final local validation (Linux, Python 3.14.7, Rust 1.99.0, disposable PostgreSQL 17): 12 Rust, 193 Python, and 180 PostgreSQL tests passed; lint/format/Clippy, POC, and schema generation passed. Focused tests cover lifetime/scope bounds, secret-free repr/storage/replay, concurrent single disclosure, consent selection, foreign actor/case denial, changed-body retry conflict, commit rollback, expiry, revocation, and HTTP metadata/revoke behavior. Independent review found no blockers; the existing Starlette/httpx warning remains.
+
+See [grants.md](grants.md) for API examples and lost-response handling. Next: M4.2 secure browser sessions; M4.4 consent/submission writers and M4.5 report projections remain separate owners' tasks.
+
+## Item 12 — secure browser sessions (M4.2)
+
+Implemented over `ace58f3` after M4.1 merged. HTTPS code exchange, current session scope, and logout use host-only Secure cookies, HttpOnly session secrets, SameSite=Strict, exact configured Origin checks, and a session-bound CSRF cookie/header for unsafe cookie-authenticated requests. Stored session/CSRF values are SHA-256 digests; issuance returns cookies only after commit. Sessions expire within eight hours and never outlive the underlying credential/grant. Existing merchant bearer authentication retains its prior behavior, including missing-credential error/challenge format.
+
+Shared request authentication derives merchant/customer/reviewer principals from persisted access. Existing merchant data/mutation routes reject grant sessions; customer submission and reviewer projections remain M4.4/M4.5 tasks. Merchant workflow services recheck session and underlying access inside their transactions, including after external work. No frontend login screen or public deployment was added.
+
+Final local validation (Linux, Python 3.14.7, Rust 1.99.0, disposable PostgreSQL 17): 12 Rust, 195 Python, and 190 PostgreSQL tests passed; lint/format/Clippy, POC, schema generation and documentation links passed. Tests cover hashed secret storage, bounded lifetimes, code validation, secure cookie attributes, trusted-Origin checks, session-bound CSRF, bearer precedence, HTTP refusal, parent revocation, logout, session expiry, transaction rollback, and session revocation during invoice normalization. HTTP cookie expiry required explicit UTC normalization; a full-suite regression also restored the legacy Bearer challenge. Independent review found no blockers. Existing Starlette/httpx deprecation warning remains.
+
+Compose YAML parsed and includes browser-origin forwarding. The local Docker installation has no Compose subcommand, so Compose CLI/runtime validation was not available; this is not deployment evidence. HTTPS browser/proxy behavior and the frontend cookie flow remain deployment/browser acceptance work.
+
+See [sessions.md](sessions.md) for Person 4's cookie/CSRF contract and [access.md](access.md) for Person 2/3's transaction/disclosure boundaries. Person 1's M4.0/M4.1/M4.2 backend implementation is complete subject to this PR's integration; M4 as a whole still needs customer submissions and scoped reports.
+
+## Item 13 — M7.1 backend deployment preparation
 
 Implemented October 12, 2026, as Person 3 on `feat/m7-deployment-controls`, based on `87adfe3` after M4.0 merged. The branch was published before editing, with separately pushed application-boundary and runtime/acceptance increments. P1's grant work remained on its own branch; shared auth/schema and frontend source/build configuration were not edited.
 

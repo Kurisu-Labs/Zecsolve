@@ -93,7 +93,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 `Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
 
-Person 1 starts M4.0; Person 3 has implemented M4.3 with local validation recorded. Person 2 can inspect packet requirements/fixtures and starts M5.0 implementation after M4.0 merges. Person 1 then progresses through M4.1/M4.2; Person 3 proceeds to M4.4; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
+Person 1 has implemented M4.0–M4.2; their API and authorization handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md). Person 3 has implemented M4.3. Person 2 can inspect packet requirements/fixtures and starts M5.0 implementation after M4.0 merges. Person 1 then progresses through M4.1/M4.2; Person 3 proceeds to M4.4; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
 
 All M6 tasks remain deferred and assigned to Person 4. When frontend is resumed, M6.0 can start against current contracts; fixtures may unblock development of dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
 
@@ -104,13 +104,13 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | Task | Owner | Branch | Prerequisites | Status |
 |---|---|---|---|---|
 | [M3.1 — Live validation](#m3-1) | Person 3 | `docs/m3-live-validation` | Trusted compatible RPC endpoint supplied by the operator | Externally blocked |
-| [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Implemented; validation and PR integration in progress |
-| [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Waiting |
-| [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Waiting |
+| [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Done: PR #14 merged |
+| [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Done: PR #15 merged |
+| [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Implemented; final PR validation in progress |
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Implemented; local acceptance passed, PR integration gate applies |
 | [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Waiting |
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Waiting |
-| [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Waiting |
+| [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Ready |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
 | [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Waiting |
 | [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
@@ -142,7 +142,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.0 — Access foundation
 
-- **Owner:** Person 1. **Branch:** `feat/m4-access-foundation`. **Status:** Implemented; validation and PR integration in progress.
+- **Owner:** Person 1. **Branch:** `feat/m4-access-foundation`. **Status:** Done: PR #14 merged.
 - **Prerequisites:** Existing M1/M2 and M3 implementation on main.
 - **Goal:** Provide one shared access and persistence foundation for the remaining backend tasks.
 - **Owned code:** `auth/`, shared workflow authorization, `db/models.py`, forward access migrations, and access contracts. Source paths in these cards are relative to `apps/api/src/zecsolve/` unless otherwise stated.
@@ -155,7 +155,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.1 — Grant lifecycle
 
-- **Owner:** Person 1. **Branch:** `feat/m4-case-grants`. **Status:** Waiting.
+- **Owner:** Person 1. **Branch:** `feat/m4-case-grants`. **Status:** Done: PR #15 merged.
 - **Prerequisites:** M4.0 merged.
 - **Goal:** Let merchants manage bounded customer/reviewer access to one owned case.
 - **Owned code:** New grant schemas, services, API router, and focused tests; any shared model changes remain with Person 1.
@@ -168,7 +168,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.2 — Browser sessions
 
-- **Owner:** Person 1. **Branch:** `feat/m4-browser-sessions`. **Status:** Waiting.
+- **Owner:** Person 1. **Branch:** `feat/m4-browser-sessions`. **Status:** Implemented; final PR validation in progress.
 - **Prerequisites:** M4.1 merged.
 - **Goal:** Exchange an initial merchant or grant code for revocable browser access.
 - **Owned code:** Session authentication, session router/service, Origin/CSRF handling, and relevant configuration/tests.
@@ -614,7 +614,7 @@ Recorded M1/M2 and M3 adapter results are in [DEVELOPMENT.md](DEVELOPMENT.md), i
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** Person 1 can claim M4.0 access foundation; Person 3 has implemented and locally validated M4.3; next customer-submission work (M4.4) waits for M4.2. Person 2 can review packet requirements and public fixtures, then start M5.0 implementation after M4.0 merges. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** Person 1 has implemented M4.0–M4.2. After M4.2 merges, Person 3 can begin M4.4 using the shared actor/session contracts; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, then start M5.0 implementation after M4.0 merges. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 

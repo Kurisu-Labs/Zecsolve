@@ -40,4 +40,4 @@ Acquire the underlying credential/grant shared lock before any session lock, the
 
 Downgrade locks authorizers and new tables before checking history, and refuses to remove any populated access/consent/retry or attributed records. Empty access rollback preserves existing merchant ciphertext and metadata. Use forward migrations for accepted history and stop traffic before planned rollback.
 
-Published contracts: [access context](../contracts/access-context.schema.json) and [grant scope](../contracts/grant-scope.schema.json). The next Person 1 increment exposes grant creation/metadata/revocation, followed by secure browser code exchange and Origin/CSRF-protected sessions. Customer submission and reviewer projections remain owned by their assigned contributors.
+Published contracts: [access context](../contracts/access-context.schema.json) and [grant scope](../contracts/grant-scope.schema.json). [Grant lifecycle](grants.md) and [browser sessions](sessions.md) now implement the Person 1 consumers of this foundation. Customer submission and reviewer projections remain owned by their assigned contributors.

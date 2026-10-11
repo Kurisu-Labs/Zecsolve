@@ -64,6 +64,8 @@ An existing PostgreSQL installation also works: create a dedicated database and 
 | `GET /api/cases/{id}/report` | Returns merchant verification/decision history, current balances, and chain-review flags; optional `verification_id` selects a candidate |
 | `POST /api/cases/{id}/resolve` | Records an authorized merchant decision with reason, reviewed case version, and retry key; production offline approvals remain blocked |
 | `POST /api/cases/{id}/chain-observations` | Refreshes trusted chain evidence for a verification, including resolved cases; merchant + `Idempotency-Key` required |
+| `POST /api/cases/{id}/grants`, `GET /api/cases/{id}/grants`, `DELETE /api/cases/{id}/grants/{grant_id}` | Merchant grant lifecycle; explicit case/disclosure scope, one-time secret and revocation; see [grant guide](docs/grants.md) |
+| `POST /api/session`, `GET /api/session`, `DELETE /api/session` | HTTPS browser code exchange, current access scope and logout; explicit Origin configuration and CSRF required for cookie writes ([guide](docs/sessions.md)) |
 | `GET /docs` | Interactive API contract; use **Authorize** to enter the POC token |
 
 Paste the contents of `fixtures/mainnet/receipt.json` into the `receipt_json` string and `fixtures/mainnet/transaction.hex` into `raw_tx_hex`. The POC endpoint accepts content, never server file paths or fetch URLs. It does not write evidence or recovered fields to the database. The separate [persisted verification API](docs/verification.md) operates on previously submitted encrypted evidence.

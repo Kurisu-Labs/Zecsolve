@@ -1,0 +1,74 @@
+{
+  "$defs": {
+    "GrantScopeV1": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "customer",
+            "reviewer"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "report_sections": {
+          "items": {
+            "enum": [
+              "case",
+              "invoice",
+              "claims",
+              "evidence",
+              "verifications",
+              "observations",
+              "evaluations",
+              "balances",
+              "decisions",
+              "events"
+            ],
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Report Sections",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "allow_export": {
+          "default": false,
+          "title": "Allow Export",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "role"
+      ],
+      "title": "GrantScopeV1",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "scope": {
+      "$ref": "#/$defs/GrantScopeV1"
+    },
+    "ttl_hours": {
+      "default": 24,
+      "maximum": 168,
+      "minimum": 1,
+      "title": "Ttl Hours",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "scope"
+  ],
+  "title": "GrantCreateRequest",
+  "type": "object"
+}
