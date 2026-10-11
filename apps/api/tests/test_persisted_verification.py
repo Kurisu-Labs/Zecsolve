@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import threading
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
@@ -223,3 +224,77 @@ def test_failed_commit_rolls_back_every_verification_record(database, verificati
     assert counts(database) == [0, 0, 0, 0, 0]
     with Session(database) as session:
         assert session.get(Case, case.case_id).version == 2
+
+
+@pytest.mark.parametrize(
+    "failure,state,reason",
+    [("missing", "UNAVAILABLE", "VERIFIER_UNAVAILABLE"), ("timeout", "ERROR", "VERIFIER_TIMEOUT")],
+)
+def test_technical_failures_are_recorded_and_new_key_can_retry(
+    database, root, tmp_path, verification_setup, failure, state, reason
+):
+    service, principal, case, evidence, _ = verification_setup
+    binary = tmp_path / "verifier"
+    if failure == "timeout":
+        binary.write_text("#!/usr/bin/python3\nimport time; time.sleep(2)\n")
+        binary.chmod(0o700)
+    service.verifier = VerifierAdapter(binary, timeout=0.05)
+    request = CaseVerifyRequest(evidence_id=evidence.evidence_id)
+    failed, _ = service.verify(principal, case.case_id, request, "first")
+    assert (failed.result.receipt_state, failed.result.reason_code) == (state, reason)
+    service.verifier = VerifierAdapter(root / "target/debug/zecsolve-verifier")
+    assert service.verify(principal, case.case_id, request, "first") == (failed, True)
+    recovered, replayed = service.verify(principal, case.case_id, request, "retry")
+    assert not replayed and recovered.result.receipt_state == "VALID"
+    assert counts(database) == [2, 2, 2, 2, 0]
+
+
+def test_replay_rejects_corrupted_verification_event(database, verification_setup):
+    from sqlalchemy import update
+
+    service, principal, case, evidence, _ = verification_setup
+    request = CaseVerifyRequest(evidence_id=evidence.evidence_id)
+    attempt, _ = service.verify(principal, case.case_id, request, "verify")
+    with database.begin() as connection:
+        connection.execute(text("ALTER TABLE case_events DISABLE TRIGGER immutable_record"))
+        connection.execute(
+            update(CaseEvent).where(CaseEvent.id == attempt.event_id).values(event_hash="00" * 32)
+        )
+        connection.execute(text("ALTER TABLE case_events ENABLE TRIGGER immutable_record"))
+    with pytest.raises(WorkflowError) as error:
+        service.verify(principal, case.case_id, request, "verify")
+    assert error.value.status == 409
+
+
+def test_verification_records_reject_updates_and_deletes(database, verification_setup):
+    from sqlalchemy.exc import DBAPIError
+
+    service, principal, case, evidence, _ = verification_setup
+    service.verify(
+        principal, case.case_id, CaseVerifyRequest(evidence_id=evidence.evidence_id), "verify"
+    )
+    for model in (Verification, ChainObservation, VerificationEvaluation, CaseVerificationRequest):
+        for statement in (
+            model.__table__.delete(),
+            model.__table__.update().values(id=uuid.uuid4()),
+        ):
+            with pytest.raises(DBAPIError, match="immutable record"):
+                with database.begin() as connection:
+                    connection.execute(statement)
+
+
+def test_storage_failure_is_persisted_as_error(database, verification_setup, monkeypatch):
+    service, principal, case, evidence, _ = verification_setup
+
+    def fail(*args, **kwargs):
+        raise OSError(28, "synthetic ENOSPC")
+
+    monkeypatch.setattr("zecsolve.adapters.verifier.tempfile.TemporaryDirectory", fail)
+    attempt, _ = service.verify(
+        principal, case.case_id, CaseVerifyRequest(evidence_id=evidence.evidence_id), "storage"
+    )
+    assert (attempt.result.receipt_state, attempt.result.reason_code) == (
+        "ERROR",
+        "VERIFIER_PROCESS_ERROR",
+    )
+    assert counts(database) == [1, 1, 1, 1, 0]

@@ -15,6 +15,7 @@ from zecsolve.schemas.workflow_verification import (
     OfflineObservationV1,
     OwnedAllocationV1,
     VerificationAttemptV1,
+    VerificationEventV1,
 )
 from zecsolve.services.cases import load_owned_case
 from zecsolve.services.workflow import WorkflowError
@@ -87,8 +88,31 @@ def read_attempt(session, principal, case_id, verification_id):
         if observation_row is None or event is None:
             raise ValueError("Incomplete verification context")
         report = VerificationReport.model_validate(row.result)
+        audit = VerificationEventV1(
+            schema_version=event.schema_version,
+            event_id=event.id,
+            case_id=event.case_id,
+            sequence=event.sequence,
+            actor=event.actor,
+            action=event.action,
+            at=event.at,
+            payload=event.payload,
+            payload_hash=event.payload_hash,
+            previous_hash=event.previous_hash,
+            event_hash=event.event_hash,
+        )
+        if audit.payload_hash != digest(audit.payload) or audit.event_hash != digest(
+            audit.model_dump(mode="json", exclude={"event_id", "payload", "event_hash"})
+        ):
+            raise ValueError("Audit hash mismatch")
         observation = OfflineObservationV1.model_validate(observation_row.provenance)
         evaluation = EvaluationSnapshotV1.model_validate(evaluation_row.snapshot)
+        if (row.receipt_state, row.verifier_version, row.rules_version) != (
+            report.receipt_state,
+            report.verifier.version,
+            evaluation.result.rules_version,
+        ):
+            raise ValueError("Verification metadata mismatch")
         if (
             evaluation.evaluation_id,
             evaluation.verification_id,
@@ -121,6 +145,18 @@ def read_attempt(session, principal, case_id, verification_id):
             or observation.raw_tx_sha256 != report.raw_tx_sha256
         ):
             raise ValueError("Observation binding mismatch")
+        if (
+            observation.observed_at,
+            observation.confirmations,
+            observation.block_hash,
+            observation.block_height,
+        ) != (
+            observation_row.observed_at,
+            observation_row.confirmations,
+            observation_row.block_hash,
+            observation_row.block_height,
+        ):
+            raise ValueError("Observation metadata mismatch")
         expected = {
             "verification_id": str(row.id),
             "evidence_id": str(row.evidence_id),
