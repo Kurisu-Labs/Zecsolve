@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy import (
     JSON,
     BigInteger,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -164,6 +165,32 @@ class CaseCreationRequest(Identified, Timestamped, Base):
 
 class Claim(Identified, Timestamped, Base):
     __tablename__ = "claims"
+    __table_args__ = (
+        UniqueConstraint("id", "case_id", "merchant_id", name="uq_claim_owner"),
+        CheckConstraint(
+            "merchant_id IS NOT NULL OR (actor_grant_id IS NULL AND actor_credential_id IS NULL)",
+            name="ck_claim_actor_owner",
+        ),
+        ForeignKeyConstraint(
+            ["case_id", "merchant_id"], ["cases.id", "cases.merchant_id"], name="fk_claim_owner"
+        ),
+        ForeignKeyConstraint(
+            ["actor_credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_claim_credential",
+        ),
+        ForeignKeyConstraint(
+            ["actor_grant_id", "case_id", "merchant_id"],
+            ["case_grants.id", "case_grants.case_id", "case_grants.merchant_id"],
+            name="fk_claim_grant",
+        ),
+        CheckConstraint(
+            "actor_grant_id IS NULL OR actor_credential_id IS NULL", name="ck_claim_actor"
+        ),
+    )
+    merchant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    actor_credential_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    actor_grant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
     case_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("cases.id"), index=True)
     claimant_role: Mapped[str] = mapped_column(String(32))
     reported_txid: Mapped[str | None] = mapped_column(String(64))
@@ -173,7 +200,16 @@ class Claim(Identified, Timestamped, Base):
 class Evidence(Identified, Timestamped, Base):
     __tablename__ = "evidence"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["actor_grant_id", "case_id", "merchant_id"],
+            ["case_grants.id", "case_grants.case_id", "case_grants.merchant_id"],
+            name="fk_evidence_grant",
+        ),
+        CheckConstraint("actor_grant_id IS NULL OR submitted_by IS NULL", name="ck_evidence_actor"),
         UniqueConstraint("id", "case_id", "merchant_id", name="uq_evidence_case_owner"),
+        CheckConstraint(
+            "actor_grant_id IS NULL OR merchant_id IS NOT NULL", name="ck_evidence_actor_owner"
+        ),
         ForeignKeyConstraint(
             ["case_id", "merchant_id"],
             ["cases.id", "cases.merchant_id"],
@@ -192,6 +228,7 @@ class Evidence(Identified, Timestamped, Base):
     storage_ref: Mapped[str] = mapped_column(Text)
     merchant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
     submitted_by: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    actor_grant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
     bundle_version: Mapped[str | None] = mapped_column(String(16))
     bundle_metadata: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
 
@@ -610,3 +647,212 @@ class ObservationRequest(Identified, Timestamped, Base):
     verification_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     observation_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     idempotency_key: Mapped[str] = mapped_column(String(128))
+
+
+class CaseGrant(Identified, Timestamped, Base):
+    __tablename__ = "case_grants"
+    __table_args__ = (
+        UniqueConstraint("id", "case_id", "merchant_id", name="uq_grant_owner"),
+        UniqueConstraint("token_sha256", name="uq_grant_token"),
+        ForeignKeyConstraint(
+            ["case_id", "merchant_id"], ["cases.id", "cases.merchant_id"], name="fk_grant_case"
+        ),
+        ForeignKeyConstraint(
+            ["issued_by", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_grant_issuer",
+        ),
+        CheckConstraint("role IN ('customer','reviewer')", name="ck_grant_role"),
+        CheckConstraint("token_sha256 ~ '^[0-9a-f]{64}$'", name="ck_grant_digest"),
+        CheckConstraint("expires_at > created_at", name="ck_grant_expiry"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    issued_by: Mapped[uuid.UUID] = mapped_column(Uuid)
+    role: Mapped[str] = mapped_column(String(16))
+    token_sha256: Mapped[str] = mapped_column(String(64))
+    scope: Mapped[dict] = mapped_column(JSON)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class GrantEvidence(Base):
+    __tablename__ = "grant_evidence"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["grant_id", "case_id", "merchant_id"],
+            ["case_grants.id", "case_grants.case_id", "case_grants.merchant_id"],
+            name="fk_selection_grant",
+        ),
+        ForeignKeyConstraint(
+            ["evidence_id", "case_id", "merchant_id"],
+            ["evidence.id", "evidence.case_id", "evidence.merchant_id"],
+            name="fk_selection_evidence",
+        ),
+    )
+    grant_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    evidence_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+
+
+class GrantCreationRequest(Identified, Timestamped, Base):
+    __tablename__ = "grant_creation_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id",
+            "credential_id",
+            "case_id",
+            "idempotency_key",
+            name="uq_grant_creation_key",
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_grant_request_credential",
+        ),
+        ForeignKeyConstraint(
+            ["grant_id", "case_id", "merchant_id"],
+            ["case_grants.id", "case_grants.case_id", "case_grants.merchant_id"],
+            name="fk_grant_request_owner",
+        ),
+        CheckConstraint("request_hash ~ '^[0-9a-f]{64}$'", name="ck_grant_request_hash"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    grant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_hash: Mapped[str] = mapped_column(String(64))
+
+
+class BrowserSession(Identified, Timestamped, Base):
+    __tablename__ = "browser_sessions"
+    __table_args__ = (
+        UniqueConstraint("token_sha256", name="uq_session_token"),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_session_credential",
+        ),
+        ForeignKeyConstraint(
+            ["grant_id", "case_id", "merchant_id"],
+            ["case_grants.id", "case_grants.case_id", "case_grants.merchant_id"],
+            name="fk_session_grant",
+        ),
+        CheckConstraint(
+            "(credential_id IS NOT NULL AND grant_id IS NULL AND case_id IS NULL) "
+            "OR (credential_id IS NULL AND grant_id IS NOT NULL AND case_id IS NOT NULL)",
+            name="ck_session_actor",
+        ),
+        CheckConstraint(
+            "token_sha256 ~ '^[0-9a-f]{64}$' AND csrf_sha256 ~ '^[0-9a-f]{64}$'",
+            name="ck_session_digest",
+        ),
+        CheckConstraint(
+            "expires_at > created_at AND expires_at <= created_at + interval '8 hours'",
+            name="ck_session_expiry",
+        ),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    grant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    token_sha256: Mapped[str] = mapped_column(String(64))
+    csrf_sha256: Mapped[str] = mapped_column(String(64))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class EvidenceConsent(Identified, Timestamped, Base):
+    __tablename__ = "evidence_consents"
+    __table_args__ = (
+        UniqueConstraint("evidence_id", name="uq_evidence_consent"),
+        ForeignKeyConstraint(
+            ["evidence_id", "case_id", "merchant_id"],
+            ["evidence.id", "evidence.case_id", "evidence.merchant_id"],
+            name="fk_consent_evidence",
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_consent_credential",
+        ),
+        ForeignKeyConstraint(
+            ["grant_id", "case_id", "merchant_id"],
+            ["case_grants.id", "case_grants.case_id", "case_grants.merchant_id"],
+            name="fk_consent_grant",
+        ),
+        CheckConstraint(
+            "(credential_id IS NOT NULL) <> (grant_id IS NOT NULL)", name="ck_consent_actor"
+        ),
+        CheckConstraint("processing_authorized", name="ck_consent_processing"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    evidence_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    grant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    disclosure_version: Mapped[str] = mapped_column(String(80))
+    processing_authorized: Mapped[bool] = mapped_column(Boolean)
+    share_with_reviewers: Mapped[bool] = mapped_column(Boolean)
+
+
+class AccessSubmissionRequest(Identified, Timestamped, Base):
+    __tablename__ = "access_submission_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "credential_id",
+            "case_id",
+            "operation",
+            "idempotency_key",
+            name="uq_access_credential_retry",
+        ),
+        UniqueConstraint(
+            "grant_id", "case_id", "operation", "idempotency_key", name="uq_access_grant_retry"
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_access_retry_credential",
+        ),
+        ForeignKeyConstraint(
+            ["grant_id", "case_id", "merchant_id"],
+            ["case_grants.id", "case_grants.case_id", "case_grants.merchant_id"],
+            name="fk_access_retry_grant",
+        ),
+        ForeignKeyConstraint(
+            ["evidence_id", "case_id", "merchant_id"],
+            ["evidence.id", "evidence.case_id", "evidence.merchant_id"],
+            name="fk_access_retry_evidence",
+        ),
+        ForeignKeyConstraint(
+            ["claim_id", "case_id", "merchant_id"],
+            ["claims.id", "claims.case_id", "claims.merchant_id"],
+            name="fk_access_retry_claim",
+        ),
+        ForeignKeyConstraint(
+            ["event_id", "case_id"],
+            ["case_events.id", "case_events.case_id"],
+            name="fk_access_retry_event",
+        ),
+        CheckConstraint(
+            "(credential_id IS NOT NULL) <> (grant_id IS NOT NULL)", name="ck_access_retry_actor"
+        ),
+        CheckConstraint(
+            "(operation = 'claim' AND claim_id IS NOT NULL AND evidence_id IS NULL) "
+            "OR (operation = 'evidence' AND evidence_id IS NOT NULL AND claim_id IS NULL)",
+            name="ck_access_retry_resource",
+        ),
+        CheckConstraint("request_hash ~ '^[0-9a-f]{64}$'", name="ck_access_retry_hash"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    grant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    operation: Mapped[str] = mapped_column(String(16))
+    claim_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    evidence_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    event_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_hash: Mapped[str] = mapped_column(String(64))

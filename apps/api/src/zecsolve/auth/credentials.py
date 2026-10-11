@@ -17,6 +17,7 @@ TOKEN_PATTERN = re.compile(r"zsm_[A-Za-z0-9_-]{43}\Z")
 class MerchantPrincipal:
     merchant_id: uuid.UUID
     credential_id: uuid.UUID
+    session_id: uuid.UUID | None = None
 
 
 @dataclass(frozen=True)

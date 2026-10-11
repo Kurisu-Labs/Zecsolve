@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+from zecsolve.schemas.access import AccessContextV1, GrantScopeV1
 from zecsolve.schemas.address import AddressNormalizationReport, NormalizeAddressRequest
 from zecsolve.schemas.case import (
     CaseCreateRequest,
@@ -33,6 +34,8 @@ from zecsolve.schemas.workflow_verification import (
 
 root = Path(__file__).resolve().parents[1]
 for name, model in (
+    ("access-context", AccessContextV1),
+    ("grant-scope", GrantScopeV1),
     ("verifier-result", VerificationReport),
     ("normalize-address-request", NormalizeAddressRequest),
     ("normalize-address-result", AddressNormalizationReport),
