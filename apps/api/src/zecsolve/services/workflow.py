@@ -23,6 +23,8 @@ def transaction(engine):
 
 
 def authorize_merchant(session: Session, principal: MerchantPrincipal):
+    if not isinstance(principal, MerchantPrincipal):
+        raise WorkflowError(403, "MERCHANT_REQUIRED")
     credential = session.scalar(
         select(MerchantCredential)
         .where(
@@ -30,11 +32,17 @@ def authorize_merchant(session: Session, principal: MerchantPrincipal):
             MerchantCredential.merchant_id == principal.merchant_id,
         )
         .with_for_update(read=True)
+        .execution_options(populate_existing=True)
     )
     # Evaluate time after acquiring the lock: a lock-only wait can outlive expiry.
     now = session.scalar(select(func.clock_timestamp()))
     if credential is None or credential.revoked_at is not None or credential.expires_at <= now:
         raise WorkflowError(401, "INVALID_MERCHANT_CREDENTIALS")
+
+    if principal.session_id is not None:
+        from zecsolve.auth.access import validate_session
+
+        validate_session(session, principal, credential.expires_at)
 
 
 def validate_idempotency_key(key: str | None) -> str:
