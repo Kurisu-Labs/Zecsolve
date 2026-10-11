@@ -47,7 +47,7 @@ def test_memo_preserves_original_text_and_pads_utf8_bytes():
     assert InvoiceCreateRequest(**fields(expected_memo="x")).memo_bytes == b"x" + bytes(511)
     assert InvoiceCreateRequest(**fields(expected_memo="")).memo_bytes == bytes(512)
     assert InvoiceCreateRequest(**fields()).memo_bytes is None
-    for memo in ["é" * 257, "\ud800"]:
+    for memo in ["é" * 257, "\ud800", "embedded\0nul"]:
         with pytest.raises(ValidationError):
             InvoiceCreateRequest(**fields(expected_memo=memo))
 
@@ -59,7 +59,7 @@ def test_expiry_requires_timezone_and_normalizes_to_utc():
     second = InvoiceCreateRequest(**fields(expires_at="2026-10-12T00:00:00Z"))
     assert first.expires_at == datetime(2026, 10, 12, tzinfo=UTC)
     assert first.model_dump(mode="json") == second.model_dump(mode="json")
-    for expiry in ["2026-10-12T00:00:00", 1791763200]:
+    for expiry in ["2026-10-12T00:00:00", 1791763200, "1791763200"]:
         with pytest.raises(ValidationError):
             InvoiceCreateRequest(**fields(expires_at=expiry))
 

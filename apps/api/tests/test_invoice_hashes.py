@@ -41,6 +41,10 @@ def test_snapshot_binds_exact_terms_owner_policy_and_receiver():
         policy=InvoicePolicyV1(),
     )
     snapshot = invoice_snapshot(**fields)
+    shifted = invoice_snapshot(
+        **{**fields, "created_at": datetime.fromisoformat("2026-10-11T07:00:00+07:00")}
+    )
+    assert shifted.created_at.isoformat() == "2026-10-11T00:00:00+00:00"
     assert snapshot.terms.memo_hex == (b"\xc3\xa9" + bytes(510)).hex()
     assert snapshot.terms.expected_memo == "é"
     same = request.model_copy(update={"expires_at": datetime(2030, 1, 1, tzinfo=UTC)})

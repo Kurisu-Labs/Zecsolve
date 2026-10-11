@@ -20,6 +20,8 @@ class InvoiceCreateRequest(Contract):
     @classmethod
     def bounded_utf8(cls, value, info):
         if value is not None:
+            if "\0" in value:
+                raise ValueError("NUL is not supported in stored text")
             limit = 512 if info.field_name == "expected_memo" else 1024
             if len(value.encode("utf-8")) > limit:
                 raise ValueError("Text exceeds UTF-8 byte limit")
@@ -30,6 +32,8 @@ class InvoiceCreateRequest(Contract):
     def explicit_datetime(cls, value):
         if value is not None and not isinstance(value, (str, datetime)):
             raise ValueError("Use a timezone-aware timestamp")
+        if isinstance(value, str) and "T" not in value and "t" not in value and " " not in value:
+            raise ValueError("Use an ISO timestamp with a date and time")
         return value
 
     @field_validator("expires_at")
@@ -74,3 +78,8 @@ class InvoiceSnapshotV1(Contract):
     terms: InvoiceTermsV1
     policy: InvoicePolicyV1
     snapshot_hash: HexDigest
+
+    @field_validator("created_at")
+    @classmethod
+    def utc_created_at(cls, value):
+        return value.astimezone(UTC)

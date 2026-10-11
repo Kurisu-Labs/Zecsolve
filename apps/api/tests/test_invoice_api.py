@@ -112,6 +112,7 @@ def test_authentication_and_merchant_isolation(database, invoice_api, invoice_bo
         {"policy": {}},
         {"network": "testnet"},
         {"expected_memo": "é" * 257},
+        {"expected_memo": "embedded\0nul"},
         {"expires_at": "2030-01-01T00:00:00"},
     ],
 )
