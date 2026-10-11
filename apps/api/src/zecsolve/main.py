@@ -18,6 +18,7 @@ from zecsolve.adapters.verifier import VerifierAdapter
 from zecsolve.api.cases import router as case_router
 from zecsolve.api.evidence import router as evidence_router
 from zecsolve.api.invoices import router as invoice_router
+from zecsolve.api.resolutions import router as resolution_router
 from zecsolve.api.verifications import router as verification_router
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
@@ -81,6 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(case_router)
     app.include_router(evidence_router)
     app.include_router(verification_router)
+    app.include_router(resolution_router)
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 
