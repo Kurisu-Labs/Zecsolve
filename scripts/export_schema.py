@@ -4,7 +4,13 @@ import json
 from pathlib import Path
 
 from zecsolve.schemas.address import AddressNormalizationReport, NormalizeAddressRequest
-from zecsolve.schemas.case import CaseCreateRequest, CaseDetailV1, CaseOpenedV1
+from zecsolve.schemas.case import (
+    CaseCreateRequest,
+    CaseDetailV1,
+    CaseListQuery,
+    CaseListV1,
+    CaseOpenedV1,
+)
 from zecsolve.schemas.evidence import (
     EvidenceStoredV1,
     EvidenceSubmitRequest,
@@ -35,6 +41,8 @@ for name, model in (
     ("case-create-request", CaseCreateRequest),
     ("case-opened", CaseOpenedV1),
     ("case-detail", CaseDetailV1),
+    ("case-list-query", CaseListQuery),
+    ("case-list", CaseListV1),
     ("evidence-submit-request", EvidenceSubmitRequest),
     ("evidence-stored", EvidenceStoredV1),
     ("evidence-submitted-event", EvidenceSubmittedEventV1),
