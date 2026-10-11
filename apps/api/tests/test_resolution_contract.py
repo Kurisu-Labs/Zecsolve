@@ -33,3 +33,23 @@ def test_resolution_input_enforces_action_reference_and_server_authority():
         assert ResolveRequest(**(valid | {"action": action, "verification_id": None}))
     with pytest.raises(ValidationError):
         ResolveRequest(**(valid | {"action": "REJECT_EVIDENCE", "verification_id": None}))
+
+
+def test_generated_resolution_schemas_match_runtime_contracts(root):
+    import json
+
+    from zecsolve.schemas.resolution import (
+        MerchantCaseReportV1,
+        ResolutionOutcomeV1,
+        ResolveRequest,
+    )
+
+    for name, model in (
+        ("case-resolve-request", ResolveRequest),
+        ("resolution-outcome", ResolutionOutcomeV1),
+        ("merchant-case-report", MerchantCaseReportV1),
+    ):
+        assert (
+            json.loads((root / f"contracts/{name}.schema.json").read_text())
+            == model.model_json_schema()
+        )

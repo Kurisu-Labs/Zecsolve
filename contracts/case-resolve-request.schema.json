@@ -1,0 +1,44 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "APPROVE_OUTPUT",
+        "REQUEST_EVIDENCE",
+        "REJECT_EVIDENCE",
+        "CLOSE_UNRESOLVED"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "verification_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verification Id"
+    },
+    "expected_case_version": {
+      "minimum": 1,
+      "title": "Expected Case Version",
+      "type": "integer"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "action",
+    "expected_case_version",
+    "reason"
+  ],
+  "title": "ResolveRequest",
+  "type": "object"
+}
