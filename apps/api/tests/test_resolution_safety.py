@@ -1,4 +1,5 @@
 import threading
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 
@@ -360,3 +361,152 @@ def test_confirmation_expiry_during_invoice_lock_blocks_credit(database, resolut
             result = future.result(timeout=10)
     assert isinstance(result, WorkflowError) and "STALE_OBSERVATION" in result.details["findings"]
     assert counts(database) == [0, 0, 3]
+
+
+def test_two_synthetic_outputs_accumulate_to_full_balance(
+    database, root, resolution_setup, verification_setup, receipt, raw_tx
+):
+    principal, _, original = resolution_setup
+    verifier = verification_setup[0]
+    # Synthetic 600k + 400k accounting inputs; no additional historical recovery claim.
+    synthetic = original.result.model_copy(
+        update={"output": original.result.output.model_copy(update={"amount_zat": 600_000})}
+    )
+    verifier.verifier.verify = lambda *args: synthetic
+    case, first = second_case(
+        database, root, verifier, principal, original, receipt, raw_tx, expected=1_000_000
+    )
+    service = ResolutionService(database, SimulatedObserver(), simulated_authority)
+    partial, _ = service.resolve(principal, case.case_id, approve(first), "partial")
+    assert partial.balances.credited_zat == 600_000 and partial.case_state == "UNDER_REVIEW"
+    synthetic = original.result.model_copy(
+        update={
+            "output": original.result.output.model_copy(
+                update={
+                    "amount_zat": 400_000,
+                    "output_index": original.result.output.output_index + 1,
+                }
+            )
+        }
+    )
+    second, _ = verifier.verify(
+        principal, case.case_id, CaseVerifyRequest(evidence_id=first.evidence_id), "another-output"
+    )
+    full, _ = service.resolve(principal, case.case_id, approve(second), "full")
+    assert full.balances.credited_zat == 1_000_000 and full.balances.outstanding_zat == 0
+    assert full.case_state == "RESOLVED" and full.case_version == 6
+    assert counts(database) == [2, 2, 9]
+
+
+def test_downgrade_waits_for_noncredit_decision_before_guard(database, root, resolution_setup):
+    from alembic import command
+    from alembic.config import Config
+    from sqlalchemy import event
+
+    principal, case, _ = resolution_setup
+    paused, release = threading.Event(), threading.Event()
+    role = threading.local()
+    request = ResolveRequest(
+        action="REQUEST_EVIDENCE", expected_case_version=3, reason="Need evidence"
+    )
+
+    def coordinate(connection, cursor, statement, parameters, context, executemany):
+        if getattr(role, "name", None) == "writer" and statement.startswith(
+            "INSERT INTO resolutions"
+        ):
+            paused.set()
+            assert release.wait(timeout=5)
+        if (
+            getattr(role, "name", None) == "migration"
+            and statement.startswith("LOCK TABLE ")
+            and "case_resolution_requests" in statement
+        ):
+            release.set()
+
+    def decide():
+        role.name = "writer"
+        return ResolutionService(database).resolve(principal, case.case_id, request, "inflight")
+
+    def downgrade():
+        role.name = "migration"
+        config = Config(str(root / "alembic.ini"))
+        config.set_main_option("script_location", str(root / "apps/api/migrations"))
+        try:
+            with database.begin() as connection:
+                config.attributes["connection"] = connection
+                command.downgrade(config, "0006")
+            return "downgraded"
+        except RuntimeError as error:
+            return str(error)
+
+    event.listen(database, "before_cursor_execute", coordinate)
+    try:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            writer = pool.submit(decide)
+            assert paused.wait(timeout=5)
+            migration = pool.submit(downgrade)
+            decision, _ = writer.result(timeout=10)
+            assert "forward migration" in migration.result(timeout=10)
+    finally:
+        release.set()
+        event.remove(database, "before_cursor_execute", coordinate)
+    assert ResolutionService(database).resolve(principal, case.case_id, request, "inflight") == (
+        decision,
+        True,
+    )
+
+
+def test_downgrade_preserves_failed_approval_diagnostic(database, root, resolution_setup):
+    from alembic import command
+    from alembic.config import Config
+
+    principal, case, attempt = resolution_setup
+    with pytest.raises(WorkflowError):
+        ResolutionService(database).resolve(principal, case.case_id, approve(attempt), "blocked")
+    config = Config(str(root / "alembic.ini"))
+    config.set_main_option("script_location", str(root / "apps/api/migrations"))
+    with pytest.raises(RuntimeError, match="forward migration"):
+        with database.begin() as connection:
+            config.attributes["connection"] = connection
+            command.downgrade(config, "0006")
+    assert len(CaseReportService(database).get(principal, case.case_id).decision_observations) == 1
+
+
+@pytest.mark.parametrize("target", ["outcome", "evaluation", "observation"])
+def test_corrupted_decision_links_are_rejected_on_replay(database, resolution_setup, target):
+    from zecsolve.db.models import DecisionEvaluation
+
+    principal, case, attempt = resolution_setup
+    service = ResolutionService(database, SimulatedObserver(), simulated_authority)
+    decision, _ = service.resolve(principal, case.case_id, approve(attempt), "done")
+    with database.begin() as connection:
+        if target == "outcome":
+            table = "resolutions"
+            payload = decision.model_dump(mode="json") | {"invoice_id": str(uuid.uuid4())}
+            statement = (
+                update(Resolution)
+                .where(Resolution.id == decision.resolution_id)
+                .values(outcome_snapshot=payload)
+            )
+        elif target == "evaluation":
+            table = "decision_evaluations"
+            statement = (
+                update(DecisionEvaluation)
+                .where(DecisionEvaluation.id == decision.evaluation.evaluation_id)
+                .values(snapshot={})
+            )
+        else:
+            table = "chain_observations"
+            statement = (
+                update(ChainObservation)
+                .where(ChainObservation.id == decision.evaluation.observation.observation_id)
+                .values(confirmations=999)
+            )
+        connection.execute(text(f"ALTER TABLE {table} DISABLE TRIGGER immutable_record"))
+        connection.execute(statement)
+        connection.execute(text(f"ALTER TABLE {table} ENABLE TRIGGER immutable_record"))
+    with pytest.raises(WorkflowError) as error:
+        service.resolve(principal, case.case_id, approve(attempt), "done")
+    assert error.value.status == 409
+    with pytest.raises(WorkflowError):
+        CaseReportService(database).get(principal, case.case_id)
