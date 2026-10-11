@@ -2,7 +2,7 @@
 
 from sqlalchemy import select
 
-from zecsolve.db.models import ChainObservation, Resolution
+from zecsolve.db.models import ChainObservation, Resolution, VerificationEvaluation
 from zecsolve.schemas.resolution import ChainReviewV1
 from zecsolve.services.observations import read_decision_observation
 from zecsolve.services.resolution_records import read_resolution
@@ -28,7 +28,10 @@ def chain_review(decisions, observations):
         )
         # An unavailable refresh cannot erase a previously observed loss of inclusion.
         relevant = [item for item in later if item.state != "UNAVAILABLE"]
-        if relevant and relevant[-1].state == "UNCONFIRMED":
+        if relevant and (
+            relevant[-1].state == "UNCONFIRMED"
+            or relevant[-1].confirmations < decision.evaluation.invoice.policy.minimum_confirmations
+        ):
             findings.append(
                 ChainReviewV1(
                     resolution_id=decision.resolution_id, observation_id=relevant[-1].observation_id
@@ -48,6 +51,14 @@ def read_chain_review(session, principal, case_id):
             )
         )
     ]
+    initial_ids = set(
+        session.scalars(
+            select(VerificationEvaluation.observation_id).where(
+                VerificationEvaluation.case_id == case_id,
+                VerificationEvaluation.merchant_id == principal.merchant_id,
+            )
+        )
+    )
     observations = [
         read_decision_observation(session, principal, case_id, row.id)
         for row in session.scalars(
@@ -56,8 +67,6 @@ def read_chain_review(session, principal, case_id):
                 ChainObservation.merchant_id == principal.merchant_id,
             )
         )
-        if row.provenance
-        and row.provenance.get("schema_version")
-        in ("decision-observation-v1", "decision-observation-v2")
+        if row.id not in initial_ids
     ]
     return chain_review(decisions, observations)

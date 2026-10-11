@@ -222,8 +222,14 @@ def test_reorg_blocks_another_output_until_prior_inclusion_is_restored(
     with pytest.raises(WorkflowError, match="APPROVED_OUTPUT_CHAIN_REVIEW"):
         resolver.resolve(principal, case.case_id, approve(second), "approve-second")
     assert CaseReportService(database).get(principal, case.case_id).balances.credited_zat == 100_000
+    node.tx.update(height=109, confirmations=1, in_active_chain=True)
+    node.block.update(height=109, confirmations=1)
+    ObservationService(database, observer).refresh_request(
+        principal, case.case_id, first.verification_id, "reincluded-below-policy"
+    )
+    assert CaseReportService(database).get(principal, case.case_id).chain_review
     node.tx.update(height=100, confirmations=10, in_active_chain=True)
-    node.block["confirmations"] = 10
+    node.block.update(height=100, confirmations=10)
     ObservationService(database, observer).refresh_request(
         principal, case.case_id, first.verification_id, "restored"
     )
@@ -265,3 +271,32 @@ def test_refresh_history_is_immutable_and_failed_retry_write_rolls_back(
         with pytest.raises(DBAPIError):
             with database.begin() as connection:
                 connection.execute(text(statement))
+
+
+def test_unknown_observation_format_cannot_hide_chain_review(database, resolution_setup, raw_tx):
+    from sqlalchemy import text, update
+    from zecsolve.services.chain_review import read_chain_review
+
+    principal, case, attempt = resolution_setup
+    node, observer = make_observer(attempt, raw_tx)
+    ResolutionService(database, observer, observer.authorizes).resolve(
+        principal, case.case_id, approve(attempt), "approve"
+    )
+    node.tx.update(height=-1, confirmations=0, in_active_chain=False)
+    node.block["confirmations"] = -1
+    lost = ObservationService(database, observer).refresh(
+        principal, case.case_id, attempt.verification_id
+    )
+    with database.begin() as connection:
+        connection.execute(text("ALTER TABLE chain_observations DISABLE TRIGGER immutable_record"))
+        connection.execute(
+            update(ChainObservation)
+            .where(ChainObservation.id == lost.observation_id)
+            .values(provenance={"schema_version": "unknown"})
+        )
+        connection.execute(text("ALTER TABLE chain_observations ENABLE TRIGGER immutable_record"))
+    with (
+        Session(database) as session,
+        pytest.raises(WorkflowError, match="OBSERVATION_HISTORY_UNAVAILABLE"),
+    ):
+        read_chain_review(session, principal, case.case_id)
