@@ -7,6 +7,18 @@ from pydantic import AwareDatetime, Field, field_validator
 from zecsolve.domain.statuses import CaseState
 from zecsolve.schemas.verification import Contract, HexDigest
 
+MAX_CASE_PAGE_SIZE = 100
+MAX_CASE_CURSOR_LENGTH = 512
+CaseCursorToken = Annotated[
+    str, Field(min_length=1, max_length=MAX_CASE_CURSOR_LENGTH, pattern=r"^[A-Za-z0-9_-]+$")
+]
+
+
+class CaseListQuery(Contract):
+    limit: Annotated[int, Field(ge=1, le=MAX_CASE_PAGE_SIZE)] = 50
+    state: CaseState | None = None
+    cursor: CaseCursorToken | None = None
+
 
 class CaseCreateRequest(Contract):
     invoice_id: uuid.UUID
@@ -67,3 +79,9 @@ class CaseOpenedV1(CaseSummaryV1):
 class CaseDetailV1(CaseSummaryV1):
     # Current state is separate from the immutable opening outcome returned on retries.
     opening_event: CaseOpeningEventV1
+
+
+class CaseListV1(Contract):
+    schema_version: Literal["1"] = "1"
+    items: Annotated[list[CaseSummaryV1], Field(max_length=MAX_CASE_PAGE_SIZE)]
+    next_cursor: CaseCursorToken | None = None

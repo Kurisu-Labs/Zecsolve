@@ -249,3 +249,29 @@ Integration review found a TypeScript build error, invalid verification referenc
 Validation: clean locked dependency installation, four workflow regression tests, type checking and production build passed. The production build's case and report routes were opened successfully in the local browser. Independent source review confirmed the reported blockers were resolved. Added a separate web CI job; backend CI continues to run its full suite. This does not claim browser end-to-end testing against a live chain source.
 
 Remaining: customer/reviewer grants and sessions, API case listing and claim writers, full packet/replay, same-origin deployment integration, and complete M6 browser acceptance. M3 live-node validation remains pending because no trusted endpoint has been provided.
+
+## Item 09 — merchant case listing (M4.3)
+
+Implemented October 11, 2026, as Person 3 on `feat/m4-case-listing`, starting from `2de8150` after checking remote branches and open PRs. The branch was published before implementation; contracts/cursors and endpoint/database coverage were committed and pushed separately. The preceding entries remain historical records.
+
+- Add merchant-only `GET /api/cases` returning versioned summary pages, optional exact state filtering, and limits of 1–100 (default 50). Order by creation time descending with a descending UUID tie-breaker and fetch at most one extra row to determine continuation.
+- Bind versioned cursors to merchant/filter, independently verify anchor ownership, and recheck credentials before reads and before returning results. Missing/foreign/forged positions fail without disclosing foreign case existence. Pagination uses current state, with documented behavior for new inserts and state changes.
+- Preserve creation, detail and report contracts. Historical rows expose summary metadata only; unsupported history still fails on existing detail/report routes. No grants, sessions, claims, frontend code, schema migrations or shared authorization changes are included.
+- Publish query/list schemas and the [Person 4 API handoff](cases.md#list-merchant-cases), and update the assignment/status documents without marking M4 or M6 complete.
+
+### Recorded local validation
+
+macOS arm64, Python 3.12.14, Rust 1.99.0, uv 0.13.0, disposable PostgreSQL 17.11 on loopback with a separate schema per test:
+
+```text
+make test: 12 Rust tests; 191 Python tests passed
+make test-db: 165 PostgreSQL tests passed
+make lint: Rust formatting/Clippy and Python lint/formatting passed
+make schema: published contracts regenerated
+make poc: historical recovery and tamper rejection passed; chain remains UNAVAILABLE
+Focused M4.3: 16 contract/cursor tests; 14 PostgreSQL API/service tests passed
+```
+
+The first native test run hit five timeouts in unchanged subprocess tests using `/usr/bin/python3`; the focused 20-test subprocess suite and complete `make test` subsequently passed without source changes. The existing Starlette/httpx deprecation warning remains. Pagination coverage deliberately makes timestamp and UUID ordering differ, includes tied timestamps, and tests all states, empty pages, merchant isolation, forged/foreign/missing anchors, rotation/revocation/expiry, expiry during a read, concurrent newer inserts, changed anchor state, legacy metadata, and real invoice/case creation. Synthetic legacy rows exercise listing only and make no cryptographic claims.
+
+Local acceptance is recorded here; completion still requires the feature PR's final review, CI and merge under CONTRIBUTING.md. Person 4 owns dashboard integration. Person 3's customer submissions depend on M4.2; M3.1 still requires a trusted endpoint, and full release acceptance remains incomplete.

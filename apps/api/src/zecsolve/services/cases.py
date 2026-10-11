@@ -1,13 +1,22 @@
 import uuid
 
 from pydantic import ValidationError
-from sqlalchemy import func, select
+from sqlalchemy import func, select, tuple_
 from sqlalchemy.exc import IntegrityError
 
 from zecsolve.db.models import Case, CaseCreationRequest, CaseEvent, Invoice
 from zecsolve.domain.events import opening_event
 from zecsolve.domain.snapshots import digest
-from zecsolve.schemas.case import CaseCreateRequest, CaseDetailV1, CaseOpenedV1, CaseOpeningEventV1
+from zecsolve.schemas.case import (
+    CaseCreateRequest,
+    CaseDetailV1,
+    CaseListQuery,
+    CaseListV1,
+    CaseOpenedV1,
+    CaseOpeningEventV1,
+    CaseSummaryV1,
+)
+from zecsolve.services.case_cursor import decode_case_cursor, encode_case_cursor
 from zecsolve.services.workflow import (
     WorkflowError,
     authorize_merchant,
@@ -30,6 +39,52 @@ def load_owned_case(session, principal, case_id):
 class CaseService:
     def __init__(self, engine):
         self.engine = engine
+
+    def list(self, principal, query: CaseListQuery) -> CaseListV1:
+        with transaction(self.engine) as session:
+            authorize_merchant(session, principal)
+            statement = select(
+                Case.id.label("case_id"),
+                Case.invoice_id,
+                Case.merchant_id,
+                Case.state,
+                Case.version,
+                Case.created_at,
+            ).where(Case.merchant_id == principal.merchant_id)
+            if query.state is not None:
+                statement = statement.where(Case.state == query.state.value)
+            if query.cursor is not None:
+                anchor_id = decode_case_cursor(query.cursor, principal.merchant_id, query.state)
+                # A cursor is a position, not authority. Look up its ordering key only
+                # within the authenticated merchant, even if the token was forged.
+                anchor = session.execute(
+                    select(Case.created_at, Case.id).where(
+                        Case.id == anchor_id, Case.merchant_id == principal.merchant_id
+                    )
+                ).one_or_none()
+                if anchor is None:
+                    raise WorkflowError(422, "INVALID_CASE_CURSOR")
+                statement = statement.where(
+                    tuple_(Case.created_at, Case.id) < tuple_(anchor.created_at, anchor.id)
+                )
+            rows = (
+                session.execute(
+                    statement.order_by(Case.created_at.desc(), Case.id.desc()).limit(
+                        query.limit + 1
+                    )
+                )
+                .mappings()
+                .all()
+            )
+            items = [CaseSummaryV1(**row) for row in rows[: query.limit]]
+            next_cursor = None
+            if len(rows) > query.limit:
+                next_cursor = encode_case_cursor(
+                    principal.merchant_id, items[-1].case_id, query.state
+                )
+            result = CaseListV1(items=items, next_cursor=next_cursor)
+            authorize_merchant(session, principal)
+            return result
 
     def load(self, session, principal, case_id):
         return load_owned_case(session, principal, case_id)

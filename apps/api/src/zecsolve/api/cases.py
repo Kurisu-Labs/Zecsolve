@@ -1,13 +1,19 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import JSONResponse
 
 from zecsolve.api.workflow import execute
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
-from zecsolve.schemas.case import CaseCreateRequest, CaseDetailV1, CaseOpenedV1
+from zecsolve.schemas.case import (
+    CaseCreateRequest,
+    CaseDetailV1,
+    CaseListQuery,
+    CaseListV1,
+    CaseOpenedV1,
+)
 from zecsolve.services.cases import CaseService
 
 router = APIRouter(prefix="/api/cases", tags=["cases"])
@@ -36,6 +42,15 @@ def create_case(
             "Idempotency-Replayed": str(replayed).lower(),
         },
     )
+
+
+@router.get("", response_model=CaseListV1)
+def list_cases(
+    query: Annotated[CaseListQuery, Query()],
+    principal: Principal,
+    workflow: Annotated[CaseService, Depends(service)],
+):
+    return execute(lambda: workflow.list(principal, query), "CASE")
 
 
 @router.get("/{case_id}", response_model=CaseDetailV1)

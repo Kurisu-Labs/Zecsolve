@@ -1,6 +1,6 @@
 # zecsolve teammate guide
 
-**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, server case listing, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, dashboard integration with the new case-list API, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
 
 This guide explains the foundation and backend milestones completed through October 11. Use [README.md](README.md) for runnable setup commands.
 
@@ -23,7 +23,7 @@ The originals were relocated without rewriting their contents. In particular, en
 | Area | Implemented now | Still needed |
 |---|---|---|
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
-| API | Health/readiness, POC verification, owned invoice/case create/read, encrypted evidence upload/metadata, persisted verification, reports, and merchant decisions | Case list, claims, export, customer/reviewer projections |
+| API | Health/readiness, POC verification, owned invoice/case create/read, paginated merchant case listing, encrypted evidence upload/metadata, persisted verification, reports, and merchant decisions | Claims, export, customer/reviewer projections |
 | Database | Immutable snapshots, one case per invoice, encrypted evidence, verification/evaluation history, chained events, atomic decisions/allocations/retries | Access grants, retention/rotation workflows |
 | Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Real-node integration validation; the trusted RPC adapter is implemented and offline remains the default |
 | Access | POC token; merchant credentials; owned invoice/case/evidence access with authorization rechecks | Customer grants, reviewer consent/sharing, browser sessions |
@@ -133,7 +133,7 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 |---|---|---|
 | Person 1 — access | M4.0 shared actor/schema foundation, then grants and browser sessions | Own shared auth/models/migrations; consumers reuse the same authorization context |
 | Person 2 — reports/export | M5.0 packet contract after M4.0; scoped reports after submission/consent is ready | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
-| Person 3 — workflow/integration/release | M4.3 case listing; customer submission after M4.2; live validation when an endpoint exists | Own submission services and deployment; consume access contracts and Person 4's built app |
+| Person 3 — workflow/integration/release | M4.3 listing implemented and locally validated; customer submission after M4.2; live validation when an endpoint exists | Own submission services and deployment; consume access contracts and Person 4's built app |
 | Person 4 — all frontend | M6.0 Vue shell when frontend work is resumed | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
 These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. All M6 work remains deferred despite Person 4's assignment. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
@@ -150,4 +150,4 @@ Commit source and lockfiles, not `.env`, `.venv`, `.cache`, `target`, or real cu
 
 Read [docs/chain.md](docs/chain.md) before configuring a node. The adapter is composed only from server settings; request bodies cannot supply URLs or trust assertions. New approvals always refresh; a merchant can also refresh an already resolved case with `POST /api/cases/{id}/chain-observations`. Keep the existing observation-v1 snapshot format intact: observation-v2 adds sanitized RPC provenance without changing older decision hashes.
 
-The user has no RPC endpoint yet. The live historical-fixture observation and merchant-approval trace are **pending**, as is recording the actual node version/capabilities. No Vue work was started. Customer/reviewer grants, browser sessions, claims/listing, replay packets, and release validation remain separate milestones.
+The user has no RPC endpoint yet. The live historical-fixture observation and merchant-approval trace are **pending**, as is recording the actual node version/capabilities. The initial frontend is recorded in PR #12. M4.3 now supplies merchant listing; customer/reviewer grants, browser sessions, claims, replay packets, and release validation remain separate milestones.

@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "CaseState": {
+      "enum": [
+        "OPEN",
+        "AWAITING_EVIDENCE",
+        "UNDER_REVIEW",
+        "RESOLVED",
+        "CLOSED_UNRESOLVED"
+      ],
+      "title": "CaseState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "limit": {
+      "default": 50,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    },
+    "state": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CaseState"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "cursor": {
+      "anyOf": [
+        {
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cursor"
+    }
+  },
+  "title": "CaseListQuery",
+  "type": "object"
+}
