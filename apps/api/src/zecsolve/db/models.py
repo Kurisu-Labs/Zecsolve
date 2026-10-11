@@ -250,6 +250,24 @@ class EvidenceSubmissionRequest(Identified, Timestamped, Base):
 class Verification(Identified, Timestamped, Base):
     __tablename__ = "verifications"
     __table_args__ = (
+        UniqueConstraint("id", "case_id", "merchant_id", name="uq_verification_case_owner"),
+        ForeignKeyConstraint(
+            ["evidence_id", "case_id", "merchant_id"],
+            ["evidence.id", "evidence.case_id", "evidence.merchant_id"],
+            name="fk_verification_evidence_owner",
+        ),
+        ForeignKeyConstraint(
+            ["actor_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_verification_actor",
+        ),
+        ForeignKeyConstraint(
+            ["event_id", "case_id"],
+            ["case_events.id", "case_events.case_id"],
+            name="fk_verification_event",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
         CheckConstraint(
             "receipt_state IN ('NONE','VALID','INVALID','UNSUPPORTED','UNAVAILABLE','ERROR')",
             name="ck_verification_state",
@@ -261,11 +279,30 @@ class Verification(Identified, Timestamped, Base):
     result: Mapped[dict] = mapped_column(JSON)
     verifier_version: Mapped[str] = mapped_column(String(120))
     rules_version: Mapped[str] = mapped_column(String(40))
+    case_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    merchant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    actor_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    event_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    workflow_version: Mapped[str | None] = mapped_column(String(16))
+    case_version: Mapped[int | None] = mapped_column(Integer)
+    case_state: Mapped[str | None] = mapped_column(String(32))
 
 
 class ChainObservation(Identified, Timestamped, Base):
     __tablename__ = "chain_observations"
     __table_args__ = (
+        UniqueConstraint(
+            "id",
+            "verification_id",
+            "case_id",
+            "merchant_id",
+            name="uq_observation_verification_owner",
+        ),
+        ForeignKeyConstraint(
+            ["verification_id", "case_id", "merchant_id"],
+            ["verifications.id", "verifications.case_id", "verifications.merchant_id"],
+            name="fk_observation_verification_owner",
+        ),
         CheckConstraint(
             "state IN ('CONFIRMED','UNCONFIRMED','UNAVAILABLE')", name="ck_chain_state"
         ),
@@ -277,6 +314,78 @@ class ChainObservation(Identified, Timestamped, Base):
     block_hash: Mapped[str | None] = mapped_column(String(64))
     block_height: Mapped[int | None] = mapped_column(BigInteger)
     confirmations: Mapped[int | None] = mapped_column(Integer)
+    case_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    merchant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    provenance: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
+
+
+class VerificationEvaluation(Identified, Timestamped, Base):
+    __tablename__ = "verification_evaluations"
+    __table_args__ = (
+        UniqueConstraint("verification_id", name="uq_evaluation_verification"),
+        ForeignKeyConstraint(
+            ["verification_id", "case_id", "merchant_id"],
+            ["verifications.id", "verifications.case_id", "verifications.merchant_id"],
+            name="fk_evaluation_verification_owner",
+        ),
+        ForeignKeyConstraint(
+            ["observation_id", "verification_id", "case_id", "merchant_id"],
+            [
+                "chain_observations.id",
+                "chain_observations.verification_id",
+                "chain_observations.case_id",
+                "chain_observations.merchant_id",
+            ],
+            name="fk_evaluation_observation",
+        ),
+        ForeignKeyConstraint(
+            ["invoice_id", "merchant_id"],
+            ["invoices.id", "invoices.merchant_id"],
+            name="fk_evaluation_invoice",
+        ),
+        ForeignKeyConstraint(
+            ["policy_id", "merchant_id"],
+            ["invoice_policies.id", "invoice_policies.merchant_id"],
+            name="fk_evaluation_policy",
+        ),
+    )
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    invoice_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    policy_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    verification_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    observation_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    snapshot: Mapped[dict] = mapped_column(JSON)
+
+
+class CaseVerificationRequest(Identified, Timestamped, Base):
+    __tablename__ = "case_verification_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id",
+            "credential_id",
+            "case_id",
+            "idempotency_key",
+            name="uq_case_verification_key",
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_verify_request_credential",
+        ),
+        ForeignKeyConstraint(
+            ["verification_id", "case_id", "merchant_id"],
+            ["verifications.id", "verifications.case_id", "verifications.merchant_id"],
+            name="fk_verify_request_owner",
+        ),
+        CheckConstraint("request_hash ~ '^[0-9a-f]{64}$'", name="ck_verify_request_hash"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_hash: Mapped[str] = mapped_column(String(64))
+    verification_id: Mapped[uuid.UUID] = mapped_column(Uuid)
 
 
 class Resolution(Identified, Base):
