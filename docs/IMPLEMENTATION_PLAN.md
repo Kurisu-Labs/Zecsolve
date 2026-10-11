@@ -4,7 +4,7 @@
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** Proposed implementation sequence; no application changes or new acceptance results are represented by this document
+**Status:** Requirements sequence retained below. As of October 11, M1/M2 backend implementation is complete; M3 adapter, refresh, and negative paths are implemented, with live-node validation pending. M4/M5 remain pending and M6 Vue is deferred by the user. Recorded results live in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 **First milestone:** Invoice → receipt verification → merchant-approved allocation → report
 

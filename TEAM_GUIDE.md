@@ -1,6 +1,6 @@
 # zecsolve teammate guide
 
-This guide explains the October 10 foundation and where to continue development. Use [README.md](README.md) for runnable setup commands.
+This guide explains the foundation and backend milestones completed through October 11. Use [README.md](README.md) for runnable setup commands.
 
 ## What we are building
 
@@ -23,12 +23,12 @@ The originals were relocated without rewriting their contents. In particular, en
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
 | API | Health/readiness, POC verification, owned invoice/case create/read, encrypted evidence upload/metadata, persisted verification, reports, and merchant decisions | Case list, claims, export, customer/reviewer projections |
 | Database | Immutable snapshots, one case per invoice, encrypted evidence, verification/evaluation history, chained events, atomic decisions/allocations/retries | Access grants, retention/rotation workflows |
-| Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Trusted live chain observations; policy-aware approval is implemented but blocked in offline deployment |
+| Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Real-node integration validation; the trusted RPC adapter is implemented and offline remains the default |
 | Access | POC token; merchant credentials; owned invoice/case/evidence access with authorization rechecks | Customer grants, reviewer consent/sharing, browser sessions |
 | Frontend | Planned Vue 3 + TypeScript + Tailwind architecture | Dashboard, customer submission and reviewer report |
 | Export | Versioned verifier result and fixture manifest | Complete replayable case packet |
 
-The POC runs without PostgreSQL; readiness requires a migrated database, verifier executable, and configured evidence encryption key. Database tests use public fixtures or synthetic rows. They prove the implemented workflow/database behavior, not that a merchant resolution API already exists.
+The POC runs without PostgreSQL; readiness requires a migrated database, verifier executable, and configured evidence encryption key. Database tests use public fixtures or synthetic rows. They prove the implemented workflow/database behavior; simulated RPC responses do not establish live chain inclusion.
 
 ## Code map
 
@@ -51,6 +51,7 @@ The POC runs without PostgreSQL; readiness requires a migrated database, verifie
 | `apps/api/src/zecsolve/domain/offline_evaluation.py`, `schemas/workflow_verification.py` | Captured evaluation inputs, offline balances, and initial report contracts |
 | `apps/api/src/zecsolve/api/resolutions.py`, `services/resolutions.py`, `services/resolution_records.py` | Merchant actions, atomic allocation, retry, version checks, and persisted decision validation |
 | `apps/api/src/zecsolve/domain/decision_rules.py`, `services/observations.py` | Versioned policy gates and immutable refresh diagnostics; default observer has no trusted confirmation source |
+| `apps/api/src/zecsolve/adapters/rpc.py`, `api/observations.py`, `services/chain_review.py` | Trusted read-only RPC, idempotent merchant refresh, and later loss-of-inclusion review |
 | `scripts/demo_resolution.py` | Same-service allocation demo in a temporary schema with clearly simulated confirmation |
 | `apps/api/src/zecsolve/services/audit.py` | Validates the stored event chain before extending it |
 | `apps/api/src/zecsolve/domain/snapshots.py` | Versioned deterministic serialization and invoice snapshot hashes |
@@ -106,7 +107,7 @@ The Rust process returns exit zero for a completed check, including `INVALID` an
 - **Separate facts:** Receipt validity, chain observation, case state, and business resolution are independent. The current offline POC can never claim confirmed chain inclusion.
 - **Separate failures:** Missing receipt → `NONE`; absent source/binary → `UNAVAILABLE`; unimplemented format → `UNSUPPORTED`; failed binding/recovery → `INVALID`; process or malformed transaction data errors → `ERROR`.
 - **Multiple findings:** Chain uncertainty and a balance shortfall may coexist. Invalid evidence is not a fraud accusation.
-- **Recipient comparison:** Domain rules consume normalized receiver bytes plus pool/network. Future invoice input must decode Unified Addresses properly rather than compare address strings. A receipt label is not a verified memo.
+- **Recipient comparison:** Domain rules consume normalized receiver bytes plus pool/network. Invoice creation decodes Unified Addresses before comparing receivers. A receipt label is not a verified memo.
 - **Invoice binding:** Require an exact expected memo match or an explicitly established unique receiver binding. Otherwise return `NEEDS_REVIEW`. A matching amount alone does not identify an invoice; a projected overpayment also requires review.
 - **Merchant authority:** Verification and rule evaluation never write allocations. The merchant resolution service rechecks stale state and commits approval, allocation, and audit event together; deployed offline observations block credit.
 
@@ -132,7 +133,7 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 | Resolution and access | Customer/reviewer scoped grants and consent; merchant decisions are implemented | PostgreSQL constraints and pure rules; avoid accepting actor/merchant identity from arbitrary request fields |
 | Frontend | Vue shell and the four independent status/balance displays | Generate TypeScript types from OpenAPI; work against explicit fixtures until routes exist |
 | Evidence and export | Authorized private storage and a packet containing snapshot, receipt, raw tx, provenance, versions and decision | Preserve original bytes; disclose only authorized case evidence |
-| Zcash integration | Trusted confirmation observations and a real Sapling fixture | Keep source observations separate from offline output recovery |
+| Zcash integration | Live Zebra validation and a real Sapling fixture | Keep source observations separate from offline output recovery |
 
 These are suggested teammate boundaries; no teammates have been assigned or messaged. Agree on API contracts before connecting the frontend. Keep CipherPay, notifications, browser WASM, signatures, and live checkout out of the foundation milestone.
 
@@ -143,3 +144,9 @@ Follow [CONTRIBUTING.md](CONTRIBUTING.md) from the start of each task: inspect a
 Run `make test` and `make lint`. Run `make test-db` with a disposable PostgreSQL URL for model, migration, or allocation changes. Regenerate the schema with `make schema` after changing the verification contract. Check that exports/logs/errors do not expose tokens, wallet keys or unnecessary receipt content.
 
 Commit source and lockfiles, not `.env`, `.venv`, `.cache`, `target`, or real customer evidence. Fixtures in this repository are already-public upstream demo artifacts. The original specification files should remain reference inputs; document implementation changes here or in architecture notes.
+
+## Trusted chain handoff (M3)
+
+Read [docs/chain.md](docs/chain.md) before configuring a node. The adapter is composed only from server settings; request bodies cannot supply URLs or trust assertions. New approvals always refresh; a merchant can also refresh an already resolved case with `POST /api/cases/{id}/chain-observations`. Keep the existing observation-v1 snapshot format intact: observation-v2 adds sanitized RPC provenance without changing older decision hashes.
+
+The user has no RPC endpoint yet. The live historical-fixture observation and merchant-approval trace are **pending**, as is recording the actual node version/capabilities. No Vue work was started. Customer/reviewer grants, browser sessions, claims/listing, replay packets, and release validation remain separate milestones.
