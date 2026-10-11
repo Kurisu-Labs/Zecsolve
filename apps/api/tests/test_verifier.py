@@ -105,3 +105,32 @@ def test_subprocess_is_bounded(tmp_path, receipt, raw_tx, program, reason):
     binary.chmod(0o700)
     result = VerifierAdapter(binary, timeout=0.2).verify(receipt, raw_tx)
     assert (result.receipt_state, result.reason_code) == ("ERROR", reason)
+
+
+@pytest.mark.parametrize("stage", ["create", "write", "cleanup"])
+def test_temporary_storage_failure_is_an_execution_error(
+    adapter, receipt, raw_tx, monkeypatch, stage
+):
+    import tempfile
+    from pathlib import Path
+
+    def unavailable_storage(*args, **kwargs):
+        raise OSError(28, "synthetic storage failure")
+
+    if stage == "create":
+        monkeypatch.setattr(
+            "zecsolve.adapters.verifier.tempfile.TemporaryDirectory", unavailable_storage
+        )
+    elif stage == "write":
+        monkeypatch.setattr(Path, "write_bytes", unavailable_storage)
+    else:
+
+        class FailedCleanup(tempfile.TemporaryDirectory):
+            def cleanup(self):
+                super().cleanup()
+                unavailable_storage()
+
+        monkeypatch.setattr("zecsolve.adapters.verifier.tempfile.TemporaryDirectory", FailedCleanup)
+    result = adapter.verify(receipt, raw_tx)
+    assert (result.receipt_state, result.reason_code) == ("ERROR", "VERIFIER_PROCESS_ERROR")
+    assert result.output is None

@@ -148,8 +148,35 @@ Independent security/code review found a malformed audit-reference error path; a
 
 See [evidence API/key guide](evidence.md). This completes storage/submission, not persisted verification, customer/reviewer consent, or release readiness. Keep historical encryption keys securely; single-key configuration is not a completed rotation solution.
 
+## Item 06 — persisted verification and initial offline reports
+
+Implemented on October 11, 2026, over baseline `c59ee0a`, in separately published contract, evaluation, migration, shared-reader, audit, service, report, HTTP, review-fix, regression, schema, and documentation increments.
+
+- Merchant-only verification accepts an owned evidence reference, authorizes/decrypts its exact stored bundle, and runs the real Rust adapter outside database locks. Persist completed valid, invalid, missing, unsupported, unavailable, and error outcomes honestly.
+- Atomically record attempt, explicit offline observation, immutable evaluation inputs/result, audit event, scoped retry outcome, and case state/version. Same-key replay returns its original outcome; a new key records a new attempt. No allocation or business approval is written.
+- Initial merchant reports read one repeatable-read snapshot, preserve historical evaluations, and calculate current balances from authoritative allocations. Project only the latest or selected owned candidate. Foreign-output conflicts disclose no foreign invoice IDs/amounts.
+- Migration `0006` preserves legacy rows, adds scoped references and immutable observation/evaluation/retry records, and refuses destructive populated rollback after serializing with active writers. Old case-detail and receipt-result contracts remain compatible.
+- Publish verify/attempt/report schemas and document derived memo/receiver disclosure: original evidence stays encrypted, but recovered fields and evaluation snapshots are outside application encryption. Customer/reviewer grants and authorized exports remain pending.
+
+### Recorded validation
+
+Linux, Python 3.14.7, Rust 1.99.0, and disposable PostgreSQL 17 with an isolated schema per database test:
+
+```text
+make test: 12 Rust tests; 125 Python tests passed
+make test-db: 111 PostgreSQL tests passed
+make lint: Rust formatting/Clippy and Python lint/formatting passed
+make poc: real fixture recovery, tamper rejection, and offline balances preserved
+```
+
+Tests cover the real HTTP invoice-to-report path, wrong-owner/case access, revocation during verification, missing/tampered/unsupported evidence, unavailable binaries, temporary-storage errors, replay integrity, concurrent requests, atomic rollback, consistent report reads, foreign-allocation redaction, legacy preservation, and cross-revision downgrade races. An existing evidence downgrade test now recognizes its serialization lock anywhere in the expanded lock list; no old migration was changed.
+
+Independent review reproduced two defects with failing regressions: temporary-file failures escaped instead of becoming stored ERROR outcomes, and replay did not verify an event's payload/header hashes. Both were fixed and follow-up review found no remaining blockers. The full suite passed afterward. The existing Starlette/httpx deprecation warning remains; no live chain confirmation or customer evidence was used.
+
+See [verification API and report guide](verification.md). The core invoice → case → encrypted evidence → verification → initial report path is connected; case listing, claim writers, and the complete consent/access workflow remain unfinished.
+
 ## Next small item
 
-Authorize and decrypt an owned bundle, run the real Rust verifier outside database locks, and persist the attempt, offline chain observation, rules evaluation, and audit event. Return an initial reasoned case report; offline confirmation remains unavailable and credit stays blocked. This completes the remaining M1 verification/report path before M2 allocation work.
+Implement M2 merchant resolution with explicit authorization, stale-state checks, idempotency, and atomic decision/allocation/audit persistence. Offline attempts must remain ineligible for approval; any confirmation fixtures used to test allocation must be clearly isolated synthetic data. Trusted live chain observations remain M3 work and are required before a real confirmed-payment release claim.
 
-Customer/reviewer grants, persisted verification/reporting, remaining case workflow services, approval/idempotency, trusted chain observations, frontend, and replayable exports remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the full milestone order.
+Customer/reviewer grants, remaining case workflow services, trusted chain observations, frontend, and replayable exports remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the full milestone order.

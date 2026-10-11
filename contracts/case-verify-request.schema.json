@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "evidence_id": {
+      "format": "uuid",
+      "title": "Evidence Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "evidence_id"
+  ],
+  "title": "CaseVerifyRequest",
+  "type": "object"
+}

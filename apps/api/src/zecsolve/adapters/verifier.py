@@ -38,34 +38,34 @@ class VerifierAdapter:
             return result(ReceiptState.ERROR, "INPUT_TOO_LARGE")
         if not self.available():
             return result(ReceiptState.UNAVAILABLE, "VERIFIER_UNAVAILABLE")
-        with tempfile.TemporaryDirectory(prefix="zecsolve-") as directory:
-            receipt_file = Path(directory, "receipt.json")
-            tx_file = Path(directory, "transaction.hex")
-            receipt_file.write_text(receipt, encoding="utf-8")
-            tx_file.write_text(raw_tx_hex, encoding="utf-8")
-            try:
+        try:
+            with tempfile.TemporaryDirectory(prefix="zecsolve-") as directory:
+                receipt_file = Path(directory, "receipt.json")
+                tx_file = Path(directory, "transaction.hex")
+                receipt_file.write_bytes(receipt.encode("utf-8"))
+                tx_file.write_bytes(raw_tx_hex.encode("utf-8"))
                 stdout = self._run(receipt_file, tx_file)
-            except TimeoutError:
-                return result(ReceiptState.ERROR, "VERIFIER_TIMEOUT")
-            except OverflowError:
-                return result(ReceiptState.ERROR, "VERIFIER_OUTPUT_TOO_LARGE")
-            except (OSError, subprocess.SubprocessError):
-                return result(ReceiptState.ERROR, "VERIFIER_PROCESS_ERROR")
+        except TimeoutError:
+            return result(ReceiptState.ERROR, "VERIFIER_TIMEOUT")
+        except OverflowError:
+            return result(ReceiptState.ERROR, "VERIFIER_OUTPUT_TOO_LARGE")
+        except (OSError, subprocess.SubprocessError):
+            return result(ReceiptState.ERROR, "VERIFIER_PROCESS_ERROR")
+        try:
+            report = VerificationReport.model_validate_json(stdout)
+        except (ValueError, ValidationError):
+            return result(ReceiptState.ERROR, "VERIFIER_PROTOCOL_ERROR")
+        if report.receipt_state == ReceiptState.VALID:
             try:
-                report = VerificationReport.model_validate_json(stdout)
-            except (ValueError, ValidationError):
+                tx_hash = hashlib.sha256(bytes.fromhex(raw_tx_hex.strip())).hexdigest()
+            except ValueError:
                 return result(ReceiptState.ERROR, "VERIFIER_PROTOCOL_ERROR")
-            if report.receipt_state == ReceiptState.VALID:
-                try:
-                    tx_hash = hashlib.sha256(bytes.fromhex(raw_tx_hex.strip())).hexdigest()
-                except ValueError:
-                    return result(ReceiptState.ERROR, "VERIFIER_PROTOCOL_ERROR")
-                if (
-                    report.receipt_sha256 != hashlib.sha256(receipt.encode()).hexdigest()
-                    or report.raw_tx_sha256 != tx_hash
-                ):
-                    return result(ReceiptState.ERROR, "VERIFIER_PROTOCOL_ERROR")
-            return report
+            if (
+                report.receipt_sha256 != hashlib.sha256(receipt.encode()).hexdigest()
+                or report.raw_tx_sha256 != tx_hash
+            ):
+                return result(ReceiptState.ERROR, "VERIFIER_PROTOCOL_ERROR")
+        return report
 
     def _run(self, receipt_file: Path, tx_file: Path) -> bytes:
         return run_bounded(

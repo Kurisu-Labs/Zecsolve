@@ -55,9 +55,11 @@ An existing PostgreSQL installation also works: create a dedicated database and 
 | `GET /api/cases/{id}` | Returns current case state/version and its immutable opening event; merchant only |
 | `POST /api/cases/{id}/evidence` | Stores an encrypted optional receipt/raw-tx bundle and appends an audit event; merchant + `Idempotency-Key` required |
 | `GET /api/cases/{id}/evidence/{evidence_id}` | Returns owned evidence metadata only; never receipt/raw-tx content or ciphertext |
+| `POST /api/cases/{id}/verify` | Verifies owned encrypted evidence and atomically stores the attempt, offline observation, evaluation, and audit event; requires `Idempotency-Key` |
+| `GET /api/cases/{id}/report` | Returns the merchant’s initial offline report with history and current balances; optional `verification_id` selects a candidate |
 | `GET /docs` | Interactive API contract; use **Authorize** to enter the POC token |
 
-Paste the contents of `fixtures/mainnet/receipt.json` into the `receipt_json` string and `fixtures/mainnet/transaction.hex` into `raw_tx_hex`. The endpoint accepts content, never server file paths or fetch URLs. It does not write evidence or recovered fields to the database.
+Paste the contents of `fixtures/mainnet/receipt.json` into the `receipt_json` string and `fixtures/mainnet/transaction.hex` into `raw_tx_hex`. The POC endpoint accepts content, never server file paths or fetch URLs. It does not write evidence or recovered fields to the database. The separate [persisted verification API](docs/verification.md) operates on previously submitted encrypted evidence.
 
 To run both services in containers:
 
@@ -81,7 +83,7 @@ Creation/issuance returns one JSON object containing the merchant ID, credential
 
 Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
 
-Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification/decision endpoints, customer/reviewer grants, and browser sessions remain future increments.
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification and initial offline reports are available; decision endpoints, customer/reviewer grants, and browser sessions remain future increments.
 
 ## Create an invoice
 
@@ -127,13 +129,13 @@ Database tests create and remove only a uniquely named test schema. Point them a
 ZECSOLVE_TEST_DATABASE_URL='postgresql+psycopg://zecsolve:zecsolve@127.0.0.1:54329/zecsolve' make test-db
 ```
 
-`make test` includes the real Rust binary, historical fixture, negative evidence, recipient normalization, rule calculations, subprocess limits, and API behavior. `make test-db` covers migrations, immutable records, merchant/invoice consistency, and concurrent output allocation. CI runs both sets. Regenerate the verifier and normalization contracts with `make schema` when changing their Pydantic models.
+`make test` includes the real Rust binary, historical fixture, negative evidence, recipient normalization, rule calculations, subprocess limits, and API behavior. `make test-db` covers migrations, immutable records, merchant/invoice consistency, and concurrent output allocation. CI runs both sets. Regenerate the published API contracts with `make schema` when changing their Pydantic models.
 
 ## Current boundary
 
-Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials; recipient normalization; immutable invoices/policies; case opening/read; encrypted merchant evidence submission and metadata; atomic creation/submission retries and chained audit events; tests; development container configuration.
+Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials; recipient normalization; immutable invoices/policies; case opening/read; encrypted merchant evidence submission and metadata; persisted real verification, offline observations and evaluation snapshots; initial merchant case reports; atomic retries and chained audit events; tests; development container configuration.
 
-Next: claims, persisted workflow verification and full reports, customer/reviewer authentication and permissions, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
+Next: atomic merchant resolution/allocation with idempotency, claims and case listing, customer/reviewer authentication and permissions, trusted chain observations, Vue frontend, and replayable case exports. Current reports are explicitly `INITIAL_OFFLINE`: no chain confirmation or credit approval is claimed. These are not simulated behind working-looking routes.
 
 The current Rust wrapper accepts mainnet receipt v0 and v5 transaction branches NU5 through NU6.2. Orchard has a real historical fixture test. The Sapling recovery path uses the upstream library but does not yet have an end-to-end historical Sapling fixture in this repository. No Ironwood compatibility is claimed.
 

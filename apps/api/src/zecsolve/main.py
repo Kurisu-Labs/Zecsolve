@@ -18,6 +18,7 @@ from zecsolve.adapters.verifier import VerifierAdapter
 from zecsolve.api.cases import router as case_router
 from zecsolve.api.evidence import router as evidence_router
 from zecsolve.api.invoices import router as invoice_router
+from zecsolve.api.verifications import router as verification_router
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
 from zecsolve.config import Settings
@@ -74,10 +75,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         settings.verifier_path, settings.verifier_timeout_seconds
     )
     app.state.verifier_slots = slots
+    app.state.verifier = verifier
     app.state.evidence_cipher = EvidenceCipher(settings.evidence_key_id, settings.evidence_key)
     app.include_router(invoice_router)
     app.include_router(case_router)
     app.include_router(evidence_router)
+    app.include_router(verification_router)
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 

@@ -23,7 +23,7 @@ from zecsolve.schemas.evidence import (
     EvidenceSubmitRequest,
 )
 from zecsolve.services.audit import load_event_chain
-from zecsolve.services.cases import CaseService
+from zecsolve.services.cases import CaseService, load_owned_case
 from zecsolve.services.workflow import (
     WorkflowError,
     authorize_merchant,
@@ -34,6 +34,34 @@ from zecsolve.services.workflow import (
 
 def content_hash(value):
     return hashlib.sha256(value.encode("utf-8")).hexdigest() if value is not None else None
+
+
+def read_evidence_metadata(session, principal, case_id, evidence_id):
+    load_owned_case(session, principal, case_id)
+    row = session.scalar(
+        select(Evidence).where(
+            Evidence.id == evidence_id,
+            Evidence.case_id == case_id,
+            Evidence.merchant_id == principal.merchant_id,
+        )
+    )
+    if row is None:
+        raise WorkflowError(404, "EVIDENCE_NOT_FOUND")
+    if row.bundle_version != "1" or row.bundle_metadata is None:
+        raise WorkflowError(409, "LEGACY_EVIDENCE_UNAVAILABLE")
+    try:
+        metadata = EvidenceStoredV1.model_validate(row.bundle_metadata)
+    except ValidationError:
+        raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE") from None
+    if (
+        metadata.evidence_id,
+        metadata.case_id,
+        metadata.merchant_id,
+        metadata.submitted_by,
+        metadata.payload_sha256,
+    ) != (row.id, row.case_id, row.merchant_id, row.submitted_by, row.sha256):
+        raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE")
+    return metadata
 
 
 class EvidenceService:
@@ -59,31 +87,7 @@ class EvidenceService:
             self.slots.release()
 
     def metadata(self, session, principal, case_id, evidence_id):
-        self.cases.load(session, principal, case_id)
-        row = session.scalar(
-            select(Evidence).where(
-                Evidence.id == evidence_id,
-                Evidence.case_id == case_id,
-                Evidence.merchant_id == principal.merchant_id,
-            )
-        )
-        if row is None:
-            raise WorkflowError(404, "EVIDENCE_NOT_FOUND")
-        if row.bundle_version != "1" or row.bundle_metadata is None:
-            raise WorkflowError(409, "LEGACY_EVIDENCE_UNAVAILABLE")
-        try:
-            metadata = EvidenceStoredV1.model_validate(row.bundle_metadata)
-        except ValidationError:
-            raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE") from None
-        if (
-            metadata.evidence_id,
-            metadata.case_id,
-            metadata.merchant_id,
-            metadata.submitted_by,
-            metadata.payload_sha256,
-        ) != (row.id, row.case_id, row.merchant_id, row.submitted_by, row.sha256):
-            raise WorkflowError(409, "EVIDENCE_METADATA_UNAVAILABLE")
-        return metadata
+        return read_evidence_metadata(session, principal, case_id, evidence_id)
 
     def replay(self, session, principal, case_id, key, request_hash):
         record = session.scalar(
