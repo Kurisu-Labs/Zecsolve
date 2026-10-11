@@ -5,7 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from zecsolve.auth.browser import session_from_request
+from zecsolve.auth.browser import SESSION_COOKIE, session_from_request
 from zecsolve.auth.credentials import MerchantPrincipal, authenticate_merchant, token_digest
 
 merchant_bearer = HTTPBearer(auto_error=False, scheme_name="MerchantCredential")
@@ -19,7 +19,9 @@ def require_actor(
         401, "Invalid merchant credentials", headers={"WWW-Authenticate": "Bearer"}
     )
     if credentials is None:
-        if request.headers.get("authorization") is not None:
+        if request.headers.get("authorization") is not None or not request.cookies.get(
+            SESSION_COOKIE
+        ):
             raise unauthorized
         return session_from_request(request)[0]
     if token_digest(credentials.credentials) is None:
