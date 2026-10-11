@@ -223,11 +223,11 @@ def upgrade():
 
 
 def downgrade():
-    op.execute("""
-        LOCK TABLE merchant_credentials, case_grants, browser_sessions, grant_evidence,
-        grant_creation_requests, evidence_consents, access_submission_requests, cases, claims,
-        evidence IN ACCESS EXCLUSIVE MODE
-    """)
+    op.execute(
+        "LOCK TABLE merchant_credentials, case_grants, browser_sessions, grant_evidence, "
+        "grant_creation_requests, evidence_consents, access_submission_requests, cases, claims, "
+        "evidence IN ACCESS EXCLUSIVE MODE"
+    )
     for table in (
         "case_grants",
         "browser_sessions",
