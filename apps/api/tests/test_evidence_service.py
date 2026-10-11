@@ -255,3 +255,77 @@ def test_revocation_during_decryption_prevents_plaintext_return(database, eviden
     with pytest.raises(WorkflowError) as error:
         service.read_content(principal, case.case_id, stored.evidence_id)
     assert error.value.status == 401
+
+
+def test_corrupted_audit_reference_blocks_submission_without_side_effects(database, evidence_setup):
+    service, principal, case, request = evidence_setup
+    stored, _ = service.submit(principal, case.case_id, request, "first")
+    with database.begin() as connection:
+        connection.execute(text("ALTER TABLE case_events DISABLE TRIGGER immutable_record"))
+        payload = connection.scalar(
+            select(CaseEvent.payload).where(CaseEvent.id == stored.event_id)
+        )
+        connection.execute(
+            update(CaseEvent)
+            .where(CaseEvent.id == stored.event_id)
+            .values(payload={**payload, "evidence_id": None})
+        )
+        connection.execute(text("ALTER TABLE case_events ENABLE TRIGGER immutable_record"))
+    with pytest.raises(WorkflowError) as error:
+        service.submit(principal, case.case_id, request, "second")
+    assert (error.value.status, error.value.code) == (409, "CASE_HISTORY_UNAVAILABLE")
+    assert counts(database) == [1, 1, 1, 2]
+
+
+def test_downgrade_waits_for_inflight_encrypted_submission(database, root, evidence_setup):
+    from alembic import command
+    from alembic.config import Config
+    from sqlalchemy import event
+
+    service, principal, case, request = evidence_setup
+    paused, release = threading.Event(), threading.Event()
+    role = threading.local()
+
+    def coordinate(connection, cursor, statement, parameters, context, executemany):
+        statement = statement.lstrip()
+        if (
+            getattr(role, "name", None) == "writer"
+            and "FROM invoices" in statement
+            and "FOR UPDATE" in statement
+        ):
+            paused.set()
+            assert release.wait(timeout=5)
+        if getattr(role, "name", None) == "migration" and statement.startswith(
+            "LOCK TABLE evidence_submission_requests"
+        ):
+            release.set()
+
+    def submit():
+        role.name = "writer"
+        return service.submit(principal, case.case_id, request, "inflight")
+
+    def downgrade():
+        role.name = "migration"
+        config = Config(str(root / "alembic.ini"))
+        config.set_main_option("script_location", str(root / "apps/api/migrations"))
+        try:
+            with database.begin() as connection:
+                config.attributes["connection"] = connection
+                command.downgrade(config, "0004")
+            return "downgraded"
+        except RuntimeError as error:
+            return str(error)
+
+    event.listen(database, "before_cursor_execute", coordinate)
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            writer = executor.submit(submit)
+            assert paused.wait(timeout=5)
+            migration = executor.submit(downgrade)
+            stored, _ = writer.result(timeout=10)
+            assert "forward migration" in migration.result(timeout=10)
+    finally:
+        release.set()
+        event.remove(database, "before_cursor_execute", coordinate)
+    assert service.read_content(principal, case.case_id, stored.evidence_id) == request
+    assert counts(database) == [1, 1, 1, 2]
