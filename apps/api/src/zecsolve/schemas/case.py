@@ -1,0 +1,57 @@
+import uuid
+from datetime import UTC
+from typing import Annotated, Literal
+
+from pydantic import AwareDatetime, Field, field_validator
+
+from zecsolve.domain.statuses import CaseState
+from zecsolve.schemas.verification import Contract, HexDigest
+
+
+class CaseCreateRequest(Contract):
+    invoice_id: uuid.UUID
+
+
+class CaseOpeningEventV1(Contract):
+    schema_version: Literal["1"] = "1"
+    event_id: uuid.UUID
+    case_id: uuid.UUID
+    sequence: Literal[1] = 1
+    actor: Annotated[str, Field(pattern=r"^credential:[0-9a-f-]{36}$")]
+    action: Literal["CASE_OPENED"] = "CASE_OPENED"
+    at: AwareDatetime
+    payload: dict[str, str]
+    payload_hash: HexDigest
+    previous_hash: None = None
+    event_hash: HexDigest
+
+    @field_validator("at")
+    @classmethod
+    def utc_time(cls, value):
+        return value.astimezone(UTC)
+
+
+class CaseSummaryV1(Contract):
+    schema_version: Literal["1"] = "1"
+    case_id: uuid.UUID
+    invoice_id: uuid.UUID
+    merchant_id: uuid.UUID
+    state: CaseState
+    version: Annotated[int, Field(strict=True, ge=1)]
+    created_at: AwareDatetime
+
+    @field_validator("created_at")
+    @classmethod
+    def utc_time(cls, value):
+        return value.astimezone(UTC)
+
+
+class CaseOpenedV1(CaseSummaryV1):
+    state: Literal["OPEN"] = "OPEN"
+    version: Literal[1] = 1
+    opening_event: CaseOpeningEventV1
+
+
+class CaseDetailV1(CaseSummaryV1):
+    # Current state is separate from the immutable opening outcome returned on retries.
+    opening_event: CaseOpeningEventV1
