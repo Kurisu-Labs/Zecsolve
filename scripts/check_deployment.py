@@ -19,6 +19,7 @@ import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
+from http.cookies import SimpleCookie
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,6 +50,7 @@ def main():
         "ZECSOLVE_DEPLOY_HTTPS_PORT": str(https_port),
         "ZECSOLVE_DEPLOY_SECRETS_DIR": str(directory),
         "ZECSOLVE_EVIDENCE_KEY_ID": "disposable-smoke-v1",
+        "ZECSOLVE_BROWSER_ORIGINS": json.dumps([f"https://localhost:{https_port}"]),
         "ZECSOLVE_DEPLOY_SUBNET": subnet + ".0/24",
         "ZECSOLVE_DEPLOY_PROXY_IP": subnet + ".2",
         "ZECSOLVE_DEPLOY_API_IP": subnet + ".3",
@@ -121,7 +123,7 @@ def main():
                 method, path, body=body, headers=headers or {}, encode_chunked=chunked
             )
             response = connection.getresponse()
-            return response.status, dict(response.getheaders()), response.read()
+            return response.status, response.headers, response.read()
         finally:
             connection.close()
 
@@ -158,6 +160,88 @@ def main():
         assert request("/api/poc/verify", method="POST", body=b"{}")[0] == 404
         assert request("/openapi.json")[0] == 404
         passed("public POC and documentation routes are disabled")
+
+        # Use P1's operator/service contracts with mounted settings; no alternate identity model.
+        operator = """
+import json, sys, uuid
+from sqlalchemy.orm import Session
+from zecsolve.auth.credentials import provision_merchant, revoke_credential
+from zecsolve.db.session import make_engine
+from zecsolve.deployment.settings import DeploymentSettings, application_settings
+engine = make_engine(application_settings(DeploymentSettings()))
+with Session(engine) as session, session.begin():
+    if len(sys.argv) == 1:
+        issued = provision_merchant(session, 'Disposable deployment merchant')
+        result = {'token': issued.token, 'credential_id': str(issued.credential_id)}
+    else:
+        revoke_credential(session, uuid.UUID(sys.argv[1]))
+        result = {'revoked': True}
+engine.dispose()
+print(json.dumps(result))
+"""
+        operator_command = compose + ["exec", "-T", "api", "python", "-c", operator]
+        issued = json.loads(run(operator_command))
+        origin = f"https://localhost:{https_port}"
+        login_body = json.dumps({"code": issued["token"]})
+
+        def session_request(path="/api/session", *, headers=None, **kwargs):
+            time.sleep(0.25)  # Stay below the separately tested ingress rate limit.
+            return request(
+                path, headers={"Content-Type": "application/json", **(headers or {})}, **kwargs
+            )
+
+        time.sleep(3)
+        for headers in ({}, {"Origin": "https://attacker.test"}):
+            assert session_request(method="POST", body=login_body, headers=headers)[0] == 403
+
+        session_secrets = [issued["token"]]
+
+        def login():
+            status, headers, body = session_request(
+                method="POST", body=login_body, headers={"Origin": origin}
+            )
+            assert status == 201 and json.loads(body)["access"]["role"] == "merchant"
+            cookies = SimpleCookie()
+            for header in headers.get_all("Set-Cookie", []):
+                cookies.load(header)
+            assert set(cookies) == {"__Host-zecsolve_session", "__Host-zecsolve_csrf"}
+            for cookie in cookies.values():
+                assert cookie["secure"] and cookie["samesite"].lower() == "strict"
+                assert cookie["path"] == "/" and not cookie["domain"]
+                assert 0 < int(cookie["max-age"]) <= 8 * 60 * 60
+                assert cookie.value.encode() not in body
+                session_secrets.append(cookie.value)
+            assert cookies["__Host-zecsolve_session"]["httponly"]
+            assert not cookies["__Host-zecsolve_csrf"]["httponly"]
+            return {
+                "Cookie": "; ".join(f"{name}={cookie.value}" for name, cookie in cookies.items()),
+                "Origin": origin,
+                "X-CSRF-Token": cookies["__Host-zecsolve_csrf"].value,
+            }
+
+        session_headers = login()
+        assert session_request(headers=session_headers)[0] == 200
+        assert session_request("/api/cases", headers=session_headers)[0] == 200
+        for overrides in (
+            {"Origin": ""},
+            {"Origin": "https://attacker.test"},
+            {"X-CSRF-Token": "bad"},
+        ):
+            assert (
+                session_request(method="DELETE", headers={**session_headers, **overrides})[0] == 403
+            )
+        assert session_request(headers=session_headers)[0] == 200
+        status, cleared, _ = session_request(method="DELETE", headers=session_headers)
+        assert status == 204
+        assert len(cleared.get_all("Set-Cookie", [])) == 2
+        assert all("Max-Age=0" in value for value in cleared.get_all("Set-Cookie"))
+        assert session_request(headers=session_headers)[0] == 401
+        session_headers = login()
+        assert json.loads(run(operator_command + [issued["credential_id"]]))["revoked"]
+        assert session_request(headers=session_headers)[0] == 401
+        assert session_request(method="POST", body=login_body, headers={"Origin": origin})[0] == 401
+        passed("TLS session cookies, restoration, Origin/CSRF, logout and parent revocation")
+
         time.sleep(3)  # Drain the ingress token bucket before testing independent limits.
         assert request("/api/cases", method="POST", body=b"x" * 4_200_001)[0] == 413
         assert (
@@ -205,11 +289,11 @@ def main():
             raise AssertionError("Readiness did not recover")
         passed("readiness fails during database outage and recovers after restart")
         logs = run(compose + ["logs", "--no-color"])
-        assert all(secret not in logs for secret in (marker, password, key))
+        assert all(secret not in logs for secret in [marker, password, key, *session_secrets])
         passed("container logs exclude request codes, authorization and configured secrets")
         report = {
             "checks": results,
-            "scope": "M7.1 backend preparation; session acceptance pending",
+            "scope": "M7.1 backend and TLS session preparation; browser acceptance pending",
             "at": datetime.now(UTC).isoformat(),
             "host": platform.platform(),
             "python": platform.python_version(),
