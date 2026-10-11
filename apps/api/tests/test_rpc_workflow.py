@@ -231,3 +231,37 @@ def test_reorg_blocks_another_output_until_prior_inclusion_is_restored(
     assert not restored.chain_review
     decision, _ = resolver.resolve(principal, case.case_id, approve(second), "approve-second")
     assert decision.balances.credited_zat == 200_000
+
+
+def test_refresh_history_is_immutable_and_failed_retry_write_rolls_back(
+    database, resolution_setup, raw_tx
+):
+    from sqlalchemy import event, text
+    from sqlalchemy.exc import DBAPIError
+
+    principal, case, attempt = resolution_setup
+    _, observer = make_observer(attempt, raw_tx)
+    service = ObservationService(database, observer)
+
+    def fail_request(connection, cursor, statement, parameters, context, executemany):
+        if statement.startswith("INSERT INTO observation_requests"):
+            raise RuntimeError("injected retry persistence failure")
+
+    event.listen(database, "before_cursor_execute", fail_request)
+    try:
+        with pytest.raises(RuntimeError, match="injected"):
+            service.refresh_request(principal, case.case_id, attempt.verification_id, "first")
+    finally:
+        event.remove(database, "before_cursor_execute", fail_request)
+    with Session(database) as session:
+        assert session.scalar(select(func.count()).select_from(ChainObservation)) == 1
+        assert session.scalar(select(func.count()).select_from(ObservationRequest)) == 0
+    service.refresh_request(principal, case.case_id, attempt.verification_id, "first")
+    for statement in (
+        "DELETE FROM observation_requests",
+        "UPDATE observation_requests SET idempotency_key='changed'",
+        "DELETE FROM chain_observations",
+    ):
+        with pytest.raises(DBAPIError):
+            with database.begin() as connection:
+                connection.execute(text(statement))

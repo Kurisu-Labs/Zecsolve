@@ -305,7 +305,7 @@ def test_downgrade_cannot_erase_an_inflight_case(database, root, setup_cases):
             assert release.wait(timeout=5), "Downgrade did not reach its serialization point"
         if getattr(role, "name", None) == "migration" and (
             statement.startswith("DROP TABLE case_creation_requests")
-            or (statement.startswith("LOCK TABLE ") and "case_creation_requests" in statement)
+            or (statement.startswith("LOCK TABLE ") and "merchant_credentials" in statement)
         ):
             release.set()
 

@@ -419,7 +419,7 @@ def test_downgrade_waits_for_noncredit_decision_before_guard(database, root, res
         if (
             getattr(role, "name", None) == "migration"
             and statement.startswith("LOCK TABLE ")
-            and "case_resolution_requests" in statement
+            and "merchant_credentials" in statement
         ):
             release.set()
 
