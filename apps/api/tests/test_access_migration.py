@@ -50,7 +50,8 @@ def test_populated_access_rollback_is_blocked(database, root, verification_setup
             text(
                 "INSERT INTO case_grants "
                 "(id, merchant_id, case_id, issued_by, role, token_sha256, scope, expires_at) "
-                "VALUES (:id,:merchant,:case,:issuer,'customer',:digest,'{}',now()+interval '1 hour')"
+                "VALUES (:id,:merchant,:case,:issuer,'customer',:digest,'{}',"
+                "now()+interval '1 hour')"
             ),
             dict(
                 id=uuid.uuid4(),
@@ -66,3 +67,29 @@ def test_populated_access_rollback_is_blocked(database, root, verification_setup
         with database.begin() as connection:
             config.attributes["connection"] = connection
             command.downgrade(config, "0008")
+
+
+def test_attribution_cannot_bypass_scoped_fk_with_null_owner(database, verification_setup):
+    import uuid
+
+    from sqlalchemy import insert
+    from sqlalchemy.exc import IntegrityError
+    from zecsolve.db.models import Claim, Evidence
+
+    _, _, case, _, _ = verification_setup
+    for statement in (
+        insert(Claim).values(
+            case_id=case.case_id, claimant_role="customer", actor_grant_id=uuid.uuid4()
+        ),
+        insert(Evidence).values(
+            case_id=case.case_id,
+            type="receipt",
+            source="test",
+            sha256="ab" * 32,
+            storage_ref="test",
+            actor_grant_id=uuid.uuid4(),
+        ),
+    ):
+        with pytest.raises(IntegrityError):
+            with database.begin() as connection:
+                connection.execute(statement)

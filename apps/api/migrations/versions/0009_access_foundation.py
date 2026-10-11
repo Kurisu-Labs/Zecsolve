@@ -186,6 +186,14 @@ def upgrade():
         CONSTRAINT ck_access_retry_hash CHECK (request_hash ~ '^[0-9a-f]{64}$')
         )
     """)
+    op.create_check_constraint(
+        "ck_claim_actor_owner",
+        "claims",
+        "merchant_id IS NOT NULL OR (actor_grant_id IS NULL AND actor_credential_id IS NULL)",
+    )
+    op.create_check_constraint(
+        "ck_evidence_actor_owner", "evidence", "actor_grant_id IS NULL OR merchant_id IS NOT NULL"
+    )
     op.execute("""
         CREATE FUNCTION zecsolve_revoke_only() RETURNS trigger LANGUAGE plpgsql AS $$
         BEGIN
@@ -246,6 +254,8 @@ def downgrade():
         "grant_evidence",
     ):
         op.drop_table(table)
+    op.drop_constraint("ck_claim_actor_owner", "claims")
+    op.drop_constraint("ck_evidence_actor_owner", "evidence")
     for table, constraints in (
         (
             "claims",

@@ -167,6 +167,10 @@ class Claim(Identified, Timestamped, Base):
     __tablename__ = "claims"
     __table_args__ = (
         UniqueConstraint("id", "case_id", "merchant_id", name="uq_claim_owner"),
+        CheckConstraint(
+            "merchant_id IS NOT NULL OR (actor_grant_id IS NULL AND actor_credential_id IS NULL)",
+            name="ck_claim_actor_owner",
+        ),
         ForeignKeyConstraint(
             ["case_id", "merchant_id"], ["cases.id", "cases.merchant_id"], name="fk_claim_owner"
         ),
@@ -203,6 +207,9 @@ class Evidence(Identified, Timestamped, Base):
         ),
         CheckConstraint("actor_grant_id IS NULL OR submitted_by IS NULL", name="ck_evidence_actor"),
         UniqueConstraint("id", "case_id", "merchant_id", name="uq_evidence_case_owner"),
+        CheckConstraint(
+            "actor_grant_id IS NULL OR merchant_id IS NOT NULL", name="ck_evidence_actor_owner"
+        ),
         ForeignKeyConstraint(
             ["case_id", "merchant_id"],
             ["cases.id", "cases.merchant_id"],
