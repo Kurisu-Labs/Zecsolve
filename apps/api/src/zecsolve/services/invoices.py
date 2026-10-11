@@ -18,6 +18,42 @@ from zecsolve.services.workflow import WorkflowError as InvoiceError
 from zecsolve.services.workflow import authorize_merchant, transaction, validate_idempotency_key
 
 
+def read_invoice_snapshot(session: Session, principal: MerchantPrincipal, invoice_id: uuid.UUID):
+    row = session.scalar(
+        select(Invoice).where(
+            Invoice.id == invoice_id, Invoice.merchant_id == principal.merchant_id
+        )
+    )
+    if row is None:
+        raise InvoiceError(404, "INVOICE_NOT_FOUND")
+    if row.policy_id is None or row.snapshot_version != "1":
+        raise InvoiceError(409, "LEGACY_INVOICE_POLICY_UNAVAILABLE")
+    policy = session.scalar(
+        select(InvoicePolicy).where(
+            InvoicePolicy.id == row.policy_id,
+            InvoicePolicy.merchant_id == principal.merchant_id,
+        )
+    )
+    return InvoiceSnapshotV1(
+        invoice_id=row.id,
+        merchant_id=row.merchant_id,
+        policy_id=row.policy_id,
+        created_at=row.created_at,
+        snapshot_hash=row.snapshot_hash,
+        policy=InvoicePolicyV1.model_validate(policy.config),
+        terms=InvoiceTermsV1(
+            expected_zat=row.expected_zat,
+            network=row.network,
+            pool=row.pool,
+            receiver_address=row.expected_receiver,
+            receiver_hex=row.receiver_hex,
+            expected_memo=row.expected_memo_text,
+            memo_hex=row.expected_memo.hex() if row.expected_memo is not None else None,
+            expires_at=row.expires_at,
+        ),
+    )
+
+
 class InvoiceService:
     def __init__(self, engine, normalizer, slots):
         self.engine, self.normalizer, self.slots = engine, normalizer, slots
@@ -29,39 +65,7 @@ class InvoiceService:
         authorize_merchant(session, principal)
 
     def snapshot(self, session: Session, principal: MerchantPrincipal, invoice_id: uuid.UUID):
-        row = session.scalar(
-            select(Invoice).where(
-                Invoice.id == invoice_id, Invoice.merchant_id == principal.merchant_id
-            )
-        )
-        if row is None:
-            raise InvoiceError(404, "INVOICE_NOT_FOUND")
-        if row.policy_id is None or row.snapshot_version != "1":
-            raise InvoiceError(409, "LEGACY_INVOICE_POLICY_UNAVAILABLE")
-        policy = session.scalar(
-            select(InvoicePolicy).where(
-                InvoicePolicy.id == row.policy_id,
-                InvoicePolicy.merchant_id == principal.merchant_id,
-            )
-        )
-        return InvoiceSnapshotV1(
-            invoice_id=row.id,
-            merchant_id=row.merchant_id,
-            policy_id=row.policy_id,
-            created_at=row.created_at,
-            snapshot_hash=row.snapshot_hash,
-            policy=InvoicePolicyV1.model_validate(policy.config),
-            terms=InvoiceTermsV1(
-                expected_zat=row.expected_zat,
-                network=row.network,
-                pool=row.pool,
-                receiver_address=row.expected_receiver,
-                receiver_hex=row.receiver_hex,
-                expected_memo=row.expected_memo_text,
-                memo_hex=row.expected_memo.hex() if row.expected_memo is not None else None,
-                expires_at=row.expires_at,
-            ),
-        )
+        return read_invoice_snapshot(session, principal, invoice_id)
 
     def replay(self, session, principal, key, request_hash):
         record = session.scalar(
