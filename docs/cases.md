@@ -4,7 +4,7 @@ This increment opens a merchant-owned case from an existing supported invoice sn
 
 ## Open and read
 
-Run `make migrate` (head `0004`) and `make api` from the repository root. Use a merchant credential and an invoice created through the [invoice API](invoices.md). Set local environment variables `MERCHANT_TOKEN` and `INVOICE_ID`, then run:
+Run `make migrate` to the current head and `make api` from the repository root; case opening requires revision `0004` or later. Use a merchant credential and an invoice created through the [invoice API](invoices.md). Set local environment variables `MERCHANT_TOKEN` and `INVOICE_ID`, then run:
 
 ```sh
 uv run --locked python - <<'PY'
@@ -62,4 +62,4 @@ Existing cases retain null `workflow_version`; existing event payload/schema fie
 
 Downgrade first takes exclusive locks in creation-request → case → event order. This waits for active creators before inspecting history. It refuses to remove any new case/event evidence; use forward migrations for deployed data. Empty-schema rollback remains available for development tests. Stop application traffic before any planned schema rollback.
 
-Published schemas: [case creation](../contracts/case-create-request.schema.json), [opening outcome](../contracts/case-opened.schema.json), and [case detail](../contracts/case-detail.schema.json). A case list, full verification report, claims/evidence, decisions, and customer/reviewer projections remain pending.
+Published schemas: [case creation](../contracts/case-create-request.schema.json), [opening outcome](../contracts/case-opened.schema.json), and [case detail](../contracts/case-detail.schema.json). [Encrypted merchant evidence submission](evidence.md) is now a separate implemented increment. A case list, full verification report, claims, decisions, and customer/reviewer projections remain pending.

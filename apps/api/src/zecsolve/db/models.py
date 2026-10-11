@@ -1,4 +1,4 @@
-"""Foundation, merchant invoice snapshots, and case opening/audit records."""
+"""Merchant workflow snapshots, encrypted evidence, and audit records."""
 
 import uuid
 from datetime import datetime

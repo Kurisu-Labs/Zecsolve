@@ -118,8 +118,38 @@ Independent review reproduced a concurrent downgrade that could discard newly co
 
 `CaseOpenedV1` and `CaseDetailV1` are deliberately limited to creation/current state and the opening event. They are not the full `CaseReportV1`; case listing, claims/evidence, later event writers, verification, and resolution remain pending. See [case API behavior and boundaries](cases.md).
 
+## Item 05 — encrypted evidence submission and metadata
+
+Implemented on October 11, 2026, over baseline `ab9ac73`, in separately published contract, crypto, migration, audit, service, API, review-fix, regression, schema, and documentation increments.
+
+- Merchant-only `POST /api/cases/{id}/evidence` stores optional receipt/raw-tx strings exactly as supplied. `GET /api/cases/{id}/evidence/{evidence_id}` returns metadata only. Internal authorized decryption is prepared for the next verification service; no public plaintext route is added.
+- Use locked `cryptography` 50.0.2 AES-256-GCM with an external base64 32-byte key, fresh random 96-bit nonce, full tag, and associated data binding merchant/case/evidence/key/version. Validate ciphertext and exact payload/component hashes on read; missing/wrong keys fail closed.
+- Migration `0005` preserves legacy evidence without inventing encryption/ownership. Enforce same-owner/case retry references, unique key-ID/nonce pairs, and immutable metadata/content/retry records. Retaining ciphertext reservations avoids nonce reuse through deletion; purge and rotation tooling remain future work.
+- Store a server-bound merchant processing acknowledgement, source labels, disclosure version, actor/time, and forced-false reviewer sharing. Source labels are assertions, including `public_fixture`; they do not establish provenance, chain status, or customer consent.
+- Ciphertext, metadata, request outcome, case version/state, and `EVIDENCE_SUBMITTED` event commit together. Serialize on invoice then refreshed case locks, validate the entire known event chain, and reauthorize after waits. Same-key retries add nothing; a new key intentionally records a new submission.
+- Empty/missing components remain honest stored input. For OPEN/AWAITING cases, incomplete input gives AWAITING_EVIDENCE and complete input returns OPEN pending verification; UNDER_REVIEW remains unchanged. New terminal-case submissions are blocked while completed retries remain readable.
+- Readiness includes encryption configuration and new uploads fail without a valid key. Metadata remains readable without decryption. Application encryption covers the bundle body, not invoice or metadata fields.
+
+### Recorded validation
+
+Linux, Python 3.14.7, Rust 1.99.0, disposable PostgreSQL 17, and an isolated schema per database test:
+
+```text
+make test: 12 Rust tests; 115 Python tests passed
+make test-db: 89 PostgreSQL tests passed
+make lint: Rust formatting/Clippy and Python lint/formatting passed
+make poc: original receipt recovery, tamper rejection, and offline balances preserved
+Schema generation, documentation links, and git diff --check: passed
+```
+
+Tests cover exact-byte round trips, associated-data mismatch, tampered ciphertext, key failure, source/acknowledgement bounds, nonce collision/reservation, cross-merchant/case access, revocation during decryption, concurrent version/event progression, corrupted audit history, commit rollback, and downgrade races. Full-suite integration exposed a cross-revision lock-order conflict: migration 0005 now waits for both evidence and case creators before locking their shared tables; the existing case concurrency regression was generalized to that earlier serialization point. The final full suite passed afterward.
+
+Independent security/code review found a malformed audit-reference error path; a failing regression reproduced it and strict reference validation fixed it. Follow-up reviews found no remaining blockers, including the cross-revision lock ordering. The existing Starlette/httpx warning remains. Public historical fixtures and synthetic data were used; no real customer keys or evidence were provisioned.
+
+See [evidence API/key guide](evidence.md). This completes storage/submission, not persisted verification, customer/reviewer consent, or release readiness. Keep historical encryption keys securely; single-key configuration is not a completed rotation solution.
+
 ## Next small item
 
-Implement private encrypted evidence bundles and merchant submission tied to owned cases, including source/consent metadata and transactional audit events. Follow with persisted verification and the initial reasoned report to complete the remaining M1 path.
+Authorize and decrypt an owned bundle, run the real Rust verifier outside database locks, and persist the attempt, offline chain observation, rules evaluation, and audit event. Return an initial reasoned case report; offline confirmation remains unavailable and credit stays blocked. This completes the remaining M1 verification/report path before M2 allocation work.
 
-Customer/reviewer grants, encrypted evidence, remaining case workflow services, approval/idempotency, trusted chain observations, frontend, and replayable exports remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the full milestone order.
+Customer/reviewer grants, persisted verification/reporting, remaining case workflow services, approval/idempotency, trusted chain observations, frontend, and replayable exports remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the full milestone order.
