@@ -6,6 +6,8 @@ The October 10 foundation runs real Glasspane output recovery against a bundled 
 
 Start with [TEAM_GUIDE.md](TEAM_GUIDE.md) for the codebase tour and next tasks. Original product documents are preserved in [instructions/](instructions/).
 
+For assignments, use the [four-person feature board](docs/IMPLEMENTATION_PLAN.md#feature-board) and [task cards](docs/IMPLEMENTATION_PLAN.md#task-cards): Person 1 owns access/auth/schema, Person 2 reports/export/replay, Person 3 submission backend/live validation/release, and **Person 4 all frontend work**. Each task names its branch, prerequisites, code boundary and completion checks. Frontend execution remains deferred; listed branches are planned, not automatically started.
+
 Before taking a task, read [CONTRIBUTING.md](CONTRIBUTING.md): check active work, publish your task branch before implementation, push progress there, and open a PR when ready.
 
 ## Run the proof of concept
@@ -73,7 +75,7 @@ The backend image builds Rust in a separate stage, runs Python as an unprivilege
 
 ## Provision merchant identity
 
-The first M1 increment adds merchant credentials and an identity check. Apply all pending migrations with `make migrate`, then run the operator CLI from the repository root:
+Merchant credentials and the identity check are implemented as part of the completed M1 backend. Apply all pending migrations with `make migrate`, then run the operator CLI from the repository root:
 
 ```sh
 uv run --locked python -m zecsolve.auth.cli create-merchant --name "Demo merchant" --ttl-days 30
@@ -139,7 +141,9 @@ Implemented: pinned verifier integration; fixture provenance; bounded subprocess
 
 The trusted read-only Zebra adapter, idempotent refresh route, and later reorganization review are implemented. [Live endpoint validation](docs/chain.md) remains pending.
 
-Next: claims and case listing, customer/reviewer authentication and permissions, Vue frontend, and replayable case exports. The deployed app blocks credit approval while offline; a server-configured trusted RPC source enables the policy-gated path. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed.
+Current milestone status: **M1/M2 backend complete; M3 adapter implemented with live validation pending; M4/M5 pending; M6 assigned to Person 4 and deferred; M7 release incomplete.** Start with M4.0 shared access foundation (Person 1) and M4.3 case listing (Person 3). Person 2 can prepare packet requirements, then implement M5.0 after M4.0 merges. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
+
+The deployed app blocks credit approval while offline; a server-configured trusted RPC source enables the policy-gated path. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed. Assigning or merging a feature does not close the separate live-validation or full-release gates.
 
 The current Rust wrapper accepts mainnet receipt v0 and v5 transaction branches NU5 through NU6.2. Orchard has a real historical fixture test. The Sapling recovery path uses the upstream library but does not yet have an end-to-end historical Sapling fixture in this repository. No Ironwood compatibility is claimed.
 

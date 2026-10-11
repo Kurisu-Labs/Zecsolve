@@ -125,17 +125,16 @@ Invoice/policy snapshots, retry records, evidence metadata/content, verification
 
 Use Alembic for future changes. Do not call `Base.metadata.create_all()` at application startup. Once teammates have applied a migration, add a new one rather than rewriting it.
 
-## Suggested next work streams
+## Assigned next work streams
 
-| Work stream | First deliverable | Integration boundary |
+| Owner / work stream | First deliverable | Integration boundary |
 |---|---|---|
-| Backend workflow | Case listing and claim writers, building on implemented merchant decisions | FastAPI schemas + application services; no business logic in route handlers |
-| Resolution and access | Customer/reviewer scoped grants and consent; merchant decisions are implemented | PostgreSQL constraints and pure rules; avoid accepting actor/merchant identity from arbitrary request fields |
-| Frontend | Vue shell and the four independent status/balance displays | Generate TypeScript types from OpenAPI; work against explicit fixtures until routes exist |
-| Evidence and export | Authorized private storage and a packet containing snapshot, receipt, raw tx, provenance, versions and decision | Preserve original bytes; disclose only authorized case evidence |
-| Zcash integration | Live Zebra validation and a real Sapling fixture | Keep source observations separate from offline output recovery |
+| Person 1 — access | M4.0 shared actor/schema foundation, then grants and browser sessions | Own shared auth/models/migrations; consumers reuse the same authorization context |
+| Person 2 — reports/export | M5.0 packet contract after M4.0; scoped reports after submission/consent is ready | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
+| Person 3 — workflow/integration/release | M4.3 case listing; customer submission after M4.2; live validation when an endpoint exists | Own submission services and deployment; consume access contracts and Person 4's built app |
+| Person 4 — all frontend | M6.0 Vue shell when frontend work is resumed | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
-These are suggested teammate boundaries; no teammates have been assigned or messaged. Agree on API contracts before connecting the frontend. Keep CipherPay, notifications, browser WASM, signatures, and live checkout out of the foundation milestone.
+These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. All M6 work remains deferred despite Person 4's assignment. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
 
 ## Before handing off a change
 

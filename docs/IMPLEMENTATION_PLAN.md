@@ -1,10 +1,14 @@
-# Zecsolve — Remaining P0 Implementation Plan
+# Zecsolve — P0 Implementation and Assignment Board
 
 **Baseline:** October 10, 2026
 
+**Assignment/status update:** October 11, 2026
+
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** Requirements sequence retained below. As of October 11, M1/M2 backend implementation is complete; M3 adapter, refresh, and negative paths are implemented, with live-node validation pending. M4/M5 remain pending and M6 Vue is deferred by the user. Recorded results live in [DEVELOPMENT.md](DEVELOPMENT.md).
+**Status:** M1/M2 backend implementation is complete. M3 adapter, refresh, and negative paths are implemented; live-node validation is externally blocked. M4/M5 are pending. Person 4 owns all M6 frontend tasks, which remain deferred until the user resumes frontend work. M7 release acceptance is incomplete. This board assigns future work; it does not claim new application behavior or test results. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
+
+**Start here:** [ownership and feature tasks](#3-ownership-and-feature-tasks), [task cards](#task-cards), and [definition of done](#definition-of-done). Milestone requirements below remain the acceptance specification; the board is the current assignment and dependency source of truth.
 
 **First milestone:** Invoice → receipt verification → merchant-approved allocation → report
 
@@ -37,36 +41,353 @@ Build one backend workflow through the real Rust verifier, real PostgreSQL trans
 - Leave `unique_receiver_binding=false` in the public P0 workflow. No registry currently proves receiver uniqueness, so callers must not be able to assert it. Missing memo evidence remains reviewable but cannot bypass binding requirements.
 - Operate the hackathon demo with public fixtures. Real customer onboarding remains gated on documented retention/deletion terms and deployment controls from the PRD; do not describe the demo as a production pilot.
 
-## 2. Repository gaps that affect the design
+## 2. Current foundation and remaining integration
 
-| Existing foundation | Remaining integration work |
+| Implemented foundation | Remaining integration work |
 |---|---|
-| Pure `evaluate()` function sums approved allocations | Load authoritative allocations from PostgreSQL, preserve evaluation inputs, and apply versioned confirmation/freshness policy |
-| Output identity is the allocation primary key | Catch conflicts in the service and serialize approvals on an invoice so different outputs cannot both pass a stale balance check |
-| Immutable invoice, verification, resolution, allocation, and event records | Add transactional writers and retain event payloads; hashes alone are insufficient to reconstruct event history |
-| `Verification` points to one non-null `Evidence` record | Treat a submission as an evidence bundle containing receipt/raw-tx components, including missing components, without fake receipt data |
-| `ChainObservation` has a table | Add an observation adapter, transaction binding/provenance, append-only observation history, and release validation |
-| A single POC token protects stateless verification | Add merchant-bound principals, revocable credentials/sessions, and case-scoped customer/reviewer grants |
-| `Case.version` exists | Check it on new decisions, increment it on workflow mutations, and return it in reports |
-| `policy_version` and `rules_version` fields exist | Persist the policy configuration and exact historical evaluation used for every decision |
-| Readiness and a migration test expect revision `0001` | Compare the database revision with the packaged Alembic head after adding migrations |
-| Database tests insert independent synthetic records | Add API/service tests proving relationship authorization, atomicity, idempotency, and rollback together |
+| Stored invoice policies, authoritative balances, and historical evaluation snapshots | Preserve these inputs in scoped reports and replay packets |
+| Atomic merchant decisions, invoice locking, output uniqueness, retries, and chained events | Preserve these guarantees when introducing new principals and browser clients |
+| Encrypted optional receipt/raw-tx bundles and persisted real verification | Add customer attribution, sharing consent, and selected reviewer disclosure |
+| Offline and trusted RPC observers, refresh history, and later chain-review findings | Validate against an actual trusted node and retain the live approval trace |
+| Revocable merchant credentials and request/transaction authorization checks | Add case grants, browser sessions, and common scoped authorization interfaces |
+| Case create/detail/report routes with case versions | Add merchant case listing and claim writers; retain separate detail/report contracts |
+| Readiness tracks the packaged migration head; revisions through `0008` exist | Add forward access migrations without rewriting history |
+| Recorded real-verifier and PostgreSQL workflow/race/rollback tests | Add grant/session/disclosure, export/replay, browser, and release acceptance evidence |
 
 Primary implementation references: [models](../apps/api/src/zecsolve/db/models.py), [rules](../apps/api/src/zecsolve/domain/rules.py), [API assembly](../apps/api/src/zecsolve/main.py), [verifier adapter](../apps/api/src/zecsolve/adapters/verifier.py), and [initial migration](../apps/api/migrations/versions/0001_initial_schema.py).
 
-## 3. Build sequence
+## 3. Ownership and feature tasks
 
-Each milestone should be reviewable and runnable before the next is considered complete. The dates in PRD §9 remain the delivery target; gates below establish completion, not an assumed number of engineering hours. Owners are unassigned.
+Milestones are delivery checkpoints; each task below is one branch and one accountable owner. The dates in PRD §9 remain the delivery target, not estimates or completion evidence. Person numbers are the user's assignment slots; record the actual contributor and branch/PR when a task is claimed. Naming branches here does not create them or announce that work has started.
 
-| Milestone | Deliverable | Depends on | PRD coverage |
+| Milestone | Current status | Delivery gate | PRD coverage |
 |---|---|---|---|
-| M1 | Authenticated invoice, case, private evidence, and persisted real verification | Existing foundation | P0-01, P0-02, P0-05, merchant portion of P0-06 |
-| M2 | Atomic merchant allocation and initial report; first vertical slice complete | M1 | P0-03, P0-04, core P0-07 |
-| M3 | Trusted live confirmation and failure-path hardening | M2 | P0-02, P0-04, P0-05 |
-| M4 | Customer/reviewer grants, disclosure consent, and scoped views | M2 | Remaining P0-01 and P0-06 |
-| M5 | Authorized replayable packet and replay command | M3, M4 | P0-08 |
-| M6 | Merchant/customer/reviewer Vue flows | M2 contracts; M4/M5 for completion | P0-07 |
-| M7 | Release rehearsal, deployment controls, and evidence collection | M1–M6 | P0-09 and all acceptance gates |
+| M1 | Backend complete; development Items 01–06 | Authenticated invoice/case/evidence through persisted real verification | P0-01, P0-02, P0-05, merchant portion of P0-06 |
+| M2 | Backend complete; Item 07 uses simulated confirmation | Atomic merchant allocation, initial report, retries/conflicts/rollback | P0-03, P0-04, core P0-07 |
+| M3 | Adapter implemented, Item 08; live gate blocked | M3.1 live node/approval evidence | P0-02, P0-04, P0-05 |
+| M4 | Pending | M4.0–M4.5 plus the route-wide role/consent matrix | Remaining P0-01 and P0-06 |
+| M5 | Pending | M5.0–M5.2 authorized export/replay; live release still requires M3.1 | P0-08 |
+| M6 | Assigned to Person 4; deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
+| M7 | Incomplete | M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
+
+### Ownership and coordination
+
+| Owner | Accountable scope | Consumer boundary |
+|---|---|---|
+| Person 1 | Access/authentication, shared actor/schema foundation, grants, browser sessions | One shared authorization contract for every backend service and frontend session client |
+| Person 2 | Scoped reports, disclosure projections, packet contract, replay and authorized export | Frontend/export reuse the same disclosure policy and versioned packet types |
+| Person 3 | Case listing, customer submission backend, live validation, deployment and release | Submission services consume Person 1's access interfaces; deployment consumes Person 4's built app |
+| Person 4 | All frontend source, shell, API client/types, merchant/customer/reviewer screens, styles, accessibility, build configuration and browser tests | Consume backend contracts; no backend contributor independently implements UI |
+
+- Read [CONTRIBUTING.md](../CONTRIBUTING.md), fetch branches, inspect open PRs and check unpublished-PR branches before claiming work. Record the contributor, status and branch/PR; publish the task branch before implementation. Never treat this board as a remote lock.
+- Start dependent branches from updated `main` only after their prerequisite PRs merge. Explicit fixture/requirements preparation may happen earlier, but does not satisfy integrated acceptance. Use the repo's merge-commit workflow.
+- Person 1 owns shared authentication, `db/models.py` and migration-head changes. Others request prerequisite shared changes before coding against them; Person 1 does not take over their feature services. Extend the current migration head in order; do not reserve guessed revision numbers or create competing heads.
+- Person 2 owns report/evidence/export disclosure projections. Person 3 owns evidence submission changes. Changes to a shared evidence module must be handed off after M4.4 merges, rather than edited concurrently.
+- Coordinate and serialize integration edits to `main.py`, configuration, schema-generation registration, and CI. Each feature supplies its own contracts/tests; update the branch from `main` and regenerate affected outputs before merging. No two active tasks independently refactor these shared files.
+- Person 4 owns frontend tests and package/build configuration. Person 3 owns deployment/CI wiring and backend static serving; agree the build-output and `/api` contract before M7.1 integration.
+- Keep M1/M2 behavior, existing merchant bearer clients, historical hashes and the separate case-detail/report endpoints compatible. Adding browser roles must not change who can verify, resolve or allocate credit.
+
+### Start order and status
+
+`Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
+
+Person 1 starts M4.0 while Person 3 starts M4.3. Person 2 can inspect packet requirements/fixtures and starts M5.0 implementation after M4.0 merges. Person 1 then progresses through M4.1/M4.2; Person 3 proceeds to M4.4; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
+
+All M6 tasks remain deferred and assigned to Person 4. When frontend is resumed, M6.0 can start against current contracts; fixtures may unblock development of dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
+
+### Feature board
+
+The links below lead to the scope and acceptance card for each branch. All future-task validation is pending; historical implementation results remain in DEVELOPMENT.md.
+
+| Task | Owner | Branch | Prerequisites | Status |
+|---|---|---|---|---|
+| [M3.1 — Live validation](#m3-1) | Person 3 | `docs/m3-live-validation` | Trusted compatible RPC endpoint supplied by the operator | Externally blocked |
+| [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Ready |
+| [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Waiting |
+| [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Waiting |
+| [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Ready |
+| [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Waiting |
+| [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Waiting |
+| [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Waiting |
+| [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
+| [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Waiting |
+| [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
+| [M6.1 — Browser access](#m6-1) | Person 4 | `feat/m6-browser-access` | Frontend resumed; M6.0 and M4.2 merged | Deferred |
+| [M6.2 — Merchant workflow](#m6-2) | Person 4 | `feat/m6-merchant-workflow` | Frontend resumed; M6.1 and M4.3 merged | Deferred |
+| [M6.3 — Grant management](#m6-3) | Person 4 | `feat/m6-grant-management` | Frontend resumed; M6.2, M4.1 and M4.4 merged | Deferred |
+| [M6.4 — Customer submission](#m6-4) | Person 4 | `feat/m6-customer-submission` | Frontend resumed; M6.1 and M4.4 merged | Deferred |
+| [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-reviewer-export` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Deferred |
+| [M6.6 — Browser acceptance](#m6-6) | Person 4 | `test/m6-browser-acceptance` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Deferred |
+| [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Waiting for completion dependencies |
+| [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-release-rehearsal` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | Waiting |
+
+### Task cards
+
+<a id="m3-1"></a>
+
+#### M3.1 — Live validation
+
+- **Owner:** Person 3. **Branch:** `docs/m3-live-validation`. **Status:** Externally blocked.
+- **Prerequisites:** Trusted compatible RPC endpoint supplied by the operator.
+- **Goal:** Close the remaining trusted-chain release gate using the public historical fixture.
+- **Owned code:** `docs/chain.md` validation procedure and sanitized release evidence; coordinate any adapter defect separately.
+- **Exclusions:** No simulated result may satisfy this gate; no new payment, node provisioning, frontend, or unrelated RPC refactor.
+- **Public interfaces:** Exercise the existing refresh and merchant resolve APIs with server-configured RPC settings; preserve observation-v1/v2 compatibility.
+- **Acceptance checks:** Record actual node version/capabilities, bound raw transaction/network/block/confirmation data, freshness and policy eligibility, and a real merchant approval trace.
+- **Validation evidence:** Pending: commands, revision, environment, timestamp, sanitized observation and invoice/case/decision references; never RPC secrets. All cards also require the common definition of done below.
+
+<a id="m4-0"></a>
+
+#### M4.0 — Access foundation
+
+- **Owner:** Person 1. **Branch:** `feat/m4-access-foundation`. **Status:** Ready.
+- **Prerequisites:** Existing M1/M2 and M3 implementation on main.
+- **Goal:** Provide one shared access and persistence foundation for the remaining backend tasks.
+- **Owned code:** `auth/`, shared workflow authorization, `db/models.py`, forward access migrations, and access contracts. Source paths in these cards are relative to `apps/api/src/zecsolve/` unless otherwise stated.
+- **Exclusions:** No customer UI, packet implementation, grant/session HTTP lifecycle, or parallel identity model. Preserve existing merchant bearer credentials and historical hashes.
+- **Public interfaces:** Publish the common actor/access context and transaction-time authorization interfaces, plus grant/session/consent/claim-attribution and retry references. Agree report/evidence/export permission vocabulary with Person 2; downstream services consume it.
+- **Acceptance checks:** Migrations preserve existing rows, evidence decryption, audit/retry records, and merchant behavior; customer attribution does not require a fake merchant credential. Expiry/revocation and case scoping can be rechecked after waits; shared contract tests pass.
+- **Validation evidence:** Pending: migration preservation/downgrade safety results, merchant regression results, generated access contracts, and foundation PR. All cards also require the common definition of done below.
+
+<a id="m4-1"></a>
+
+#### M4.1 — Grant lifecycle
+
+- **Owner:** Person 1. **Branch:** `feat/m4-case-grants`. **Status:** Waiting.
+- **Prerequisites:** M4.0 merged.
+- **Goal:** Let merchants manage bounded customer/reviewer access to one owned case.
+- **Owned code:** New grant schemas, services, API router, and focused tests; any shared model changes remain with Person 1.
+- **Exclusions:** No UI, browser session exchange, evidence submission, or report projection implementation. Existing source labels and processing acknowledgements are not reviewer-sharing authorization.
+- **Public interfaces:** `POST /api/cases/{id}/grants`, `GET /api/cases/{id}/grants`, and `DELETE /api/cases/{id}/grants/{grant_id}`. Reveal initial access codes once; subsequent metadata/replay must not redisclose reusable secrets.
+- **Acceptance checks:** Creation, metadata inspection, expiry, and idempotent revocation work; reject foreign cases, overbroad selections, and evidence without sharing authorization. Customer/reviewer roles cannot manage grants. Report-only grants can work before M4.4; evidence grants require its consent records.
+- **Validation evidence:** Pending: two-merchant/role, expiry/revocation, consent-selection, retry and secret-disclosure tests plus request/response examples. All cards also require the common definition of done below.
+
+<a id="m4-2"></a>
+
+#### M4.2 — Browser sessions
+
+- **Owner:** Person 1. **Branch:** `feat/m4-browser-sessions`. **Status:** Waiting.
+- **Prerequisites:** M4.1 merged.
+- **Goal:** Exchange an initial merchant or grant code for revocable browser access.
+- **Owned code:** Session authentication, session router/service, Origin/CSRF handling, and relevant configuration/tests.
+- **Exclusions:** No frontend login screen, localStorage token scheme, signup, email delivery, or customer role expansion.
+- **Public interfaces:** `POST`, `GET`, and `DELETE /api/session`; authenticated scope and CSRF usage documented for Person 4. Preserve existing merchant bearer clients.
+- **Acceptance checks:** Secure HttpOnly SameSite cookies, trusted Origin and CSRF checks protect state-changing cookie requests. Sessions last at most eight hours and never exceed underlying expiry; revocation takes effect on subsequent requests. Logout, invalid exchange, expiry during waits, and role denial pass.
+- **Validation evidence:** Pending: session/security matrix, bearer compatibility regressions, and browser-client contract examples. All cards also require the common definition of done below.
+
+<a id="m4-3"></a>
+
+#### M4.3 — Case listing
+
+- **Owner:** Person 3. **Branch:** `feat/m4-case-listing`. **Status:** Ready.
+- **Prerequisites:** Existing merchant case backend on main.
+- **Goal:** Supply merchant dashboard summaries without requiring full reports.
+- **Owned code:** Case-list schema and focused additions to case router/service/tests.
+- **Exclusions:** No grants, claim writes, shared authentication changes, frontend, or detail/report replacement. No schema migration is planned.
+- **Public interfaces:** `GET /api/cases` with cursor pagination and optional state filter; preserve existing `GET /api/cases/{id}` and `/report`.
+- **Acceptance checks:** Pagination has deterministic ordering with an ID tie-breaker; filters, empty results and invalid cursors are handled; credentials are rechecked and foreign cases/private evidence never appear.
+- **Validation evidence:** Pending: pagination/filter/merchant isolation tests and sample list contract for Person 4. All cards also require the common definition of done below.
+
+<a id="m4-4"></a>
+
+#### M4.4 — Customer submissions
+
+- **Owner:** Person 3. **Branch:** `feat/m4-customer-submissions`. **Status:** Waiting.
+- **Prerequisites:** M4.2 merged, including the M4.0 persistence interfaces.
+- **Goal:** Accept scoped customer claims and evidence with honest attribution and recorded disclosure consent.
+- **Owned code:** Claim writer/router/contracts and submission changes to evidence service/router; new audit payload versions and focused tests. Request additional shared schema work from Person 1 before using it.
+- **Exclusions:** No grant/session implementation, reviewer report projection, frontend, allocation, or automatic verification.
+- **Public interfaces:** `POST /api/cases/{id}/claims` and the extended evidence submission API accept authorized merchants/customers. Record actor/grant, processing permission, disclosure version/time, and reviewer-sharing choice; sharing defaults false. Customer responses are minimal acknowledgements.
+- **Acceptance checks:** Exact evidence bytes remain encrypted; claim/evidence links stay within the case. Consent, version/event and retry outcome commit atomically; failed writes roll back. Same-key replay adds nothing; terminal cases, foreign IDs, revoked sessions and attempts to verify/approve are rejected. Existing merchant inputs remain supported.
+- **Validation evidence:** Pending: customer/merchant submission, consent default, attribution, idempotency/concurrency and rollback tests; acknowledgement examples. All cards also require the common definition of done below.
+
+<a id="m4-5"></a>
+
+#### M4.5 — Scoped reports
+
+- **Owner:** Person 2. **Branch:** `feat/m4-scoped-reports`. **Status:** Waiting.
+- **Prerequisites:** M4.2 and M4.4 merged.
+- **Goal:** Expose only explicitly selected report fields and consented evidence to reviewers.
+- **Owned code:** Role projections, report service/router integration, authorized evidence-read interfaces, and disclosure tests. Person 1 retains shared auth/model ownership; Person 3 retains evidence submission.
+- **Exclusions:** No alternate permission system, frontend, exporter, or broadening of case detail access. Do not serialize the whole merchant report and strip a few fields afterward.
+- **Public interfaces:** Keep merchant `/report` compatible and add explicit reviewer response types/disclosure scope. Existing evidence metadata reads and a scoped `GET /api/cases/{id}/evidence/{evidence_id}/content` enforce the same allowlist/consent policy; return permitted original components, never ciphertext or secrets.
+- **Acceptance checks:** The route-wide matrix covers two merchants, a customer, report-only reviewer, and evidence/export reviewer. Guessed IDs, unconsented or unselected evidence, foreign allocation details, revoked/expired grants, and unauthorized mutations are denied; allowed report fields remain useful.
+- **Validation evidence:** Pending: M4 route/role matrix, response disclosure assertions, evidence-read authorization results and fixtures for Person 4/M5. All cards also require the common definition of done below.
+
+<a id="m5-0"></a>
+
+#### M5.0 — Packet contract
+
+- **Owner:** Person 2. **Branch:** `feat/m5-packet-contract`. **Status:** Waiting.
+- **Prerequisites:** M4.0 merged.
+- **Goal:** Freeze the common packet format consumed by both exporter and replay.
+- **Owned code:** Packet schemas, integrity/canonicalization contract, public/synthetic complete and scoped fixtures, and schema tests.
+- **Exclusions:** No database exporter, permission implementation, CLI execution, fabricated live evidence, or revision of historical hashes.
+- **Public interfaces:** `CasePacketV1`: exact encoded inputs/hashes, invoice/policy, provenance, observations, verifier/rules versions, evaluation/allocation context, decisions/events, integrity manifest, and explicit disclosure/replay scope.
+- **Acceptance checks:** Complete and limited fixtures validate; original-file and decoded-transaction hashes stay distinct; omitted/redacted inputs and foreign conflicts are explicit. Current and historical supported record formats have contract coverage.
+- **Validation evidence:** Pending: generated packet schema, documented version/hash profile, fixture provenance and schema validation results. All cards also require the common definition of done below.
+
+<a id="m5-1"></a>
+
+#### M5.1 — Replay command
+
+- **Owner:** Person 2. **Branch:** `feat/m5-replay-case`. **Status:** Waiting.
+- **Prerequisites:** M5.0 merged.
+- **Goal:** Reproduce a packet locally without treating historical observation claims as fresh chain trust.
+- **Owned code:** Replay library/CLI, historical evaluator dispatch, and replay fixtures/tests.
+- **Exclusions:** No database export, network lookup, arbitrary executable/version installation, UI, or merchant credit mutation.
+- **Public interfaces:** Local `replay-case` command reports cryptographic recovery, historical rules/arithmetic, integrity and unsupported/missing/external context separately.
+- **Acceptance checks:** Real fixture recovery and historical calculations reproduce; one-byte tampering fails integrity; unsupported versions and scoped omissions do not claim full success. Packet content cannot trigger arbitrary fetches or code execution.
+- **Validation evidence:** Pending: valid, tampered, scoped, missing-version and unsupported-version replay command outputs with fixture hashes. All cards also require the common definition of done below.
+
+<a id="m5-2"></a>
+
+#### M5.2 — Authorized export
+
+- **Owner:** Person 2. **Branch:** `feat/m5-case-export`. **Status:** Waiting.
+- **Prerequisites:** M4.5 and M5.1 merged.
+- **Goal:** Export an authorized, internally consistent packet that the local replay command can consume.
+- **Owned code:** Export snapshot assembler/router, shared projection consumption, and export/replay integration tests.
+- **Exclusions:** No independent permissions, receipt redaction presented as complete replay, foreign case disclosure, or frontend download screen.
+- **Public interfaces:** `GET /api/cases/{id}/export` returns `CasePacketV1`; reviewer export requires an explicit additional grant. Reuse M4.5 disclosure rules and M5.0 types.
+- **Acceptance checks:** Concurrent approval cannot mix snapshots; reauthorization blocks revoked access. Permitted exact inputs/history survive export and replay; denied/omitted evidence is excluded and marked. Valid, tampered and scoped cases pass their expected outcomes.
+- **Validation evidence:** Pending: sanitized authorized packets/replay output, snapshot-concurrency tests and export permission/consent matrix. All cards also require the common definition of done below.
+
+<a id="m6-0"></a>
+
+#### M6.0 — Application foundation
+
+- **Owner:** Person 4. **Branch:** `feat/m6-web-foundation`. **Status:** Deferred.
+- **Prerequisites:** Frontend explicitly resumed; existing workflow contracts.
+- **Goal:** Establish the Vue 3/TypeScript/Tailwind app and reusable frontend contracts.
+- **Owned code:** New `apps/web` source, routing, components, styles, frontend package/build configuration, generated API client types and frontend tests.
+- **Exclusions:** No backend permission/business logic, unlabelled simulated data, or unfinished backend endpoint represented as working.
+- **Public interfaces:** Generate client types from backend OpenAPI; use same-origin `/api` with the Vite development proxy. Provide exact integer-zatoshi formatting, shared loading/error handling, and independent receipt/chain/case/business status displays.
+- **Acceptance checks:** Type checking/build pass; routing and explicit API fixtures work; money conversion is exact and shared components support keyboard access and responsive layouts. Document the build output contract for Person 3.
+- **Validation evidence:** Pending: build/typecheck/component results and fixture-backed screenshots; not actual-backend feature acceptance. All cards also require the common definition of done below.
+
+<a id="m6-1"></a>
+
+#### M6.1 — Browser access
+
+- **Owner:** Person 4. **Branch:** `feat/m6-browser-access`. **Status:** Deferred.
+- **Prerequisites:** Frontend resumed; M6.0 and M4.2 merged.
+- **Goal:** Connect all three roles to the browser session contract.
+- **Owned code:** Frontend access-code entry/exchange, session state, protected navigation, logout, expiry/revocation screens and tests.
+- **Exclusions:** No backend session implementation, signup, localStorage credentials, or query-string access codes.
+- **Public interfaces:** Consume session APIs and documented CSRF mechanism. Accept manual/fragment codes, strip them after exchange, and render role-appropriate navigation.
+- **Acceptance checks:** Session restoration/logout and invalid/expired/revoked access work against the actual backend; codes do not persist in URLs or localStorage; forbidden views and stale sessions recover safely.
+- **Validation evidence:** Pending: actual-backend session scenarios and frontend access/security checks. All cards also require the common definition of done below.
+
+<a id="m6-2"></a>
+
+#### M6.2 — Merchant workflow
+
+- **Owner:** Person 4. **Branch:** `feat/m6-merchant-workflow`. **Status:** Deferred.
+- **Prerequisites:** Frontend resumed; M6.1 and M4.3 merged.
+- **Goal:** Deliver the merchant invoice-to-decision workflow using existing services.
+- **Owned code:** Frontend case list, invoice/case creation, evidence upload/selection, verification, report/balance display, decision forms and tests.
+- **Exclusions:** No new backend endpoints, grants UI, export integration, automatic approval, or floating-point money conversion.
+- **Public interfaces:** Consume existing invoice/case/evidence/verify/report/resolve APIs and the M4.3 list contract. Keep one retry key per pending action and send the reviewed case version.
+- **Acceptance checks:** Merchant completes the flow against the actual backend; retries after response loss do not duplicate work; stale versions require refreshed review. Partial payments, conflicts, tamper rejection, missing evidence and unavailable/insufficient chain evidence are accurately displayed.
+- **Validation evidence:** Pending: backend-connected merchant browser scenarios and screenshots; simulated confirmations visibly labelled. All cards also require the common definition of done below.
+
+<a id="m6-3"></a>
+
+#### M6.3 — Grant management
+
+- **Owner:** Person 4. **Branch:** `feat/m6-grant-management`. **Status:** Deferred.
+- **Prerequisites:** Frontend resumed; M6.2, M4.1 and M4.4 merged.
+- **Goal:** Let merchants manage access and allowed disclosure from a case.
+- **Owned code:** Frontend grant creation/list/revocation, field/evidence selection, export permission controls and tests.
+- **Exclusions:** No backend permissions/consent changes, silent sharing defaults, or recovery of previously revealed codes.
+- **Public interfaces:** Consume grant metadata/create/revoke APIs and the available consent metadata. Display newly created codes once and explain revocation/download limits.
+- **Acceptance checks:** Create/revoke customer and reviewer access against the backend; unconsented evidence cannot be selected successfully; report/evidence/export permissions remain distinct; errors and expired/revoked states are visible.
+- **Validation evidence:** Pending: backend-connected grant-management scenarios, consent restriction checks and screenshots. All cards also require the common definition of done below.
+
+<a id="m6-4"></a>
+
+#### M6.4 — Customer submission
+
+- **Owner:** Person 4. **Branch:** `feat/m6-customer-submission`. **Status:** Deferred.
+- **Prerequisites:** Frontend resumed; M6.1 and M4.4 merged.
+- **Goal:** Provide the scoped disclosure, consent and submission experience.
+- **Owned code:** Frontend disclosure/consent, claim/evidence form, minimal acknowledgement and tests.
+- **Exclusions:** No merchant/reviewer report access, verification/approval controls, or backend submission changes.
+- **Public interfaces:** Consume claim/evidence submission APIs and their customer acknowledgements; optional missing evidence stays explicit; reviewer sharing starts unchecked.
+- **Acceptance checks:** Customer submits with recorded consent against the backend; retry/validation/expired-access paths work; no unrelated evidence or merchant actions appear, including on direct navigation.
+- **Validation evidence:** Pending: actual-backend submission and role-isolation browser results plus consent/acknowledgement screenshots. All cards also require the common definition of done below.
+
+<a id="m6-5"></a>
+
+#### M6.5 — Reviewer and export views
+
+- **Owner:** Person 4. **Branch:** `feat/m6-reviewer-export`. **Status:** Deferred.
+- **Prerequisites:** Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged.
+- **Goal:** Show reviewer disclosures and connect authorized downloads for reviewers and merchants.
+- **Owned code:** Frontend reviewer report, selected evidence display, download controls, merchant export integration and tests.
+- **Exclusions:** No client-only authorization, backend exporter/projection changes, or write controls for reviewers.
+- **Public interfaces:** Consume scoped report/evidence and export APIs. Distinguish report-only from export-enabled access and label incomplete/scoped packets and proof limits.
+- **Acceptance checks:** Granted information displays correctly against the backend; denied direct reads/downloads remain denied; authorized packets download; memo/notes render as text, never markup; merchant export is connected.
+- **Validation evidence:** Pending: backend-connected reviewer/export matrix, text-rendering checks and screenshots. All cards also require the common definition of done below.
+
+<a id="m6-6"></a>
+
+#### M6.6 — Browser acceptance
+
+- **Owner:** Person 4. **Branch:** `test/m6-browser-acceptance`. **Status:** Deferred.
+- **Prerequisites:** Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged.
+- **Goal:** Close M6 with end-to-end proof across the three roles.
+- **Owned code:** Frontend actual-backend browser suite, accessibility/responsive QA, UI evidence and frontend setup documentation; coordinate CI registration with Person 3.
+- **Exclusions:** No mocked responses counted as end-to-end acceptance, live inclusion claim from simulated observers, or backend feature ownership transfer.
+- **Public interfaces:** Exercise the shipped frontend and actual backend APIs; use only isolated explicitly labelled test confirmation composition.
+- **Acceptance checks:** First slice, same-invoice retry, cross-invoice conflict, tampered/missing evidence, insufficient confirmation, stale decisions, consent, role restrictions, expiry/revocation and export pass. Keyboard, labelled errors, loading states and responsive checks pass.
+- **Validation evidence:** Pending: browser/typecheck/build results, screenshots, revision/environment, and the UI evidence handoff to Person 3. All cards also require the common definition of done below.
+
+<a id="m7-1"></a>
+
+#### M7.1 — Deployment controls
+
+- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Waiting for completion dependencies.
+- **Prerequisites:** Backend preparation can start on current main; completion requires M4.2 and M6.0.
+- **Goal:** Provide a bounded same-origin deployment of the backend and Person 4's built application.
+- **Owned code:** `infra/`, Compose/ingress deployment configuration, backend static-serving integration, readiness/logging/limits and coordinated CI wiring.
+- **Exclusions:** No frontend source/build-config edits owned by Person 4, private-customer pilot claim, live RPC substitute, or destructive database downgrade.
+- **Public interfaces:** Consume Person 4's frontend build output contract; serve `/api` and app through TLS. Preserve packaged-head/encryption/verifier readiness and separate chain capability.
+- **Acceptance checks:** Runtime validation confirms TLS, correct cookie deployment, request/rate and CPU/memory limits, secret-safe logs, same-origin app/API serving and disabled public POC. An RPC outage does not masquerade as receipt failure.
+- **Validation evidence:** Pending: sanitized configuration and actual container/ingress runtime results; configuration parsing alone is insufficient. All cards also require the common definition of done below.
+
+<a id="m7-2"></a>
+
+#### M7.2 — Release rehearsal
+
+- **Owner:** Person 3. **Branch:** `test/m7-release-rehearsal`. **Status:** Waiting.
+- **Prerequisites:** M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier.
+- **Goal:** Assemble reproducible release acceptance and recovery evidence.
+- **Owned code:** Release checklist, migration/restart/retry/restore rehearsal, sanitized demo traces, limitations and release documentation. Person 4 supplies browser results and UI screenshots.
+- **Exclusions:** No assumed discovery results, automatic outreach, skipped gate marked passed, production pilot claim, or mutation of historical DEVELOPMENT.md results.
+- **Public interfaces:** Use existing workflow/export/replay/deployment interfaces; collect team-provided discovery/submission evidence and preserve attribution.
+- **Acceptance checks:** Migration, restart/lost-response recovery and encrypted restore pass; all A-01–A-15 rows have attributable evidence and required gates pass. Missing live validation or deferred frontend keeps full release incomplete. Document limits and recovery without losing accepted allocations.
+- **Validation evidence:** Pending: acceptance matrix with command/scenario, result, revision, environment/time; live/simulated traces separated; restore/demo/replay/UI evidence and team-supplied discovery artifacts. All cards also require the common definition of done below.
+
+### Definition of done
+
+A task card is the handoff: owner, goal, branch, prerequisites, owned code, exclusions, public interfaces, acceptance checks, and validation evidence are mandatory. Update status/claim fields without rewriting historical results. Do not mark a task complete merely because its branch exists, its code compiles, or its implementation was pushed.
+
+A feature is **Done** only when all of the following hold:
+
+1. Its behavior and negative-path acceptance checks pass, including actual-backend integration where required.
+2. Required repository checks pass: `make test` and `make lint` for application changes; `make test-db` on disposable PostgreSQL for database/migration/allocation changes and the task's database-backed authorization/submission scenarios. Regenerate changed published contracts with `make schema` and check their diff. Frontend work additionally passes its typecheck/build and relevant component/browser checks; Person 4 establishes those commands in M6.0.
+3. Documentation and contracts match the implementation. A documentation-only task checks content, local links and `git diff --check`; it does not invent application-test results.
+4. Evidence records commands/scenarios, actual outcomes, revision, environment, UTC timestamp and PR. Public/synthetic/simulated/live material is identified explicitly; no secrets or customer evidence enter the repo.
+5. The final diff is reviewed, CI passes and the PR merges into `main`. Follow CONTRIBUTING.md for merge commits and branch cleanup; no forced or direct-to-main integration.
+
+Task completion does not imply milestone or release completion. M4 needs the full route-wide role/consent matrix; M5 needs authorized export/replay and concurrency integrity; M6 needs the actual-backend browser gate; M7 needs all required release evidence, including M3.1 and resumed/completed M6. An acceptance row with an explicit incomplete outcome is useful tracking, not a passed release gate.
+
+
+### Milestone requirements
+
+The following retained requirements describe behavior and acceptance, including completed M1/M2 work. Use the task board above to select new work; do not restart completed milestones.
 
 ### M1 — authenticated invoice to persisted verification
 
@@ -178,7 +499,7 @@ Capture commands/results with revision, environment, and time. Record the three 
 
 ### Persisted additions
 
-Use forward Alembic revisions after `0001`; do not rewrite the existing migration. Split additions into a core workflow revision for M1/M2 and an access/export revision for M4/M5.
+Revisions `0001`–`0008` already exist. Person 1 owns the access foundation migrations and coordinates any later database additions. Extend the current Alembic head with forward revisions; never rewrite an applied migration or independently create competing heads. The table records required invariants across implemented and remaining records, not a request to recreate M1/M2 tables.
 
 | Addition | Required purpose and invariants |
 |---|---|
@@ -205,12 +526,17 @@ All successful workflow responses carry stable IDs and a report/schema version. 
 | `POST /api/invoices` | Expected integer amount, network/pool, receiver address, memo text or null, expiry or null | Immutable snapshot plus server-selected policy; merchant only |
 | `POST /api/cases` | Invoice ID | Case ID/state/version; merchant only |
 | `GET /api/cases` | Cursor and optional state filter | Merchant-owned case summaries; add this read route for the dashboard |
-| `GET /api/cases/{id}` | Case ID | `CaseReportV1`, projected for the caller |
+| `GET /api/cases/{id}` | Case ID | Existing merchant case detail; preserve this contract and deny ungranted roles |
+| `GET /api/cases/{id}/report` | Case ID and optional verification ID | Existing merchant report; add explicit reviewer projection in M4.5 |
 | `POST /api/cases/{id}/claims` | Optional reported txid and note | Assertion record; merchant or scoped customer |
 | `POST /api/cases/{id}/evidence` | Optional receipt/raw-tx strings, optional claim ID, source label, consent acknowledgement | Evidence bundle ID; merchant or scoped customer; source label is not a trust grant |
+| `GET /api/cases/{id}/evidence/{evidence_id}` | Case and evidence IDs | Existing merchant metadata read; add permitted reviewer projection in M4.5 |
+| `GET /api/cases/{id}/evidence/{evidence_id}/content` | Case and evidence IDs | M4.5 scoped original components; selected evidence and consent required for reviewers; never ciphertext or key material |
 | `POST /api/cases/{id}/verify` | Evidence bundle ID | Persisted result, observation, evaluation, and updated case version; merchant only in P0 |
 | `POST /api/cases/{id}/resolve` | Action, verification ID where required, expected case version, reason | Resolution/allocated output reference and post-decision balances; merchant only |
+| `POST /api/cases/{id}/chain-observations` | Verification ID | Existing merchant refresh with provenance; includes closed cases and does not allocate credit |
 | `POST /api/cases/{id}/grants` | Customer/reviewer role, expiry, allowed report/evidence selections, export permission | One-time access code plus grant metadata; merchant only |
+| `GET /api/cases/{id}/grants` | Case ID | Owned grant metadata for management, never reusable access codes |
 | `DELETE /api/cases/{id}/grants/{grant_id}` | Grant ID | Revocation; merchant only; already-revoked is harmless |
 | `GET /api/cases/{id}/export` | Case ID | Complete or explicitly scoped/limited `CasePacketV1`; authorization rechecked |
 | `POST /api/session`, `DELETE /api/session`, `GET /api/session` | Initial access code for creation | Browser session creation, logout, and current access scope |
@@ -267,7 +593,7 @@ Use real PostgreSQL for transactions/locks and the real Rust binary for cryptogr
 
 Run the existing verifier/rules/API suites after integration changes and `make test-db` for every schema/allocation change. Add targeted service/API tests under the existing test tree and browser tests in the frontend package. Generate OpenAPI types and check them for drift; regenerate the existing verifier schema only if its actual model changes.
 
-The previous documentation session could not start `make test` because Cargo was unavailable; Cargo, uv, and a disposable PostgreSQL database must be available before recording implementation results. Do not count source inspection, test presence, or a skipped database suite as a passed acceptance gate.
+Recorded M1/M2 and M3 adapter results are in [DEVELOPMENT.md](DEVELOPMENT.md), including the latest 12 Rust, 175 Python, and 151 PostgreSQL passing tests. These are historical results, not checks rerun by this assignment update. Cargo, uv, and a disposable PostgreSQL database must be available before recording new implementation results. Do not count source inspection, test presence, or a skipped database suite as a passed acceptance gate.
 
 ## 7. Release evidence, dependencies, and immediate next task
 
@@ -286,7 +612,7 @@ The previous documentation session could not start `make test` because Cargo was
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate implementation task:** M1's core workflow migration, merchant provisioning/auth dependency, receiver normalization, invoice/case creation, encrypted evidence bundle, persisted verifier call, and an initial `CaseReportV1`. Its first test must demonstrate the real historical output with zero credited balance and blocked offline approval. Then implement M2's transaction protocol without introducing a demo-only allocation shortcut.
+**Immediate tasks:** Person 1 can claim M4.0 access foundation; Person 3 can claim M4.3 case listing. Person 2 can review packet requirements and public fixtures, then start M5.0 implementation after M4.0 merges. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 
