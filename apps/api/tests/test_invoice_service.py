@@ -169,3 +169,127 @@ def test_invalid_address_and_expired_invoice_create_nothing(
             service.create(principal, request, "invalid")
         assert error.value.status == 422
     assert counts(database) == [0, 0, 0]
+
+
+def test_concurrent_key_with_different_body_commits_one_and_conflicts(
+    database, service, principal, invoice_request
+):
+    from zecsolve.services.invoices import InvoiceError
+
+    barrier = threading.Barrier(2)
+    normalize = service.normalizer.normalize
+
+    def synchronize(request):
+        result = normalize(request)
+        barrier.wait(timeout=5)
+        return result
+
+    service.normalizer.normalize = synchronize
+
+    def create(amount):
+        try:
+            return service.create(
+                principal,
+                invoice_request.model_copy(update={"expected_zat": amount}),
+                "conflicting-race",
+            )
+        except InvoiceError as error:
+            return error.status
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(create, [200_000, 300_000]))
+    assert sum(result == 409 for result in results) == 1
+    assert counts(database) == [1, 1, 1]
+
+
+def test_expired_credential_cannot_read_or_replay(database, service, principal, invoice_request):
+    from datetime import timedelta
+
+    from sqlalchemy import update
+    from zecsolve.db.models import MerchantCredential
+    from zecsolve.services.invoices import InvoiceError
+
+    snapshot, _ = service.create(principal, invoice_request, "expiring")
+    with database.begin() as connection:
+        now = connection.scalar(select(func.clock_timestamp()))
+        connection.execute(
+            update(MerchantCredential)
+            .where(MerchantCredential.id == principal.credential_id)
+            .values(created_at=now - timedelta(days=2), expires_at=now - timedelta(days=1))
+        )
+    for operation in [
+        lambda: service.get(principal, snapshot.invoice_id),
+        lambda: service.create(principal, invoice_request, "expiring"),
+    ]:
+        with pytest.raises(InvoiceError) as error:
+            operation()
+        assert error.value.status == 401
+    assert counts(database) == [1, 1, 1]
+
+
+def test_credential_lock_timeout_is_bounded_without_writes(
+    database, service, principal, invoice_request
+):
+    from sqlalchemy.exc import DBAPIError
+    from zecsolve.db.models import MerchantCredential
+
+    with database.begin() as connection:
+        connection.execute(
+            select(MerchantCredential)
+            .where(MerchantCredential.id == principal.credential_id)
+            .with_for_update()
+        )
+        with pytest.raises(DBAPIError) as error:
+            service.create(principal, invoice_request, "blocked")
+        assert error.value.orig.sqlstate == "55P03"
+    assert counts(database) == [0, 0, 0]
+
+
+@pytest.mark.parametrize("operation", ["get", "replay"])
+def test_expiry_is_rechecked_after_waiting_for_credential_lock(
+    database, service, principal, invoice_request, operation
+):
+    import time
+    from datetime import timedelta
+
+    from sqlalchemy import update
+    from zecsolve.db.models import MerchantCredential
+    from zecsolve.services.invoices import InvoiceError
+
+    snapshot, _ = service.create(principal, invoice_request, "expiry-race")
+    with database.begin() as connection:
+        now = connection.scalar(select(func.clock_timestamp()))
+        connection.execute(
+            update(MerchantCredential)
+            .where(MerchantCredential.id == principal.credential_id)
+            .values(expires_at=now + timedelta(seconds=2))
+        )
+    action = (
+        (lambda: service.get(principal, snapshot.invoice_id))
+        if operation == "get"
+        else (lambda: service.create(principal, invoice_request, "expiry-race"))
+    )
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        with database.begin() as blocker:
+            blocker.execute(
+                select(MerchantCredential)
+                .where(MerchantCredential.id == principal.credential_id)
+                .with_for_update()
+            )
+            future = executor.submit(action)
+            deadline = time.monotonic() + 1
+            with database.connect() as observer:
+                while not observer.scalar(
+                    text(
+                        "SELECT EXISTS (SELECT 1 FROM pg_stat_activity "
+                        "WHERE wait_event_type='Lock' AND query LIKE '%merchant_credentials%')"
+                    )
+                ):
+                    assert time.monotonic() < deadline, (
+                        "Request did not wait on the held credential lock"
+                    )
+                    time.sleep(0.01)
+            time.sleep(2.1)
+        with pytest.raises(InvoiceError) as error:
+            future.result(timeout=5)
+        assert error.value.status == 401

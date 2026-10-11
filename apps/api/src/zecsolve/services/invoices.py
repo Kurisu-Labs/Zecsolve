@@ -36,16 +36,16 @@ class InvoiceService:
 
     def authorize(self, session: Session, principal: MerchantPrincipal):
         credential = session.scalar(
-            select(MerchantCredential.id)
+            select(MerchantCredential)
             .where(
                 MerchantCredential.id == principal.credential_id,
                 MerchantCredential.merchant_id == principal.merchant_id,
-                MerchantCredential.revoked_at.is_(None),
-                MerchantCredential.expires_at > func.clock_timestamp(),
             )
             .with_for_update(read=True)
         )
-        if credential is None:
+        # Evaluate time after acquiring the lock: a lock-only wait can outlive expiry.
+        now = session.scalar(select(func.clock_timestamp()))
+        if credential is None or credential.revoked_at is not None or credential.expires_at <= now:
             raise InvoiceError(401, "INVALID_MERCHANT_CREDENTIALS")
 
     def snapshot(self, session: Session, principal: MerchantPrincipal, invoice_id: uuid.UUID):
