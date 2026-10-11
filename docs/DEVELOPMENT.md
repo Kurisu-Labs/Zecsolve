@@ -175,8 +175,38 @@ Independent review reproduced two defects with failing regressions: temporary-fi
 
 See [verification API and report guide](verification.md). The core invoice → case → encrypted evidence → verification → initial report path is connected; case listing, claim writers, and the complete consent/access workflow remain unfinished.
 
+## Item 07 — merchant decisions and atomic allocation
+
+Implemented on October 11, 2026, over baseline `ab141ce`, in separately pushed contracts, policy evaluation, migration, observations, transaction service, reports, HTTP, safety tests, demo, schema, and documentation increments.
+
+- Add merchant-only `POST /api/cases/{id}/resolve` with four typed actions, required reason, reviewed case version, and scoped idempotency key. Approval/rejection requires a same-case verification; actor, amount, identity, and chain trust cannot be supplied by callers.
+- Preserve immutable policy/initial evaluator version `0.1.0`; add decision evaluator `0.2.0` with explicit source authorization, transaction binding, confirmation count, and post-lock freshness gates. Unsupported stored selectors fail closed; no historical snapshot is rewritten.
+- Record a fresh immutable observation outside decision locks. ASGI composes only the offline observer and default-deny source policy. Simulated observation and permissive policy exist only in isolated test/demo composition, with no public toggle.
+- Lock invoice then case, reauthorize, return completed semantic/key retries before stale/terminal checks, and evaluate current balances. Atomically persist decision evaluation, resolution, full-output allocation, case state/version, event, and retry outcome. A uniqueness loser rolls back all business records before returning same-invoice replay or an opaque foreign conflict.
+- Extend reports with separate decision observations/evaluations/outcomes, retaining initial verifier history and current balance arithmetic. Reports explicitly identify simulated decisions. Legacy resolutions remain assertion views without invented decision context.
+- Migration `0007` preserves legacy resolution/allocation rows, adds scoped references and immutable history, and blocks populated rollback after serializing with active writers. A failed approval's diagnostic observation is also protected from downgrade.
+- Add a disposable-schema demo through the normal application services: real historical receipt recovery, blocked offline approval, labeled simulated partial approval, retry, second-invoice conflict, and tampered-receipt rejection. The script removes its schema and prints only safe trace metadata.
+
+### Recorded validation
+
+Linux, Python 3.14.7, Rust 1.99.0, disposable PostgreSQL 17, isolated test schemas:
+
+```text
+make test: 12 Rust tests; 134 Python tests passed
+make test-db: 141 PostgreSQL tests passed
+make lint: Rust formatting/Clippy and Python lint/formatting passed
+make poc: historical recovery, tamper rejection, and offline balances unchanged
+Isolated resolution demo: passed as part of the PostgreSQL suite
+```
+
+Safety tests prove same-output/same-invoice concurrent replay, one winner across two invoices, fresh review for concurrent different outputs, no overpayment after refresh, synthetic 600,000 + 400,000 aggregation, post-lock observation expiry, revocation during refresh, foreign/wrong-case rejection, terminal replay, event/commit rollback, immutable records, corrupted outcome/evaluation/observation rejection, legacy preservation, and downgrade serialization. Public historical receipt recovery and synthetic accounting/source inputs are explicitly distinguished.
+
+Independent review found no blockers and independently ran 28 focused tests; additional migration, aggregation, and linkage-corruption tests passed afterward, followed by the complete final suite. The existing Starlette/httpx deprecation warning remains. No live chain inclusion, real-customer onboarding, or release-complete credit path is claimed.
+
+See [merchant decisions and isolated demo](resolutions.md). M2's first backend slice is now demonstrated with simulated confirmation; the deployed app permits noncredit decisions but continues to block approval while offline.
+
 ## Next small item
 
-Implement M2 merchant resolution with explicit authorization, stale-state checks, idempotency, and atomic decision/allocation/audit persistence. Offline attempts must remain ineligible for approval; any confirmation fixtures used to test allocation must be clearly isolated synthetic data. Trusted live chain observations remain M3 work and are required before a real confirmed-payment release claim.
+Implement M3's bounded, read-only trusted chain observer and its negative-path tests: network/raw-byte binding, current source health, best-chain inclusion, confirmation count, refresh failure, and stale observations. Keep offline default behavior until a compatible trusted endpoint is configured. A real historical-output observation and merchant approval trace are required before calling the credit path release-ready.
 
-Customer/reviewer grants, remaining case workflow services, trusted chain observations, frontend, and replayable exports remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the full milestone order.
+Customer/reviewer grants, claim writers and case listing, frontend, authorized replay packets, retention/rotation, and release rehearsal remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for milestone order.
