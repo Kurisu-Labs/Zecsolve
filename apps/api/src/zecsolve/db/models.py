@@ -172,11 +172,79 @@ class Claim(Identified, Timestamped, Base):
 
 class Evidence(Identified, Timestamped, Base):
     __tablename__ = "evidence"
+    __table_args__ = (
+        UniqueConstraint("id", "case_id", "merchant_id", name="uq_evidence_case_owner"),
+        ForeignKeyConstraint(
+            ["case_id", "merchant_id"],
+            ["cases.id", "cases.merchant_id"],
+            name="fk_evidence_case_owner",
+        ),
+        ForeignKeyConstraint(
+            ["submitted_by", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_evidence_submitter",
+        ),
+    )
     case_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("cases.id"), index=True)
     type: Mapped[str] = mapped_column(String(40))
     source: Mapped[str] = mapped_column(String(200))
     sha256: Mapped[str] = mapped_column(String(64))
     storage_ref: Mapped[str] = mapped_column(Text)
+    merchant_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    submitted_by: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    bundle_version: Mapped[str | None] = mapped_column(String(16))
+    bundle_metadata: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
+
+
+class EvidenceContent(Base):
+    __tablename__ = "evidence_contents"
+    __table_args__ = (
+        UniqueConstraint("key_id", "nonce", name="uq_evidence_key_nonce"),
+        CheckConstraint("octet_length(nonce) = 12", name="ck_evidence_nonce_length"),
+        CheckConstraint(
+            "octet_length(ciphertext) BETWEEN 16 AND 4200016", name="ck_evidence_ciphertext_size"
+        ),
+    )
+    evidence_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("evidence.id"), primary_key=True)
+    key_id: Mapped[str] = mapped_column(String(64))
+    nonce: Mapped[bytes] = mapped_column(LargeBinary)
+    ciphertext: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class EvidenceSubmissionRequest(Identified, Timestamped, Base):
+    __tablename__ = "evidence_submission_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id",
+            "credential_id",
+            "case_id",
+            "idempotency_key",
+            name="uq_evidence_submission_key",
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_evidence_request_credential",
+        ),
+        ForeignKeyConstraint(
+            ["evidence_id", "case_id", "merchant_id"],
+            ["evidence.id", "evidence.case_id", "evidence.merchant_id"],
+            name="fk_evidence_request_owner",
+        ),
+        ForeignKeyConstraint(
+            ["event_id", "case_id"],
+            ["case_events.id", "case_events.case_id"],
+            name="fk_evidence_request_event",
+        ),
+        CheckConstraint("request_hash ~ '^[0-9a-f]{64}$'", name="ck_evidence_request_hash"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_hash: Mapped[str] = mapped_column(String(64))
+    evidence_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    event_id: Mapped[uuid.UUID] = mapped_column(Uuid)
 
 
 class Verification(Identified, Timestamped, Base):
@@ -245,7 +313,10 @@ class OutputAllocation(Timestamped, Base):
 
 class CaseEvent(Identified, Base):
     __tablename__ = "case_events"
-    __table_args__ = (UniqueConstraint("case_id", "sequence", name="uq_case_event_sequence"),)
+    __table_args__ = (
+        UniqueConstraint("case_id", "sequence", name="uq_case_event_sequence"),
+        UniqueConstraint("id", "case_id", name="uq_event_case"),
+    )
     case_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("cases.id"), index=True)
     sequence: Mapped[int] = mapped_column(Integer)
     actor: Mapped[str] = mapped_column(String(200))
