@@ -66,6 +66,9 @@ def upgrade():
 
 
 def downgrade():
+    # Creators read retry records first. Wait for them before inspecting evidence,
+    # then keep all affected tables stable until rollback either finishes or aborts.
+    op.execute("LOCK TABLE case_creation_requests, cases, case_events IN ACCESS EXCLUSIVE MODE")
     if op.get_bind().scalar(
         sa.text(
             "SELECT EXISTS (SELECT 1 FROM cases WHERE workflow_version IS NOT NULL) OR "
