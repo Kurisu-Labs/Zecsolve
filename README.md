@@ -39,18 +39,22 @@ make api
 
 Set `ZECSOLVE_POC_TOKEN` in `.env` to a randomly generated value before using the POC endpoint. Generate one with `python3 -c 'import secrets; print(secrets.token_urlsafe(32))'`. An empty token disables that endpoint. Keep `.env` private; it is ignored by Git and Docker builds.
 
+Encrypted evidence also requires `ZECSOLVE_EVIDENCE_KEY_ID` and a base64-encoded 32-byte `ZECSOLVE_EVIDENCE_KEY`. Missing/invalid encryption configuration disables new evidence submissions and makes readiness return 503. See [key setup and evidence usage](docs/evidence.md); retain the key securely across restarts.
+
 An existing PostgreSQL installation also works: create a dedicated database and set `ZECSOLVE_DATABASE_URL` in `.env`. Compose uses port **54329** to avoid the usual local port 5432. Credentials in Compose are for local development.
 
 | Endpoint | Behavior |
 |---|---|
 | `GET /health/live` | Process is running; does not claim dependencies are ready |
-| `GET /health/ready` | Checks migration revision and executable availability; returns 503 when incomplete |
+| `GET /health/ready` | Checks migration revision, executable availability, and evidence encryption configuration; returns 503 when incomplete |
 | `POST /api/poc/verify` | Bearer-token-protected, stateless verification of `receipt_json` and `raw_tx_hex` strings |
 | `GET /api/auth/me` | Returns merchant/credential IDs derived from an active merchant credential |
 | `POST /api/invoices` | Creates an immutable merchant-owned invoice and server-selected policy; requires `Idempotency-Key` |
 | `GET /api/invoices/{id}` | Returns the authenticated merchant's invoice snapshot; inaccessible IDs return 404 |
 | `POST /api/cases` | Opens one case per owned invoice and atomically records its opening event; requires `Idempotency-Key` |
 | `GET /api/cases/{id}` | Returns current case state/version and its immutable opening event; merchant only |
+| `POST /api/cases/{id}/evidence` | Stores an encrypted optional receipt/raw-tx bundle and appends an audit event; merchant + `Idempotency-Key` required |
+| `GET /api/cases/{id}/evidence/{evidence_id}` | Returns owned evidence metadata only; never receipt/raw-tx content or ciphertext |
 | `GET /docs` | Interactive API contract; use **Authorize** to enter the POC token |
 
 Paste the contents of `fixtures/mainnet/receipt.json` into the `receipt_json` string and `fixtures/mainnet/transaction.hex` into `raw_tx_hex`. The endpoint accepts content, never server file paths or fetch URLs. It does not write evidence or recovered fields to the database.
@@ -77,7 +81,7 @@ Creation/issuance returns one JSON object containing the merchant ID, credential
 
 Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
 
-Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Evidence/decision endpoints, customer/reviewer grants, browser sessions, and private evidence storage remain future increments.
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification/decision endpoints, customer/reviewer grants, and browser sessions remain future increments.
 
 ## Create an invoice
 
@@ -127,9 +131,9 @@ ZECSOLVE_TEST_DATABASE_URL='postgresql+psycopg://zecsolve:zecsolve@127.0.0.1:543
 
 ## Current boundary
 
-Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials with expiry/revocation and identity endpoint; mainnet recipient normalization CLI and Python adapter; merchant invoice/policy creation and retrieval; one case per invoice with atomic opening event and safe retries; tests; development container configuration.
+Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials; recipient normalization; immutable invoices/policies; case opening/read; encrypted merchant evidence submission and metadata; atomic creation/submission retries and chained audit events; tests; development container configuration.
 
-Next: claims and private evidence, persisted workflow verification and full reports, customer/reviewer authentication and permissions, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
+Next: claims, persisted workflow verification and full reports, customer/reviewer authentication and permissions, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
 
 The current Rust wrapper accepts mainnet receipt v0 and v5 transaction branches NU5 through NU6.2. Orchard has a real historical fixture test. The Sapling recovery path uses the upstream library but does not yet have an end-to-end historical Sapling fixture in this repository. No Ironwood compatibility is claimed.
 

@@ -1,0 +1,75 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "event_id": {
+      "format": "uuid",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "case_id": {
+      "format": "uuid",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "sequence": {
+      "minimum": 2,
+      "title": "Sequence",
+      "type": "integer"
+    },
+    "actor": {
+      "pattern": "^credential:[0-9a-f-]{36}$",
+      "title": "Actor",
+      "type": "string"
+    },
+    "action": {
+      "const": "EVIDENCE_SUBMITTED",
+      "default": "EVIDENCE_SUBMITTED",
+      "title": "Action",
+      "type": "string"
+    },
+    "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "title": "Payload",
+      "type": "object"
+    },
+    "payload_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Payload Hash",
+      "type": "string"
+    },
+    "previous_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Previous Hash",
+      "type": "string"
+    },
+    "event_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Event Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "case_id",
+    "sequence",
+    "actor",
+    "at",
+    "payload",
+    "payload_hash",
+    "previous_hash",
+    "event_hash"
+  ],
+  "title": "EvidenceSubmittedEventV1",
+  "type": "object"
+}

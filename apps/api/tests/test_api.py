@@ -21,7 +21,11 @@ def test_health_is_honest_when_database_unavailable(root):
         assert api.get("/health/live").json()["name"] == "zecsolve"
         response = api.get("/health/ready")
         assert response.status_code == 503
-        assert response.json() == {"database_migrated": False, "verifier_available": True}
+        assert response.json() == {
+            "database_migrated": False,
+            "verifier_available": True,
+            "evidence_encryption_configured": False,
+        }
 
 
 def test_poc_requires_token_and_returns_real_recovery(root, receipt, raw_tx):

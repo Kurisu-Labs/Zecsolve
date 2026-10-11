@@ -14,3 +14,5 @@ class Settings(BaseSettings):
     migrations_path: Path = Path("apps/api/migrations")
     verifier_path: Path = Path("target/debug/zecsolve-verifier")
     verifier_timeout_seconds: float = Field(default=10, gt=0, le=60)
+    evidence_key_id: str = ""
+    evidence_key: SecretStr = SecretStr("")

@@ -4,7 +4,7 @@ This M1 increment creates and retrieves merchant-owned invoices. It does not cre
 
 ## Create and read
 
-Run `make migrate` (head `0003`) and `make api` from the repository root. Provision a merchant credential using the [operator CLI](../README.md#provision-merchant-identity). Put that credential in the local `MERCHANT_TOKEN` environment variable, then run this example with the existing public fixture:
+Run `make migrate` to the current head and `make api` from the repository root; invoice snapshots require revision `0003` or later. Provision a merchant credential using the [operator CLI](../README.md#provision-merchant-identity). Put that credential in the local `MERCHANT_TOKEN` environment variable, then run this example with the existing public fixture:
 
 ```sh
 uv run --locked python - <<'PY'

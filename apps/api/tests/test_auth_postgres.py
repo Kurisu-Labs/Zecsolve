@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import uuid
@@ -196,7 +197,14 @@ def test_readiness_requires_packaged_head(database, root, monkeypatch):
     # Readiness uses the same engine as authentication, with verifier availability isolated.
     monkeypatch.setattr("zecsolve.main.make_engine", lambda settings: database)
     monkeypatch.setattr("zecsolve.main.VerifierAdapter.available", lambda self: True)
-    app = create_app(Settings(_env_file=None, migrations_path=root / "apps/api/migrations"))
+    app = create_app(
+        Settings(
+            _env_file=None,
+            migrations_path=root / "apps/api/migrations",
+            evidence_key_id="test",
+            evidence_key=base64.b64encode(bytes(32)).decode(),
+        )
+    )
     with TestClient(app) as api:
         assert api.get("/health/ready").status_code == 200
         config = Config(str(root / "alembic.ini"))

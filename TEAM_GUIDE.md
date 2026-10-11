@@ -21,14 +21,14 @@ The originals were relocated without rewriting their contents. In particular, en
 | Area | Implemented now | Still needed |
 |---|---|---|
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
-| API | Health, readiness, stateless POC verification, merchant invoice and case create/read | Case list/full report, claim/evidence/resolve/export endpoints |
-| Database | Invoice/policy snapshots, one case per invoice, opening-event payload/hashes, atomic creation retries | Evidence/resolution writers, later event sequencing, access grants |
+| API | Health/readiness, POC verification, owned invoice/case create/read, encrypted evidence upload/metadata | Case list/full report, claims, persisted verification, resolve/export |
+| Database | Immutable snapshots, one case per invoice, encrypted evidence, chained opening/submission events, atomic retries | Verification/resolution writers, access grants, retention/rotation workflows |
 | Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Integrate the stored policy with real allocations and chain observations |
-| Access | Development POC token; expiring/revocable merchant credentials; owned invoice/case create/read | Evidence authorization, customer submission grants, reviewer consent and scoped evidence permissions |
+| Access | POC token; merchant credentials; owned invoice/case/evidence access with authorization rechecks | Customer grants, reviewer consent/sharing, browser sessions |
 | Frontend | Planned Vue 3 + TypeScript + Tailwind architecture | Dashboard, customer submission and reviewer report |
 | Export | Versioned verifier result and fixture manifest | Complete replayable case packet |
 
-The POC runs without PostgreSQL; readiness requires a migrated database. Database constraint tests use synthetic rows. They prove database behavior, not that a merchant resolution API already exists.
+The POC runs without PostgreSQL; readiness requires a migrated database, verifier executable, and configured evidence encryption key. Database tests use public fixtures or synthetic rows. They prove the implemented workflow/database behavior, not that a merchant resolution API already exists.
 
 ## Code map
 
@@ -44,6 +44,9 @@ The POC runs without PostgreSQL; readiness requires a migrated database. Databas
 | `apps/api/src/zecsolve/api/cases.py`, `services/cases.py` | Case creation/read, initial event persistence, and semantic/idempotent replay |
 | `apps/api/src/zecsolve/services/workflow.py`, `api/workflow.py` | Shared transaction, post-lock credential checks, key validation, and safe HTTP errors |
 | `apps/api/src/zecsolve/domain/events.py` | Versioned opening event and separate payload/header hashes |
+| `apps/api/src/zecsolve/adapters/evidence_crypto.py` | AES-256-GCM, scoped associated data, key availability, and integrity checks |
+| `apps/api/src/zecsolve/api/evidence.py`, `services/evidence.py` | Merchant bundle submission, metadata reads, internal authorized decryption, and atomic retries |
+| `apps/api/src/zecsolve/services/audit.py` | Validates the stored event chain before extending it |
 | `apps/api/src/zecsolve/domain/snapshots.py` | Versioned deterministic serialization and invoice snapshot hashes |
 | `crates/zecsolve-verifier/src/address.rs`, `src/normalize_cli.rs` | Mainnet shielded receiver decoding/validation and bounded normalization CLI |
 | `apps/api/src/zecsolve/adapters/address.py`, `schemas/address.py` | Python normalizer adapter and versioned request/result contracts |
@@ -109,7 +112,7 @@ The POC constructs a synthetic 200,000-zatoshi invoice over the historical 100,0
 
 `output_allocations` use the full output identity as their primary key and contain only approved allocations. Pending candidates belong in verification/rule results. Allocations reference both a verification and a resolution. Database tests confirm only one concurrent insert can win.
 
-Invoice/policy snapshots, creation retry records, verification attempts, resolutions, output allocations, and case events reject updates/deletes. A database administrator can still alter these controls; do not describe the history as immutable against an operator or independently notarized. The opening event now has a transactional writer and verifiable payload/header hashes; later state-transition writers and event sequencing remain pending.
+Invoice/policy snapshots, retry records, evidence metadata/content, verification attempts, resolutions, output allocations, and case events reject updates/deletes. A database administrator can still alter these controls; do not describe the history as immutable against an operator or independently notarized. Opening and evidence-submission events have transactional writers and verifiable payload/header hashes; later verification/decision writers remain pending. Evidence retention and key rotation need a separate design that preserves nonce reservations.
 
 Use Alembic for future changes. Do not call `Base.metadata.create_all()` at application startup. Once teammates have applied a migration, add a new one rather than rewriting it.
 
@@ -117,7 +120,7 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 
 | Work stream | First deliverable | Integration boundary |
 |---|---|---|
-| Backend workflow | Private evidence and persisted verification over owned invoice/case records | FastAPI schemas + application services; no business logic in route handlers |
+| Backend workflow | Persisted verification and reports over owned encrypted evidence bundles | FastAPI schemas + application services; no business logic in route handlers |
 | Resolution and access | Integrate the merchant dependency, add scoped grants, idempotency and atomic allocation | PostgreSQL constraints and pure rules; avoid accepting actor/merchant identity from arbitrary request fields |
 | Frontend | Vue shell and the four independent status/balance displays | Generate TypeScript types from OpenAPI; work against explicit fixtures until routes exist |
 | Evidence and export | Authorized private storage and a packet containing snapshot, receipt, raw tx, provenance, versions and decision | Preserve original bytes; disclose only authorized case evidence |

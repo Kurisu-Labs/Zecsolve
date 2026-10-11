@@ -23,6 +23,8 @@ services:
       ZECSOLVE_DATABASE_URL: postgresql+psycopg://zecsolve:zecsolve@db:5432/zecsolve
       ZECSOLVE_VERIFIER_PATH: /usr/local/bin/zecsolve-verifier
       ZECSOLVE_POC_TOKEN: ${ZECSOLVE_POC_TOKEN:-}
+      ZECSOLVE_EVIDENCE_KEY_ID: ${ZECSOLVE_EVIDENCE_KEY_ID:-}
+      ZECSOLVE_EVIDENCE_KEY: ${ZECSOLVE_EVIDENCE_KEY:-}
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:

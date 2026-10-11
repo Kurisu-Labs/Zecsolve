@@ -13,8 +13,10 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from zecsolve import __version__
 from zecsolve.adapters.address import AddressNormalizer
+from zecsolve.adapters.evidence_crypto import EvidenceCipher
 from zecsolve.adapters.verifier import VerifierAdapter
 from zecsolve.api.cases import router as case_router
+from zecsolve.api.evidence import router as evidence_router
 from zecsolve.api.invoices import router as invoice_router
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
@@ -72,8 +74,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         settings.verifier_path, settings.verifier_timeout_seconds
     )
     app.state.verifier_slots = slots
+    app.state.evidence_cipher = EvidenceCipher(settings.evidence_key_id, settings.evidence_key)
     app.include_router(invoice_router)
     app.include_router(case_router)
+    app.include_router(evidence_router)
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 
@@ -117,7 +121,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 ) == (migration_head,)
         except SQLAlchemyError:
             pass
-        checks = {"database_migrated": database, "verifier_available": verifier.available()}
+        checks = {
+            "database_migrated": database,
+            "verifier_available": verifier.available(),
+            "evidence_encryption_configured": app.state.evidence_cipher.available,
+        }
         return JSONResponse(status_code=200 if all(checks.values()) else 503, content=checks)
 
     @app.get("/api/auth/me", response_model=MerchantIdentity)
