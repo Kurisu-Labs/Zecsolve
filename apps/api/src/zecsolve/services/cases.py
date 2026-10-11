@@ -16,19 +16,23 @@ from zecsolve.services.workflow import (
 )
 
 
+def load_owned_case(session, principal, case_id):
+    case = session.scalar(
+        select(Case).where(Case.id == case_id, Case.merchant_id == principal.merchant_id)
+    )
+    if case is None:
+        raise WorkflowError(404, "CASE_NOT_FOUND")
+    if case.workflow_version != "1":
+        raise WorkflowError(409, "LEGACY_CASE_HISTORY_UNAVAILABLE")
+    return case
+
+
 class CaseService:
     def __init__(self, engine):
         self.engine = engine
 
     def load(self, session, principal, case_id):
-        case = session.scalar(
-            select(Case).where(Case.id == case_id, Case.merchant_id == principal.merchant_id)
-        )
-        if case is None:
-            raise WorkflowError(404, "CASE_NOT_FOUND")
-        if case.workflow_version != "1":
-            raise WorkflowError(409, "LEGACY_CASE_HISTORY_UNAVAILABLE")
-        return case
+        return load_owned_case(session, principal, case_id)
 
     def initial_event(self, session, case) -> CaseOpeningEventV1:
         row = session.scalar(
