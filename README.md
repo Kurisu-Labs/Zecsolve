@@ -76,6 +76,12 @@ docker compose up --build
 
 The backend image builds Rust in a separate stage, runs Python as an unprivileged user, and applies migrations before serving. Local ports bind only to loopback. Container runtime validation is separate from the native test suite.
 
+## Deployment preparation
+
+The separate [M7.1 deployment composition](docs/deployment.md) serves the built Vue app and API through TLS, with ingress limits, private API/database ports, non-root resource limits, and secret-safe runtime logs. Its production entry point disables the public POC and documentation routes. Run `python3 scripts/check_deployment.py` with Docker/Compose and OpenSSL for an isolated actual-container rehearsal.
+
+This completes the backend preparation slice only. Browser session/cookie/Origin integration awaits M4.2; Person 4 retains frontend/browser acceptance. Live validation and full release/restore acceptance remain separate gates.
+
 ## Provision merchant identity
 
 Merchant credentials and the identity check are implemented as part of the completed M1 backend. Apply all pending migrations with `make migrate`, then run the operator CLI from the repository root:

@@ -120,7 +120,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | [M6.4 — Customer submission](#m6-4) | Person 4 | `feat/m6-customer-submission` | Frontend resumed; M6.1 and M4.4 merged | Deferred |
 | [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-reviewer-export` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Deferred |
 | [M6.6 — Browser acceptance](#m6-6) | Person 4 | `test/m6-browser-acceptance` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Deferred |
-| [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Waiting for completion dependencies |
+| [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend preparation validated; session/browser integration pending |
 | [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-release-rehearsal` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | Waiting |
 
 ### Task cards
@@ -350,14 +350,14 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M7.1 — Deployment controls
 
-- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Waiting for completion dependencies.
+- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Backend preparation implemented and locally validated; full M7.1 remains incomplete pending M4.2/session and Person 4 browser integration. PR review/CI/merge still apply to this preparation increment.
 - **Prerequisites:** Backend preparation can start on current main; completion requires M4.2 and M6.0.
 - **Goal:** Provide a bounded same-origin deployment of the backend and Person 4's built application.
 - **Owned code:** `infra/`, Compose/ingress deployment configuration, backend static-serving integration, readiness/logging/limits and coordinated CI wiring.
 - **Exclusions:** No frontend source/build-config edits owned by Person 4, private-customer pilot claim, live RPC substitute, or destructive database downgrade.
 - **Public interfaces:** Consume Person 4's frontend build output contract; serve `/api` and app through TLS. Preserve packaged-head/encryption/verifier readiness and separate chain capability.
 - **Acceptance checks:** Runtime validation confirms TLS, correct cookie deployment, request/rate and CPU/memory limits, secret-safe logs, same-origin app/API serving and disabled public POC. An RPC outage does not masquerade as receipt failure.
-- **Validation evidence:** Pending: sanitized configuration and actual container/ingress runtime results; configuration parsing alone is insufficient. All cards also require the common definition of done below.
+- **Validation evidence:** [Deployment guide](deployment.md) and [Item 11](DEVELOPMENT.md#item-11--m71-backend-deployment-preparation) record 19 boundary tests, full native checks and nine actual-container acceptance checks. The separate deployment CI workflow repeats TLS, serving, ingress/resource limits, readiness outage recovery and log-redaction checks. The current frontend build is consumed without frontend-source changes. Cookie/session/Origin/CSRF and full browser workflow evidence remain pending; configuration parsing alone is insufficient. All cards also require the common definition of done below.
 
 <a id="m7-2"></a>
 
