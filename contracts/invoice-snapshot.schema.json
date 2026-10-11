@@ -1,0 +1,186 @@
+{
+  "$defs": {
+    "InvoicePolicyV1": {
+      "additionalProperties": false,
+      "properties": {
+        "policy_version": {
+          "const": "invoice-policy-v1",
+          "default": "invoice-policy-v1",
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "rules_version": {
+          "default": "0.1.0",
+          "title": "Rules Version",
+          "type": "string"
+        },
+        "minimum_confirmations": {
+          "default": 10,
+          "exclusiveMinimum": 0,
+          "title": "Minimum Confirmations",
+          "type": "integer"
+        },
+        "max_observation_age_seconds": {
+          "default": 60,
+          "exclusiveMinimum": 0,
+          "title": "Max Observation Age Seconds",
+          "type": "integer"
+        },
+        "memo_binding": {
+          "const": "exact",
+          "default": "exact",
+          "title": "Memo Binding",
+          "type": "string"
+        },
+        "allow_overpayment": {
+          "const": false,
+          "default": false,
+          "title": "Allow Overpayment",
+          "type": "boolean"
+        },
+        "unique_receiver_binding": {
+          "const": false,
+          "default": false,
+          "title": "Unique Receiver Binding",
+          "type": "boolean"
+        }
+      },
+      "title": "InvoicePolicyV1",
+      "type": "object"
+    },
+    "InvoiceTermsV1": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_zat": {
+          "exclusiveMinimum": 0,
+          "maximum": 2100000000000000,
+          "title": "Expected Zat",
+          "type": "integer"
+        },
+        "network": {
+          "const": "mainnet",
+          "title": "Network",
+          "type": "string"
+        },
+        "pool": {
+          "enum": [
+            "orchard",
+            "sapling"
+          ],
+          "title": "Pool",
+          "type": "string"
+        },
+        "receiver_address": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Receiver Address",
+          "type": "string"
+        },
+        "expected_memo": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Memo"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "receiver_hex": {
+          "pattern": "^[0-9a-f]{86}$",
+          "title": "Receiver Hex",
+          "type": "string"
+        },
+        "memo_hex": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{1024}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Memo Hex"
+        }
+      },
+      "required": [
+        "expected_zat",
+        "network",
+        "pool",
+        "receiver_address",
+        "receiver_hex",
+        "memo_hex"
+      ],
+      "title": "InvoiceTermsV1",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "invoice_id": {
+      "format": "uuid",
+      "title": "Invoice Id",
+      "type": "string"
+    },
+    "merchant_id": {
+      "format": "uuid",
+      "title": "Merchant Id",
+      "type": "string"
+    },
+    "policy_id": {
+      "format": "uuid",
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "terms": {
+      "$ref": "#/$defs/InvoiceTermsV1"
+    },
+    "policy": {
+      "$ref": "#/$defs/InvoicePolicyV1"
+    },
+    "snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "invoice_id",
+    "merchant_id",
+    "policy_id",
+    "created_at",
+    "terms",
+    "policy",
+    "snapshot_hash"
+  ],
+  "title": "InvoiceSnapshotV1",
+  "type": "object"
+}

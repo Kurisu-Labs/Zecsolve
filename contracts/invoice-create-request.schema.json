@@ -1,0 +1,64 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "expected_zat": {
+      "exclusiveMinimum": 0,
+      "maximum": 2100000000000000,
+      "title": "Expected Zat",
+      "type": "integer"
+    },
+    "network": {
+      "const": "mainnet",
+      "title": "Network",
+      "type": "string"
+    },
+    "pool": {
+      "enum": [
+        "orchard",
+        "sapling"
+      ],
+      "title": "Pool",
+      "type": "string"
+    },
+    "receiver_address": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Receiver Address",
+      "type": "string"
+    },
+    "expected_memo": {
+      "anyOf": [
+        {
+          "maxLength": 512,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Memo"
+    },
+    "expires_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expires At"
+    }
+  },
+  "required": [
+    "expected_zat",
+    "network",
+    "pool",
+    "receiver_address"
+  ],
+  "title": "InvoiceCreateRequest",
+  "type": "object"
+}

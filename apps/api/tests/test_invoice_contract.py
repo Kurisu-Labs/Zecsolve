@@ -1,3 +1,4 @@
+import json
 from datetime import UTC, datetime
 
 import pytest
@@ -75,3 +76,16 @@ def test_policy_defaults_are_conservative_and_immutable():
     assert policy.unique_receiver_binding is False
     with pytest.raises(ValidationError):
         policy.minimum_confirmations = 0
+
+
+def test_invoice_schemas_match_runtime_models(root):
+    from zecsolve.schemas.invoice import InvoiceCreateRequest, InvoiceSnapshotV1
+
+    for name, model in (
+        ("invoice-create-request", InvoiceCreateRequest),
+        ("invoice-snapshot", InvoiceSnapshotV1),
+    ):
+        assert (
+            json.loads((root / f"contracts/{name}.schema.json").read_text())
+            == model.model_json_schema()
+        )
