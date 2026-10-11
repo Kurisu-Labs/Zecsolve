@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from pydantic import ValidationError
 
@@ -42,4 +44,22 @@ def test_evidence_rejects_oversized_invalid_or_privileged_input(extra):
     with pytest.raises(ValidationError):
         EvidenceSubmitRequest.model_validate(
             {"source": "test", "processing_authorized": True, **extra}
+        )
+
+
+def test_evidence_contract_files_match_runtime_models(root):
+    from zecsolve.schemas.evidence import (
+        EvidenceStoredV1,
+        EvidenceSubmitRequest,
+        EvidenceSubmittedEventV1,
+    )
+
+    for name, model in (
+        ("evidence-submit-request", EvidenceSubmitRequest),
+        ("evidence-stored", EvidenceStoredV1),
+        ("evidence-submitted-event", EvidenceSubmittedEventV1),
+    ):
+        assert (
+            json.loads((root / f"contracts/{name}.schema.json").read_text())
+            == model.model_json_schema()
         )
