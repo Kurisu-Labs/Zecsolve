@@ -21,9 +21,9 @@ The originals were relocated without rewriting their contents. In particular, en
 | Area | Implemented now | Still needed |
 |---|---|---|
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
-| API | Health/readiness, POC verification, owned invoice/case create/read, encrypted evidence upload/metadata, persisted verification and initial offline reports | Case list, claims, resolve/export, customer/reviewer projections |
-| Database | Immutable snapshots, one case per invoice, encrypted evidence, verification/evaluation history, chained events, atomic retries | Resolution writers, access grants, retention/rotation workflows |
-| Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Policy-aware approval and trusted chain observations; current reports remain offline |
+| API | Health/readiness, POC verification, owned invoice/case create/read, encrypted evidence upload/metadata, persisted verification, reports, and merchant decisions | Case list, claims, export, customer/reviewer projections |
+| Database | Immutable snapshots, one case per invoice, encrypted evidence, verification/evaluation history, chained events, atomic decisions/allocations/retries | Access grants, retention/rotation workflows |
+| Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Trusted live chain observations; policy-aware approval is implemented but blocked in offline deployment |
 | Access | POC token; merchant credentials; owned invoice/case/evidence access with authorization rechecks | Customer grants, reviewer consent/sharing, browser sessions |
 | Frontend | Planned Vue 3 + TypeScript + Tailwind architecture | Dashboard, customer submission and reviewer report |
 | Export | Versioned verifier result and fixture manifest | Complete replayable case packet |
@@ -49,6 +49,9 @@ The POC runs without PostgreSQL; readiness requires a migrated database, verifie
 | `apps/api/src/zecsolve/api/verifications.py`, `services/verifications.py` | Authorized decryption, real verifier execution, atomic attempt/evaluation/event persistence and retry |
 | `apps/api/src/zecsolve/services/reports.py`, `services/verification_records.py` | Consistent owned report snapshots and validation of stored attempts |
 | `apps/api/src/zecsolve/domain/offline_evaluation.py`, `schemas/workflow_verification.py` | Captured evaluation inputs, offline balances, and initial report contracts |
+| `apps/api/src/zecsolve/api/resolutions.py`, `services/resolutions.py`, `services/resolution_records.py` | Merchant actions, atomic allocation, retry, version checks, and persisted decision validation |
+| `apps/api/src/zecsolve/domain/decision_rules.py`, `services/observations.py` | Versioned policy gates and immutable refresh diagnostics; default observer has no trusted confirmation source |
+| `scripts/demo_resolution.py` | Same-service allocation demo in a temporary schema with clearly simulated confirmation |
 | `apps/api/src/zecsolve/services/audit.py` | Validates the stored event chain before extending it |
 | `apps/api/src/zecsolve/domain/snapshots.py` | Versioned deterministic serialization and invoice snapshot hashes |
 | `crates/zecsolve-verifier/src/address.rs`, `src/normalize_cli.rs` | Mainnet shielded receiver decoding/validation and bounded normalization CLI |
@@ -98,18 +101,18 @@ The Rust process returns exit zero for a completed check, including `INVALID` an
 
 - **Integer money:** 1 ZEC = 100,000,000 zatoshis. Parse decimal UI input exactly; do not multiply binary floating-point currency values.
 - **Output identity:** `network:pool:txid:output_index`. Two outputs in one transaction can pay two invoices.
-- **No double credit:** Same output and same invoice is an idempotent retry. Same output and another invoice is a conflict. Catch the database uniqueness race in the future service.
+- **No double credit:** Same output and same invoice is an idempotent retry. Same output and another invoice is a conflict. The resolution service catches the database uniqueness race and reauthorizes the winning outcome.
 - **Approved versus candidate:** `credited_zat` sums unique approved allocations. `candidate_zat` is an unallocated, matching recovered output. A projected balance is not paid status.
 - **Separate facts:** Receipt validity, chain observation, case state, and business resolution are independent. The current offline POC can never claim confirmed chain inclusion.
 - **Separate failures:** Missing receipt → `NONE`; absent source/binary → `UNAVAILABLE`; unimplemented format → `UNSUPPORTED`; failed binding/recovery → `INVALID`; process or malformed transaction data errors → `ERROR`.
 - **Multiple findings:** Chain uncertainty and a balance shortfall may coexist. Invalid evidence is not a fraud accusation.
 - **Recipient comparison:** Domain rules consume normalized receiver bytes plus pool/network. Future invoice input must decode Unified Addresses properly rather than compare address strings. A receipt label is not a verified memo.
 - **Invoice binding:** Require an exact expected memo match or an explicitly established unique receiver binding. Otherwise return `NEEDS_REVIEW`. A matching amount alone does not identify an invoice; a projected overpayment also requires review.
-- **Merchant authority:** Verification and rule evaluation never write allocations. A later merchant resolution service must recheck stale state and commit approval, allocation, and audit event together.
+- **Merchant authority:** Verification and rule evaluation never write allocations. The merchant resolution service rechecks stale state and commits approval, allocation, and audit event together; deployed offline observations block credit.
 
 The [persisted workflow](docs/verification.md) decrypts an owned bundle, runs Rust outside database locks, and records an immutable attempt, offline observation, evaluation, and event together. Reports use one consistent database snapshot and project only the latest or explicitly selected candidate; they never sum unapproved attempts. Recovered memo/receiver fields are merchant disclosures and remain outside application encryption.
 
-The POC constructs a synthetic 200,000-zatoshi invoice over the historical 100,000-zatoshi output. Until approval exists, it shows **0 credited** and **100,000 projected shortfall**. This distinction is intentional.
+The POC constructs a synthetic 200,000-zatoshi invoice over the historical 100,000-zatoshi output. With offline observations it shows **0 credited** and **100,000 projected shortfall**. The isolated simulated-confirmation demo separately exercises merchant approval and credited balances. This distinction is intentional.
 
 ## Database conventions
 
@@ -117,7 +120,7 @@ The POC constructs a synthetic 200,000-zatoshi invoice over the historical 100,0
 
 `output_allocations` use the full output identity as their primary key and contain only approved allocations. Pending candidates belong in verification/rule results. Allocations reference both a verification and a resolution. Database tests confirm only one concurrent insert can win.
 
-Invoice/policy snapshots, retry records, evidence metadata/content, verification attempts, resolutions, output allocations, and case events reject updates/deletes. A database administrator can still alter these controls; do not describe the history as immutable against an operator or independently notarized. Opening, evidence-submission, and verification events have transactional writers and verifiable payload/header hashes; decision writers remain pending. Offline observations and evaluation snapshots also reject ordinary edits/deletes. Evidence retention and key rotation need a separate design that preserves nonce reservations.
+Invoice/policy snapshots, retry records, evidence metadata/content, verification attempts, resolutions, output allocations, and case events reject updates/deletes. A database administrator can still alter these controls; do not describe the history as immutable against an operator or independently notarized. Opening, evidence-submission, verification, and decision events have transactional writers and verifiable payload/header hashes. Offline observations and evaluation snapshots also reject ordinary edits/deletes. Evidence retention and key rotation need a separate design that preserves nonce reservations.
 
 Use Alembic for future changes. Do not call `Base.metadata.create_all()` at application startup. Once teammates have applied a migration, add a new one rather than rewriting it.
 
@@ -125,8 +128,8 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 
 | Work stream | First deliverable | Integration boundary |
 |---|---|---|
-| Backend workflow | Atomic merchant resolution/allocation over stored attempts, with stale-state checks and retry safety | FastAPI schemas + application services; no business logic in route handlers |
-| Resolution and access | Integrate the merchant dependency, add scoped grants, idempotency and atomic allocation | PostgreSQL constraints and pure rules; avoid accepting actor/merchant identity from arbitrary request fields |
+| Backend workflow | Case listing and claim writers, building on implemented merchant decisions | FastAPI schemas + application services; no business logic in route handlers |
+| Resolution and access | Customer/reviewer scoped grants and consent; merchant decisions are implemented | PostgreSQL constraints and pure rules; avoid accepting actor/merchant identity from arbitrary request fields |
 | Frontend | Vue shell and the four independent status/balance displays | Generate TypeScript types from OpenAPI; work against explicit fixtures until routes exist |
 | Evidence and export | Authorized private storage and a packet containing snapshot, receipt, raw tx, provenance, versions and decision | Preserve original bytes; disclose only authorized case evidence |
 | Zcash integration | Trusted confirmation observations and a real Sapling fixture | Keep source observations separate from offline output recovery |

@@ -57,6 +57,7 @@ An existing PostgreSQL installation also works: create a dedicated database and 
 | `GET /api/cases/{id}/evidence/{evidence_id}` | Returns owned evidence metadata only; never receipt/raw-tx content or ciphertext |
 | `POST /api/cases/{id}/verify` | Verifies owned encrypted evidence and atomically stores the attempt, offline observation, evaluation, and audit event; requires `Idempotency-Key` |
 | `GET /api/cases/{id}/report` | Returns the merchant’s initial offline report with history and current balances; optional `verification_id` selects a candidate |
+| `POST /api/cases/{id}/resolve` | Records an authorized merchant decision with reason, reviewed case version, and retry key; production offline approvals remain blocked |
 | `GET /docs` | Interactive API contract; use **Authorize** to enter the POC token |
 
 Paste the contents of `fixtures/mainnet/receipt.json` into the `receipt_json` string and `fixtures/mainnet/transaction.hex` into `raw_tx_hex`. The POC endpoint accepts content, never server file paths or fetch URLs. It does not write evidence or recovered fields to the database. The separate [persisted verification API](docs/verification.md) operates on previously submitted encrypted evidence.
@@ -83,7 +84,7 @@ Creation/issuance returns one JSON object containing the merchant ID, credential
 
 Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
 
-Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification and initial offline reports are available; decision endpoints, customer/reviewer grants, and browser sessions remain future increments.
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification, reports, and [merchant decisions](docs/resolutions.md) are available; customer/reviewer grants and browser sessions remain future increments. Production credit approval remains blocked by the offline observer.
 
 ## Create an invoice
 
@@ -133,9 +134,9 @@ ZECSOLVE_TEST_DATABASE_URL='postgresql+psycopg://zecsolve:zecsolve@127.0.0.1:543
 
 ## Current boundary
 
-Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials; recipient normalization; immutable invoices/policies; case opening/read; encrypted merchant evidence submission and metadata; persisted real verification, offline observations and evaluation snapshots; initial merchant case reports; atomic retries and chained audit events; tests; development container configuration.
+Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials; recipient normalization; immutable invoices/policies; case opening/read; encrypted merchant evidence submission and metadata; persisted real verification, offline observations and evaluation snapshots; merchant case reports and atomic resolution/allocation services; isolated simulated-confirmation demo; atomic retries and chained audit events; tests; development container configuration.
 
-Next: atomic merchant resolution/allocation with idempotency, claims and case listing, customer/reviewer authentication and permissions, trusted chain observations, Vue frontend, and replayable case exports. Current reports are explicitly `INITIAL_OFFLINE`: no chain confirmation or credit approval is claimed. These are not simulated behind working-looking routes.
+Next: trusted live chain observations (M3), claims and case listing, customer/reviewer authentication and permissions, Vue frontend, and replayable case exports. The deployed app blocks credit approval while offline. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed.
 
 The current Rust wrapper accepts mainnet receipt v0 and v5 transaction branches NU5 through NU6.2. Orchard has a real historical fixture test. The Sapling recovery path uses the upstream library but does not yet have an end-to-end historical Sapling fixture in this repository. No Ironwood compatibility is claimed.
 

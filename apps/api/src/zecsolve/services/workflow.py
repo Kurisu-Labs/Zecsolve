@@ -9,9 +9,10 @@ from zecsolve.db.models import MerchantCredential
 
 
 class WorkflowError(Exception):
-    def __init__(self, status: int, code: str):
+    def __init__(self, status: int, code: str, details: dict | None = None):
         super().__init__(code)
         self.status, self.code = status, code
+        self.details = details
 
 
 @contextmanager

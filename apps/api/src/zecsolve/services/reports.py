@@ -1,13 +1,16 @@
 from sqlalchemy import func, select, text
 
-from zecsolve.db.models import Claim, Evidence, Resolution, Verification
+from zecsolve.db.models import ChainObservation, Claim, Evidence, Resolution, Verification
 from zecsolve.domain.offline_evaluation import evaluate_offline
 from zecsolve.schemas.case import CaseSummaryV1
-from zecsolve.schemas.workflow_verification import CaseReportV1, ClaimViewV1, ResolutionViewV1
+from zecsolve.schemas.resolution import MerchantCaseReportV1
+from zecsolve.schemas.workflow_verification import ClaimViewV1, ResolutionViewV1
 from zecsolve.services.audit import load_event_chain
 from zecsolve.services.cases import load_owned_case
 from zecsolve.services.evidence import read_evidence_metadata
 from zecsolve.services.invoices import read_invoice_snapshot
+from zecsolve.services.observations import read_decision_observation
+from zecsolve.services.resolution_records import read_resolution
 from zecsolve.services.verification_records import allocation_context, read_attempt
 from zecsolve.services.workflow import WorkflowError, authorize_merchant, transaction
 
@@ -93,7 +96,43 @@ class CaseReportService:
                     .order_by(Resolution.approved_at, Resolution.id)
                 )
             ]
-            report = CaseReportV1(
+            decisions = [
+                read_resolution(session, principal, case_id, row.id)
+                for row in session.scalars(
+                    select(Resolution)
+                    .where(Resolution.case_id == case_id, Resolution.workflow_version == "1")
+                    .order_by(Resolution.approved_at, Resolution.id)
+                )
+            ]
+            initial_ids = {item.observation.observation_id for item in attempts}
+            decision_observations = [
+                read_decision_observation(session, principal, case_id, row.id)
+                for row in session.scalars(
+                    select(ChainObservation)
+                    .where(
+                        ChainObservation.case_id == case_id,
+                        ChainObservation.merchant_id == principal.merchant_id,
+                    )
+                    .order_by(ChainObservation.observed_at, ChainObservation.id)
+                )
+                if row.id not in initial_ids
+            ]
+            scope = "INITIAL_OFFLINE"
+            if decisions:
+                scope = (
+                    "SIMULATED_DECISIONS"
+                    if any(
+                        item.evaluation.observation
+                        and item.evaluation.observation.source_kind == "SIMULATED"
+                        for item in decisions
+                    )
+                    else "MERCHANT_DECISIONS"
+                )
+            report = MerchantCaseReportV1(
+                report_scope=scope,
+                decisions=decisions,
+                decision_observations=decision_observations,
+                decision_evaluations=[item.evaluation for item in decisions],
                 generated_at=session.scalar(select(func.clock_timestamp())),
                 case=CaseSummaryV1(
                     case_id=case.id,

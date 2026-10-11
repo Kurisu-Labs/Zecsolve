@@ -56,7 +56,7 @@ The report reads one repeatable-read database snapshot. Its current balances use
 
 With the bundled 100,000-zatoshi fixture and a matching 200,000-zatoshi invoice/memo, the offline report shows 0 credited, 200,000 outstanding, 100,000 candidate, and 100,000 projected outstanding. `eligible_for_credit` is always false. Receipt recovery, chain confirmation, and merchant approval remain separate facts; neither route writes an allocation or moves funds.
 
-This increment supports stored rules version `0.1.0`. Unsupported versions fail closed. Trusted live observations, policy-aware confirmation approval, stale-decision checks, atomic merchant resolution, and replayable exports remain later work.
+This increment supports stored rules version `0.1.0`. Unsupported versions fail closed. [Merchant resolution](resolutions.md) now adds a separate `0.2.0` decision evaluator, stale-decision checks, and atomic allocation. This initial offline evaluator and immutable invoice policy selector remain `0.1.0`. Trusted live observations and replayable exports remain later work.
 
 ## Access, disclosure, and migration
 
@@ -66,4 +66,4 @@ Reports and retries read stored results without decrypting the original bundle. 
 
 Migration `0006` preserves legacy verification/observation rows without inventing ownership, policy, or chain provenance. Unsupported legacy workflow history is not presented as a new report. Scoped foreign keys and immutable observation/evaluation/retry records complement existing immutable attempts/events. Downgrade first serializes with authorization and workflow writers, then refuses to remove populated new verification history. Use forward migrations for deployed evidence and stop traffic before planned rollback. Hashes and triggers do not protect against an administrator rewriting data and controls.
 
-Published schemas: [verify request](../contracts/case-verify-request.schema.json), [attempt](../contracts/verification-attempt.schema.json), and [initial offline report](../contracts/case-report.schema.json). This report is not a customer/reviewer grant, full consent flow, or replay packet.
+Published schemas: [verify request](../contracts/case-verify-request.schema.json), [attempt](../contracts/verification-attempt.schema.json), and [initial offline report](../contracts/case-report.schema.json). The report route is now extended by [MerchantCaseReportV1](../contracts/merchant-case-report.schema.json) with separate decision history and diagnostic observations; initial snapshots remain unchanged. It is not a customer/reviewer grant, full consent flow, or replay packet.

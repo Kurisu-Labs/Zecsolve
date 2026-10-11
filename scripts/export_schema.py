@@ -11,6 +11,7 @@ from zecsolve.schemas.evidence import (
     EvidenceSubmittedEventV1,
 )
 from zecsolve.schemas.invoice import InvoiceCreateRequest, InvoiceSnapshotV1
+from zecsolve.schemas.resolution import MerchantCaseReportV1, ResolutionOutcomeV1, ResolveRequest
 from zecsolve.schemas.verification import VerificationReport
 from zecsolve.schemas.workflow_verification import (
     CaseReportV1,
@@ -34,6 +35,9 @@ for name, model in (
     ("case-verify-request", CaseVerifyRequest),
     ("verification-attempt", VerificationAttemptV1),
     ("case-report", CaseReportV1),
+    ("case-resolve-request", ResolveRequest),
+    ("resolution-outcome", ResolutionOutcomeV1),
+    ("merchant-case-report", MerchantCaseReportV1),
 ):
     target = root / f"contracts/{name}.schema.json"
     target.parent.mkdir(exist_ok=True)

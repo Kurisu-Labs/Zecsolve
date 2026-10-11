@@ -1,0 +1,897 @@
+{
+  "$defs": {
+    "CaseState": {
+      "enum": [
+        "OPEN",
+        "AWAITING_EVIDENCE",
+        "UNDER_REVIEW",
+        "RESOLVED",
+        "CLOSED_UNRESOLVED"
+      ],
+      "title": "CaseState",
+      "type": "string"
+    },
+    "ChainState": {
+      "enum": [
+        "CONFIRMED",
+        "UNCONFIRMED",
+        "UNAVAILABLE"
+      ],
+      "title": "ChainState",
+      "type": "string"
+    },
+    "DecisionEvaluationV1": {
+      "additionalProperties": false,
+      "properties": {
+        "rules_version": {
+          "title": "Rules Version",
+          "type": "string"
+        },
+        "findings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "credited_zat": {
+          "minimum": 0,
+          "title": "Credited Zat",
+          "type": "integer"
+        },
+        "outstanding_zat": {
+          "minimum": 0,
+          "title": "Outstanding Zat",
+          "type": "integer"
+        },
+        "excess_zat": {
+          "minimum": 0,
+          "title": "Excess Zat",
+          "type": "integer"
+        },
+        "candidate_zat": {
+          "maximum": 2100000000000000,
+          "minimum": 0,
+          "title": "Candidate Zat",
+          "type": "integer"
+        },
+        "projected_outstanding_zat": {
+          "minimum": 0,
+          "title": "Projected Outstanding Zat",
+          "type": "integer"
+        },
+        "eligible_for_credit": {
+          "title": "Eligible For Credit",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "rules_version",
+        "findings",
+        "credited_zat",
+        "outstanding_zat",
+        "excess_zat",
+        "candidate_zat",
+        "projected_outstanding_zat",
+        "eligible_for_credit"
+      ],
+      "title": "DecisionEvaluationV1",
+      "type": "object"
+    },
+    "DecisionObservationV1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "decision-observation-v1",
+          "default": "decision-observation-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "observation_id": {
+          "format": "uuid",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "verification_id": {
+          "format": "uuid",
+          "title": "Verification Id",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/ChainState"
+        },
+        "source_kind": {
+          "enum": [
+            "OFFLINE",
+            "RPC",
+            "SIMULATED"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "source": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "reason_code": {
+          "pattern": "^[A-Z0-9_]{1,80}$",
+          "title": "Reason Code",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "network": {
+          "const": "mainnet",
+          "default": "mainnet",
+          "title": "Network",
+          "type": "string"
+        },
+        "txid": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Txid"
+        },
+        "raw_tx_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Tx Sha256"
+        },
+        "confirmations": {
+          "anyOf": [
+            {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confirmations"
+        },
+        "block_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Block Hash"
+        },
+        "block_height": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Block Height"
+        }
+      },
+      "required": [
+        "observation_id",
+        "verification_id",
+        "state",
+        "source_kind",
+        "source",
+        "reason_code",
+        "observed_at"
+      ],
+      "title": "DecisionObservationV1",
+      "type": "object"
+    },
+    "DecisionSnapshotV1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "decision-evaluation-v1",
+          "default": "decision-evaluation-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "evaluation_id": {
+          "format": "uuid",
+          "title": "Evaluation Id",
+          "type": "string"
+        },
+        "case_id": {
+          "format": "uuid",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "merchant_id": {
+          "format": "uuid",
+          "title": "Merchant Id",
+          "type": "string"
+        },
+        "evaluated_at": {
+          "format": "date-time",
+          "title": "Evaluated At",
+          "type": "string"
+        },
+        "invoice": {
+          "$ref": "#/$defs/InvoiceSnapshotV1"
+        },
+        "verification_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verification Id"
+        },
+        "verification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VerificationReport"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DecisionObservationV1"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_authorized": {
+          "title": "Source Authorized",
+          "type": "boolean"
+        },
+        "approved_allocations": {
+          "items": {
+            "$ref": "#/$defs/OwnedAllocationV1"
+          },
+          "title": "Approved Allocations",
+          "type": "array"
+        },
+        "foreign_conflict": {
+          "title": "Foreign Conflict",
+          "type": "boolean"
+        },
+        "result": {
+          "$ref": "#/$defs/DecisionEvaluationV1"
+        },
+        "snapshot_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Snapshot Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evaluation_id",
+        "case_id",
+        "merchant_id",
+        "evaluated_at",
+        "invoice",
+        "verification_id",
+        "verification",
+        "observation",
+        "source_authorized",
+        "approved_allocations",
+        "foreign_conflict",
+        "result",
+        "snapshot_hash"
+      ],
+      "title": "DecisionSnapshotV1",
+      "type": "object"
+    },
+    "InvoicePolicyV1": {
+      "additionalProperties": false,
+      "properties": {
+        "policy_version": {
+          "const": "invoice-policy-v1",
+          "default": "invoice-policy-v1",
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "rules_version": {
+          "default": "0.1.0",
+          "title": "Rules Version",
+          "type": "string"
+        },
+        "minimum_confirmations": {
+          "default": 10,
+          "exclusiveMinimum": 0,
+          "title": "Minimum Confirmations",
+          "type": "integer"
+        },
+        "max_observation_age_seconds": {
+          "default": 60,
+          "exclusiveMinimum": 0,
+          "title": "Max Observation Age Seconds",
+          "type": "integer"
+        },
+        "memo_binding": {
+          "const": "exact",
+          "default": "exact",
+          "title": "Memo Binding",
+          "type": "string"
+        },
+        "allow_overpayment": {
+          "const": false,
+          "default": false,
+          "title": "Allow Overpayment",
+          "type": "boolean"
+        },
+        "unique_receiver_binding": {
+          "const": false,
+          "default": false,
+          "title": "Unique Receiver Binding",
+          "type": "boolean"
+        }
+      },
+      "title": "InvoicePolicyV1",
+      "type": "object"
+    },
+    "InvoiceSnapshotV1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "invoice_id": {
+          "format": "uuid",
+          "title": "Invoice Id",
+          "type": "string"
+        },
+        "merchant_id": {
+          "format": "uuid",
+          "title": "Merchant Id",
+          "type": "string"
+        },
+        "policy_id": {
+          "format": "uuid",
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "terms": {
+          "$ref": "#/$defs/InvoiceTermsV1"
+        },
+        "policy": {
+          "$ref": "#/$defs/InvoicePolicyV1"
+        },
+        "snapshot_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Snapshot Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "invoice_id",
+        "merchant_id",
+        "policy_id",
+        "created_at",
+        "terms",
+        "policy",
+        "snapshot_hash"
+      ],
+      "title": "InvoiceSnapshotV1",
+      "type": "object"
+    },
+    "InvoiceTermsV1": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_zat": {
+          "exclusiveMinimum": 0,
+          "maximum": 2100000000000000,
+          "title": "Expected Zat",
+          "type": "integer"
+        },
+        "network": {
+          "const": "mainnet",
+          "title": "Network",
+          "type": "string"
+        },
+        "pool": {
+          "enum": [
+            "orchard",
+            "sapling"
+          ],
+          "title": "Pool",
+          "type": "string"
+        },
+        "receiver_address": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Receiver Address",
+          "type": "string"
+        },
+        "expected_memo": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Memo"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "receiver_hex": {
+          "pattern": "^[0-9a-f]{86}$",
+          "title": "Receiver Hex",
+          "type": "string"
+        },
+        "memo_hex": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{1024}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Memo Hex"
+        }
+      },
+      "required": [
+        "expected_zat",
+        "network",
+        "pool",
+        "receiver_address",
+        "receiver_hex",
+        "memo_hex"
+      ],
+      "title": "InvoiceTermsV1",
+      "type": "object"
+    },
+    "OfflineEvaluationV1": {
+      "additionalProperties": false,
+      "properties": {
+        "rules_version": {
+          "title": "Rules Version",
+          "type": "string"
+        },
+        "findings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "credited_zat": {
+          "minimum": 0,
+          "title": "Credited Zat",
+          "type": "integer"
+        },
+        "outstanding_zat": {
+          "minimum": 0,
+          "title": "Outstanding Zat",
+          "type": "integer"
+        },
+        "excess_zat": {
+          "minimum": 0,
+          "title": "Excess Zat",
+          "type": "integer"
+        },
+        "candidate_zat": {
+          "maximum": 2100000000000000,
+          "minimum": 0,
+          "title": "Candidate Zat",
+          "type": "integer"
+        },
+        "projected_outstanding_zat": {
+          "minimum": 0,
+          "title": "Projected Outstanding Zat",
+          "type": "integer"
+        },
+        "eligible_for_credit": {
+          "const": false,
+          "default": false,
+          "title": "Eligible For Credit",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "rules_version",
+        "findings",
+        "credited_zat",
+        "outstanding_zat",
+        "excess_zat",
+        "candidate_zat",
+        "projected_outstanding_zat"
+      ],
+      "title": "OfflineEvaluationV1",
+      "type": "object"
+    },
+    "OwnedAllocationV1": {
+      "additionalProperties": false,
+      "properties": {
+        "output_id": {
+          "title": "Output Id",
+          "type": "string"
+        },
+        "invoice_id": {
+          "format": "uuid",
+          "title": "Invoice Id",
+          "type": "string"
+        },
+        "amount_zat": {
+          "maximum": 2100000000000000,
+          "minimum": 0,
+          "title": "Amount Zat",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "output_id",
+        "invoice_id",
+        "amount_zat"
+      ],
+      "title": "OwnedAllocationV1",
+      "type": "object"
+    },
+    "ReceiptState": {
+      "enum": [
+        "NONE",
+        "VALID",
+        "INVALID",
+        "UNSUPPORTED",
+        "UNAVAILABLE",
+        "ERROR"
+      ],
+      "title": "ReceiptState",
+      "type": "string"
+    },
+    "RecoveredOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "network": {
+          "const": "mainnet",
+          "title": "Network",
+          "type": "string"
+        },
+        "pool": {
+          "enum": [
+            "orchard",
+            "sapling"
+          ],
+          "title": "Pool",
+          "type": "string"
+        },
+        "txid": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Txid",
+          "type": "string"
+        },
+        "output_index": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Output Index",
+          "type": "integer"
+        },
+        "amount_zat": {
+          "maximum": 2100000000000000,
+          "minimum": 0,
+          "title": "Amount Zat",
+          "type": "integer"
+        },
+        "receiver_hex": {
+          "pattern": "^[0-9a-f]{86}$",
+          "title": "Receiver Hex",
+          "type": "string"
+        },
+        "receiver_address": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Receiver Address",
+          "type": "string"
+        },
+        "memo_hex": {
+          "pattern": "^[0-9a-f]{1024}$",
+          "title": "Memo Hex",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "pool",
+        "txid",
+        "output_index",
+        "amount_zat",
+        "receiver_hex",
+        "receiver_address",
+        "memo_hex"
+      ],
+      "title": "RecoveredOutput",
+      "type": "object"
+    },
+    "VerificationReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "verifier": {
+          "$ref": "#/$defs/VerifierIdentity"
+        },
+        "receipt_state": {
+          "$ref": "#/$defs/ReceiptState"
+        },
+        "chain_state": {
+          "const": "UNAVAILABLE",
+          "default": "UNAVAILABLE",
+          "title": "Chain State",
+          "type": "string"
+        },
+        "reason_code": {
+          "maxLength": 80,
+          "pattern": "^[A-Z_]+$",
+          "title": "Reason Code",
+          "type": "string"
+        },
+        "raw_tx_verified": {
+          "default": false,
+          "title": "Raw Tx Verified",
+          "type": "boolean"
+        },
+        "signature_state": {
+          "default": "NONE",
+          "enum": [
+            "NONE",
+            "VALID",
+            "INVALID"
+          ],
+          "title": "Signature State",
+          "type": "string"
+        },
+        "receipt_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt Sha256"
+        },
+        "raw_tx_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Tx Sha256"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecoveredOutput"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "receipt_state",
+        "reason_code"
+      ],
+      "title": "VerificationReport",
+      "type": "object"
+    },
+    "VerifierIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "const": "zecsolve-verifier",
+          "default": "zecsolve-verifier",
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "default": "0.1.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "glasspane_revision": {
+          "const": "f6468e6d08a7adad53bf2991a311358dc84e869b",
+          "default": "f6468e6d08a7adad53bf2991a311358dc84e869b",
+          "title": "Glasspane Revision",
+          "type": "string"
+        }
+      },
+      "title": "VerifierIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "resolution_id": {
+      "format": "uuid",
+      "title": "Resolution Id",
+      "type": "string"
+    },
+    "case_id": {
+      "format": "uuid",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "merchant_id": {
+      "format": "uuid",
+      "title": "Merchant Id",
+      "type": "string"
+    },
+    "invoice_id": {
+      "format": "uuid",
+      "title": "Invoice Id",
+      "type": "string"
+    },
+    "actor_id": {
+      "format": "uuid",
+      "title": "Actor Id",
+      "type": "string"
+    },
+    "action": {
+      "enum": [
+        "APPROVE_OUTPUT",
+        "REQUEST_EVIDENCE",
+        "REJECT_EVIDENCE",
+        "CLOSE_UNRESOLVED"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    },
+    "decided_at": {
+      "format": "date-time",
+      "title": "Decided At",
+      "type": "string"
+    },
+    "verification_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Verification Id"
+    },
+    "output_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Output Id"
+    },
+    "allocated_zat": {
+      "maximum": 2100000000000000,
+      "minimum": 0,
+      "title": "Allocated Zat",
+      "type": "integer"
+    },
+    "case_version": {
+      "minimum": 2,
+      "title": "Case Version",
+      "type": "integer"
+    },
+    "case_state": {
+      "$ref": "#/$defs/CaseState"
+    },
+    "evaluation": {
+      "$ref": "#/$defs/DecisionSnapshotV1"
+    },
+    "balances": {
+      "$ref": "#/$defs/OfflineEvaluationV1"
+    },
+    "event_id": {
+      "format": "uuid",
+      "title": "Event Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "resolution_id",
+    "case_id",
+    "merchant_id",
+    "invoice_id",
+    "actor_id",
+    "action",
+    "reason",
+    "decided_at",
+    "verification_id",
+    "output_id",
+    "allocated_zat",
+    "case_version",
+    "case_state",
+    "evaluation",
+    "balances",
+    "event_id"
+  ],
+  "title": "ResolutionOutcomeV1",
+  "type": "object"
+}

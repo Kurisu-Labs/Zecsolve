@@ -7,8 +7,8 @@ from fastapi.responses import JSONResponse
 from zecsolve.api.workflow import execute
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
+from zecsolve.schemas.resolution import MerchantCaseReportV1
 from zecsolve.schemas.workflow_verification import (
-    CaseReportV1,
     CaseVerifyRequest,
     VerificationAttemptV1,
 )
@@ -54,7 +54,7 @@ def verify_evidence(
     )
 
 
-@router.get("/report", response_model=CaseReportV1)
+@router.get("/report", response_model=MerchantCaseReportV1)
 def case_report(
     case_id: uuid.UUID,
     principal: Principal,

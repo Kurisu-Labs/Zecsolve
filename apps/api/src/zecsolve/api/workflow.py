@@ -9,7 +9,7 @@ def execute(operation, resource: str):
         return operation()
     except WorkflowError as error:
         headers = {"WWW-Authenticate": "Bearer"} if error.status == 401 else None
-        raise HTTPException(error.status, error.code, headers=headers) from None
+        raise HTTPException(error.status, error.details or error.code, headers=headers) from None
     except SQLAlchemyError as error:
         if getattr(getattr(error, "orig", None), "sqlstate", None) in ("55P03", "40P01", "40001"):
             raise HTTPException(409, f"RETRY_{resource}_OPERATION") from None
