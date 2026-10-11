@@ -238,3 +238,14 @@ The user confirmed **no trusted endpoint is available**. Actual node version/cap
 ## Next small item
 
 Continue customer/reviewer scoped grants and consent, browser session exchange, case listing and claim writers, then authorized replay packets. Vue stays deferred. Retention/rotation and deployment/restore rehearsal also remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for milestone order and [chain.md](chain.md) for the independent live validation gate.
+
+
+## Frontend handoff integration — PR #12
+
+Reviewed October 11, 2026, after PR #11 established the four-person assignment board. The contributor supplied a Vue 3/TypeScript/Tailwind app with landing, demo cases, merchant credential connection, evidence submission, decisions, and printable merchant reports. This is an initial frontend implementation, not completed customer/reviewer access or release acceptance.
+
+Integration review found a TypeScript build error, invalid verification references on noncredit decisions, approval incorrectly gated by the always-false offline eligibility field, and omitted refreshed chain observations/review warnings. Focused fixes preserve server authority, correct action payloads, display latest observation history and chain-review warnings, and leave simulated partial payments under review. Report download is labeled as report JSON rather than a replay packet; live submission is explicitly merchant-only.
+
+Validation: clean locked dependency installation, four workflow regression tests, type checking and production build passed. The production build's case and report routes were opened successfully in the local browser. Independent source review confirmed the reported blockers were resolved. Added a separate web CI job; backend CI continues to run its full suite. This does not claim browser end-to-end testing against a live chain source.
+
+Remaining: customer/reviewer grants and sessions, API case listing and claim writers, full packet/replay, same-origin deployment integration, and complete M6 browser acceptance. M3 live-node validation remains pending because no trusted endpoint has been provided.

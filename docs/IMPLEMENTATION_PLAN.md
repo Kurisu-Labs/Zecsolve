@@ -1,5 +1,7 @@
 # Zecsolve — P0 Implementation and Assignment Board
 
+**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, server case listing, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+
 **Baseline:** October 10, 2026
 
 **Assignment/status update:** October 11, 2026

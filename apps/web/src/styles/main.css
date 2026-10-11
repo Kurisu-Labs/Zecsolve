@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+/*
+  zecsolve tokens. Colours are sampled from the logo:
+  black #000000, lemon #FEFB30 ("solve"), snow #F9F9F9 ("zec").
+  Yellow means "disclosed / resolved" and is the only accent.
+  `static` keeps every token emitted: component <style> blocks read them as var(--…),
+  which Tailwind does not see as usage.
+*/
+@theme static {
+  --color-ink: #000000;
+  --color-ink-raised: #0f0f0f;
+  --color-ink-sunk: #070707;
+  --color-line: #262626;
+  --color-line-strong: #3a3a3a;
+  --color-snow: #f9f9f9;
+  --color-mute: #a3a3a3;
+  --color-faint: #6b6b6b;
+  --color-paper: #fafaf7;
+  --color-zec: #fefb30;
+  --color-zec-dim: #8f8d1b;
+
+  /* Status hues share one OKLCH lightness so no state shouts louder than another. */
+  --color-ok: oklch(0.78 0.16 150);
+  --color-warn: oklch(0.78 0.15 55);
+  --color-fail: oklch(0.7 0.19 25);
+  --color-unknown: oklch(0.72 0.03 250);
+
+  --font-sans: "Geist Variable", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+:root {
+  /* Motion tokens (mirrored in src/motion/tokens.ts for GSAP). */
+  --dur-instant: 70ms;
+  --dur-fast: 150ms;
+  --dur-base: 240ms;
+  --dur-slow: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-enter: cubic-bezier(0, 0, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0.14, 1, 1);
+
+  /* Fluid type scale: 1.25 on phones to 1.333 on desktop. */
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
+  --step-0: clamp(0.94rem, 0.92rem + 0.12vw, 1rem);
+  --step-1: clamp(1.17rem, 1.12rem + 0.25vw, 1.33rem);
+  --step-2: clamp(1.46rem, 1.36rem + 0.5vw, 1.78rem);
+  --step-3: clamp(1.83rem, 1.62rem + 1vw, 2.37rem);
+  --step-4: clamp(2.29rem, 1.9rem + 1.9vw, 3.16rem);
+  --step-5: clamp(2.86rem, 2.1rem + 3.6vw, 5.2rem);
+  --step-6: clamp(3.4rem, 2.2rem + 6vw, 7.2rem);
+
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: var(--color-snow);
+    font-family: var(--font-sans);
+    font-size: 100%;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-ink);
+    color: var(--color-snow);
+    margin: 0;
+    min-height: 100dvh;
+    font-size: var(--step-0);
+    line-height: 1.55;
+  }
+  ::selection {
+    background: var(--color-zec);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-zec);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  h1, h2, h3 {
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  a { color: inherit; }
+}
+
+@layer utilities {
+  .tabular { font-variant-numeric: tabular-nums; }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .shell { width: min(100% - 2rem, 1200px); margin-inline: auto; }
+  .sr-only-focusable:not(:focus) {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+  }
+}
+
+/* Shared button vocabulary. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  font-weight: 550;
+  font-size: var(--step-0);
+  border: 1px solid var(--color-line-strong);
+  background: transparent;
+  color: var(--color-snow);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-instant) var(--ease-standard);
+}
+.btn:hover { border-color: var(--color-snow); }
+.btn:active { transform: scale(0.98); }
+.btn[disabled] { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-primary {
+  background: var(--color-zec);
+  border-color: var(--color-zec);
+  color: var(--color-ink);
+}
+.btn-primary:hover { background: #ffff6b; border-color: #ffff6b; }
+.btn-quiet { border-color: transparent; color: var(--color-mute); }
+.btn-quiet:hover { color: var(--color-snow); border-color: transparent; }
+
+.field {
+  width: 100%;
+  background: var(--color-ink-sunk);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-snow);
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.field:focus { outline: none; border-color: var(--color-zec); }
+.field::placeholder { color: var(--color-faint); }
+
+/* Route transition (productive register). */
+.route-enter-active, .route-leave-active {
+  transition: opacity var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-standard);
+}
+.route-enter-from { opacity: 0; transform: translateY(6px); }
+.route-leave-to { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {
+  animation-duration: 1ms !important;
+  transition-duration: 1ms !important;
+}
