@@ -97,3 +97,30 @@ def test_failed_session_commit_never_returns_tokens(database, verification_setup
         SessionService(database).exchange(issued.token)
     with Session(database) as session:
         assert session.scalar(select(func.count()).select_from(BrowserSession)) == 0
+
+
+def test_expired_session_never_authenticates_and_does_not_revoke_parent(
+    database, verification_setup
+):
+    from zecsolve.services.sessions import SessionService, secret_digest
+
+    _, principal, _, _, _ = verification_setup
+    issued = merchant_code(database, principal)
+    token = "zss_" + "a" * 43
+    with Session(database) as session, session.begin():
+        now = session.scalar(select(func.clock_timestamp()))
+        session.add(
+            BrowserSession(
+                merchant_id=principal.merchant_id,
+                credential_id=issued.credential_id,
+                token_sha256=secret_digest(token, "zss"),
+                csrf_sha256="ab" * 32,
+                created_at=now - timedelta(hours=2),
+                expires_at=now - timedelta(hours=1),
+            )
+        )
+    service = SessionService(database)
+    with pytest.raises(WorkflowError) as expired:
+        service.authenticate(token)
+    assert expired.value.status == 401
+    assert service.exchange(issued.token).info.access.credential_id == issued.credential_id

@@ -109,3 +109,83 @@ def test_grant_sessions_cannot_enter_merchant_routes(database, session_api, veri
             assert api.request(method, path, headers=headers, json=body).status_code == 403
         GrantService(database).revoke(principal, case.case_id, created.grant.grant_id)
         assert api.get("/api/session").status_code == 401
+
+
+def test_csrf_is_bound_to_session_not_just_matching_cookie_and_header(session_api):
+    api, issued, _ = session_api
+    assert login(api, issued.token).status_code == 201
+    first_csrf = api.cookies.get(CSRF)
+    assert login(api, issued.token).status_code == 201
+    new_session = api.cookies.get(SESSION)
+    response = api.post(
+        "/api/cases",
+        json={},
+        headers={
+            "Origin": ORIGIN,
+            "X-CSRF-Token": first_csrf,
+            "Cookie": f"{SESSION}={new_session}; {CSRF}={first_csrf}",
+        },
+    )
+    assert response.status_code == 403
+    # An invalid bearer must not silently fall back to a valid browser cookie.
+    assert api.get("/api/auth/me", headers={"Authorization": "Bearer invalid"}).status_code == 401
+    assert api.get("/api/auth/me", headers={"Authorization": "Basic bad"}).status_code == 401
+
+
+def test_http_transport_cannot_exchange_or_use_session(session_api):
+    api, issued, _ = session_api
+    assert (
+        api.post(
+            "http://app.example/api/session",
+            json={"code": issued.token},
+            headers={"Origin": ORIGIN},
+        ).status_code
+        == 400
+    )
+    assert login(api, issued.token).status_code == 201
+    response = api.get(
+        "http://app.example/api/session",
+        headers={"Cookie": f"{SESSION}={api.cookies.get(SESSION)}"},
+    )
+    assert response.status_code == 400
+
+
+def test_session_revoked_during_normalization_cannot_commit_invoice(database, root, session_api):
+    import json
+
+    from sqlalchemy import func, select, update
+    from zecsolve.db.models import BrowserSession, Invoice
+
+    api, issued, app = session_api
+    logged = login(api, issued.token)
+    session_id = logged.json()["session_id"]
+    original = app.state.normalizer.normalize
+
+    def revoke_and_normalize(request):
+        with database.begin() as connection:
+            connection.execute(
+                update(BrowserSession)
+                .where(BrowserSession.id == session_id)
+                .values(revoked_at=func.clock_timestamp())
+            )
+        return original(request)
+
+    app.state.normalizer.normalize = revoke_and_normalize
+    manifest = json.loads((root / "fixtures/manifest.json").read_text())["expected"]
+    response = api.post(
+        "/api/invoices",
+        headers={
+            "Origin": ORIGIN,
+            "X-CSRF-Token": api.cookies.get(CSRF),
+            "Idempotency-Key": "revoked",
+        },
+        json={
+            "network": "mainnet",
+            "pool": "orchard",
+            "expected_zat": 100_000,
+            "receiver_address": manifest["receiver_address"],
+        },
+    )
+    assert response.status_code == 401
+    with Session(database) as session:
+        assert session.scalar(select(func.count()).select_from(Invoice)) == 0
