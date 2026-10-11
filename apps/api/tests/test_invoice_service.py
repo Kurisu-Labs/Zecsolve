@@ -278,7 +278,7 @@ def test_expiry_is_rechecked_after_waiting_for_credential_lock(
             )
             future = executor.submit(action)
             deadline = time.monotonic() + 1
-            with database.connect() as observer:
+            with database.connect().execution_options(isolation_level="AUTOCOMMIT") as observer:
                 while not observer.scalar(
                     text(
                         "SELECT EXISTS (SELECT 1 FROM pg_stat_activity "

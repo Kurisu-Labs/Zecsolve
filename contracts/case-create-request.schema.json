@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "invoice_id": {
+      "format": "uuid",
+      "title": "Invoice Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "invoice_id"
+  ],
+  "title": "CaseCreateRequest",
+  "type": "object"
+}

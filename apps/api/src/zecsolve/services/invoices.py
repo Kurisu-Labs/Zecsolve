@@ -1,13 +1,11 @@
-import re
 import uuid
-from contextlib import contextmanager
 
-from sqlalchemy import func, select, text
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from zecsolve.auth.credentials import MerchantPrincipal
-from zecsolve.db.models import Invoice, InvoiceCreationRequest, InvoicePolicy, MerchantCredential
+from zecsolve.db.models import Invoice, InvoiceCreationRequest, InvoicePolicy
 from zecsolve.domain.snapshots import digest, invoice_snapshot
 from zecsolve.schemas.address import NormalizeAddressRequest
 from zecsolve.schemas.invoice import (
@@ -16,37 +14,19 @@ from zecsolve.schemas.invoice import (
     InvoiceSnapshotV1,
     InvoiceTermsV1,
 )
-
-
-class InvoiceError(Exception):
-    def __init__(self, status: int, code: str):
-        super().__init__(code)
-        self.status, self.code = status, code
+from zecsolve.services.workflow import WorkflowError as InvoiceError
+from zecsolve.services.workflow import authorize_merchant, transaction, validate_idempotency_key
 
 
 class InvoiceService:
     def __init__(self, engine, normalizer, slots):
         self.engine, self.normalizer, self.slots = engine, normalizer, slots
 
-    @contextmanager
     def transaction(self):
-        with Session(self.engine) as session, session.begin():
-            session.execute(text("SET LOCAL lock_timeout = '5s'"))
-            yield session
+        return transaction(self.engine)
 
     def authorize(self, session: Session, principal: MerchantPrincipal):
-        credential = session.scalar(
-            select(MerchantCredential)
-            .where(
-                MerchantCredential.id == principal.credential_id,
-                MerchantCredential.merchant_id == principal.merchant_id,
-            )
-            .with_for_update(read=True)
-        )
-        # Evaluate time after acquiring the lock: a lock-only wait can outlive expiry.
-        now = session.scalar(select(func.clock_timestamp()))
-        if credential is None or credential.revoked_at is not None or credential.expires_at <= now:
-            raise InvoiceError(401, "INVALID_MERCHANT_CREDENTIALS")
+        authorize_merchant(session, principal)
 
     def snapshot(self, session: Session, principal: MerchantPrincipal, invoice_id: uuid.UUID):
         row = session.scalar(
@@ -107,8 +87,7 @@ class InvoiceService:
     ) -> tuple[InvoiceSnapshotV1, bool]:
         with self.transaction() as session:
             self.authorize(session, principal)
-            if key is None or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", key):
-                raise InvoiceError(422, "INVALID_IDEMPOTENCY_KEY")
+            key = validate_idempotency_key(key)
             request_hash = digest(request.model_dump(mode="json"))
             previous = self.replay(session, principal, key, request_hash)
             if previous is not None:

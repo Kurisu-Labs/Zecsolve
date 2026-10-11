@@ -14,6 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from zecsolve import __version__
 from zecsolve.adapters.address import AddressNormalizer
 from zecsolve.adapters.verifier import VerifierAdapter
+from zecsolve.api.cases import router as case_router
 from zecsolve.api.invoices import router as invoice_router
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
@@ -72,6 +73,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.verifier_slots = slots
     app.include_router(invoice_router)
+    app.include_router(case_router)
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 

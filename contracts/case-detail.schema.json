@@ -1,0 +1,142 @@
+{
+  "$defs": {
+    "CaseOpeningEventV1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "case_id": {
+          "format": "uuid",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "sequence": {
+          "const": 1,
+          "default": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "actor": {
+          "pattern": "^credential:[0-9a-f-]{36}$",
+          "title": "Actor",
+          "type": "string"
+        },
+        "action": {
+          "const": "CASE_OPENED",
+          "default": "CASE_OPENED",
+          "title": "Action",
+          "type": "string"
+        },
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "payload": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Payload",
+          "type": "object"
+        },
+        "payload_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Payload Hash",
+          "type": "string"
+        },
+        "previous_hash": {
+          "default": null,
+          "title": "Previous Hash",
+          "type": "null"
+        },
+        "event_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Event Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "case_id",
+        "actor",
+        "at",
+        "payload",
+        "payload_hash",
+        "event_hash"
+      ],
+      "title": "CaseOpeningEventV1",
+      "type": "object"
+    },
+    "CaseState": {
+      "enum": [
+        "OPEN",
+        "AWAITING_EVIDENCE",
+        "UNDER_REVIEW",
+        "RESOLVED",
+        "CLOSED_UNRESOLVED"
+      ],
+      "title": "CaseState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "case_id": {
+      "format": "uuid",
+      "title": "Case Id",
+      "type": "string"
+    },
+    "invoice_id": {
+      "format": "uuid",
+      "title": "Invoice Id",
+      "type": "string"
+    },
+    "merchant_id": {
+      "format": "uuid",
+      "title": "Merchant Id",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/CaseState"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "opening_event": {
+      "$ref": "#/$defs/CaseOpeningEventV1"
+    }
+  },
+  "required": [
+    "case_id",
+    "invoice_id",
+    "merchant_id",
+    "state",
+    "version",
+    "created_at",
+    "opening_event"
+  ],
+  "title": "CaseDetailV1",
+  "type": "object"
+}

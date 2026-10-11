@@ -1,4 +1,4 @@
-"""Foundation and merchant invoice snapshots; case workflow services are the next increment."""
+"""Foundation, merchant invoice snapshots, and case opening/audit records."""
 
 import uuid
 from datetime import datetime
@@ -118,6 +118,9 @@ class InvoiceCreationRequest(Identified, Timestamped, Base):
 class Case(Identified, Timestamped, Base):
     __tablename__ = "cases"
     __table_args__ = (
+        UniqueConstraint("invoice_id", name="uq_case_invoice"),
+        UniqueConstraint("id", "merchant_id", name="uq_case_merchant"),
+        CheckConstraint("version >= 1", name="ck_case_version"),
         ForeignKeyConstraint(
             ["invoice_id", "merchant_id"], ["invoices.id", "invoices.merchant_id"]
         ),
@@ -131,6 +134,32 @@ class Case(Identified, Timestamped, Base):
     category: Mapped[str | None] = mapped_column(String(40))
     state: Mapped[str] = mapped_column(String(32), default="OPEN")
     version: Mapped[int] = mapped_column(Integer, default=1)
+    workflow_version: Mapped[str | None] = mapped_column(String(16))
+
+
+class CaseCreationRequest(Identified, Timestamped, Base):
+    __tablename__ = "case_creation_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id", "credential_id", "idempotency_key", name="uq_case_creation_key"
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_case_request_credential",
+        ),
+        ForeignKeyConstraint(
+            ["case_id", "merchant_id"],
+            ["cases.id", "cases.merchant_id"],
+            name="fk_case_request_owner",
+        ),
+        CheckConstraint("request_hash ~ '^[0-9a-f]{64}$'", name="ck_case_request_hash"),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_hash: Mapped[str] = mapped_column(String(64))
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
 
 
 class Claim(Identified, Timestamped, Base):
@@ -225,3 +254,6 @@ class CaseEvent(Identified, Base):
     payload_hash: Mapped[str] = mapped_column(String(64))
     previous_hash: Mapped[str | None] = mapped_column(String(64))
     event_hash: Mapped[str] = mapped_column(String(64))
+    # Legacy event hashes remain unchanged; their original payload is unknown.
+    schema_version: Mapped[str | None] = mapped_column(String(16))
+    payload: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
