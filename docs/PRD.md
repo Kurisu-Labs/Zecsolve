@@ -6,15 +6,17 @@
 
 **Document baseline:** 2026-10-10
 
+**Implementation/assignment status refreshed:** 2026-10-11; see the [four-person assignment board](IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks).
+
 **Delivery window:** October 10–13, 2026; planned submission on October 12
 
 **Official cutoff:** October 13, 2026, 14:59 WITA (Asia/Makassar), equivalent to October 12, 2026, 23:59 Pacific Daylight Time
 
-**Team / document owner:** Not specified; responsibility areas are listed in §10
+**Team / document owner:** Four numbered implementation owners are assigned in §10; actual names and product/submission authority are not specified.
 
 **Funding / budget:** Not specified
 
-**Status:** Draft — requirements consolidated; implementation is at the foundation stage
+**Status:** Requirements consolidated. M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh is implemented but live-node validation is pending. M4/M5 remain pending; Person 4 owns all M6 frontend work, which remains deferred. M7 release acceptance is incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains recorded results; this documentation refresh does not report new acceptance runs.
 
 The cutoff above follows the [official hackathon rules, §5](https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf). The internal sprint is shorter than the full competition period.
 
@@ -102,24 +104,24 @@ The intended journey is **invoice → case → claim/evidence → verification �
 
 The chosen architecture is a modular monolith: a planned Vue 3/TypeScript/Tailwind frontend, a FastAPI application, PostgreSQL, and a local Rust verifier invoked through a bounded adapter. Retain PostgreSQL for the case workflow; the existing constraints and migration already target it. The offline verification POC can run without a database.
 
-| Area | Present in the repository at this baseline | Remaining for the target MVP |
+| Area | Present as of October 11 | Remaining for the target MVP |
 |---|---|---|
-| Verification | Pinned Glasspane integration, historical Orchard fixture, tampered fixture, versioned JSON result | Full workflow integration; historical Sapling fixture before claiming equivalent demonstrated coverage |
-| API | Liveness, readiness, and token-protected stateless POC verification | Invoice, case, claim, evidence, persisted verification, resolution, and export services |
-| Database | Models, initial migration, invoice immutability, append-only record triggers, output uniqueness | Transactional writers, access grants, idempotency handling, and snapshot version linkage |
-| Rules | Approved-payment aggregation, candidate projection, recipient/reference checks, allocation conflict findings | Persisted policy context and integration with approvals and trusted observations |
-| Access | One development POC bearer token | Merchant identity, case-scoped customer/reviewer permissions, and disclosure consent |
-| Chain observations | Schema and explicit unavailable status | Trusted observation source, confirmation policy, and provenance collection |
-| Frontend | Architecture choice only | Merchant dashboard, customer submission, and reviewer report |
+| Verification | Pinned Glasspane integration, historical Orchard/tampered fixtures, persisted real verification | Historical Sapling fixture before claiming equivalent demonstrated coverage |
+| API | Owned invoices/cases/evidence, persisted verification, reports, atomic merchant resolutions, chain refresh, health and stateless POC | Case listing, claims, customer/reviewer access, sessions and export |
+| Database | Migrations through `0008`, immutable snapshots/history, encrypted bundles, atomic retries/allocations/events | Access/session/consent and customer-attribution additions; retention/rotation workflows |
+| Rules | Approved aggregation, candidate projection, binding/conflict findings, stored policy/evaluation context and decision-time observation gates | Preserve historical context in scoped reports and replay packets |
+| Access | Operator-provisioned expiring/revocable merchant credentials and scoped merchant services | Case-scoped customer/reviewer grants, browser sessions and disclosure consent |
+| Chain observations | Offline default, trusted Zebra adapter, idempotent refresh/provenance and later loss-of-inclusion review | Actual trusted node validation and live merchant approval trace |
+| Frontend | Vue 3/TypeScript/Tailwind architecture selected; all work assigned to Person 4 | M6.0–M6.6; execution remains deferred |
 | Export | Verifier result schema and fixture provenance manifest | Complete, authorized, replayable case packet |
 | Delivery | Setup commands, tests, CI configuration, and development container configuration | Recorded release validation, deployment verification, demo, and evidence bundle |
 
-This table reflects inspected source and documented behavior, not a fresh execution of acceptance tests. Database tests with synthetic rows do not establish that a complete merchant approval API exists. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map.
+This table reflects inspected source and [recorded development results](DEVELOPMENT.md), not a fresh execution of acceptance tests. The merchant approval service is implemented and demonstrated with isolated simulated confirmation; that does not establish live chain inclusion or full release readiness. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map and [assignment board](IMPLEMENTATION_PLAN.md#feature-board) for remaining work.
 
 ### 6.2 Verification and evidence flow
 
 1. Authenticate the caller and authorize access to the invoice/case before accepting or returning private evidence.
-2. Store permitted evidence privately, preserving the submitted bytes, input hashes, source, and submission context. The current POC is stateless; this storage is planned.
+2. Store permitted evidence privately, preserving the submitted bytes, input hashes, source, and submission context. Encrypted merchant evidence storage is implemented; scoped customer consent/submission remains planned. The separate POC endpoint stays stateless.
 3. Invoke the configured Rust executable with explicit arguments, isolated temporary files, size limits, and a timeout. User input must not select server paths, executable commands, or arbitrary fetch URLs.
 4. Validate the returned result contract and input bindings. Interpret `receipt_state` and `reason_code`, not process exit zero alone.
 5. Obtain any chain observation through a trusted application integration and record its source and observation time separately. Never accept a customer's claimed confirmation state as authoritative.
@@ -127,7 +129,7 @@ This table reflects inspected source and documented behavior, not a fresh execut
 7. Present findings and candidate amounts for review. Verification and rule evaluation do not allocate credit.
 8. On authorized approval, recheck current state and commit the resolution, allocation, and event atomically. Produce reports from those recorded facts.
 
-The backend and pinned Rust binary share one Docker deployment. Frontend hosting on Vercel remains the blueprint's planned option. Public access and real customer evidence are gated on the scoped-access and private-storage requirements in §7; the current POC is a local development service.
+The backend and pinned Rust binary share one Docker deployment. The implementation plan selects same-origin FastAPI serving of the built Vue app, with Vite proxying `/api` in development; separate Vercel hosting is deferred. Public access and real customer evidence remain gated on scoped access, retention/deletion terms and deployment controls in §7; use public fixtures for the current demo.
 
 ### 6.3 Data and independent status contracts
 
@@ -142,9 +144,9 @@ Core records are merchants, immutable invoice snapshots, merchant-owned cases, c
 | Business resolution | An explicitly authorized decision, reason, actor, and timestamp; independent of receipt and chain states |
 | Balances | Approved credit, outstanding balance, excess, candidate value, and projected outstanding balance remain separate |
 
-Existing verifier results follow [the versioned JSON schema](../contracts/verifier-result.schema.json). Their `chain_state` is always `UNAVAILABLE`; future observations belong in the separate observation layer rather than overwriting the offline verifier's claim.
+Existing verifier results follow [the versioned JSON schema](../contracts/verifier-result.schema.json). Their `chain_state` is always `UNAVAILABLE`; implemented workflow observations live in the separate observation layer rather than overwriting the offline verifier's claim.
 
-Invoices are immutable from creation in the current schema. A correction requires a new snapshot and re-review; version linkage remains a service design task. Output allocations contain approved credit only and use the full output identity as the database primary key. Append-only triggers protect ordinary application history, not against a database administrator; transactional event sequencing and hashing still need a writer.
+Invoices are immutable from creation in the current schema. A correction requires a new snapshot and re-review; explicit correction/version linkage remains outside the current workflow. Output allocations contain approved credit only and use the full output identity as the database primary key. Append-only triggers protect ordinary application history, not against a database administrator. Transactional case/evidence/verification/decision event writers and reproducible payload/header hashes are implemented; new claim/access workflows must preserve them.
 
 ### 6.4 Current and proposed API surfaces
 
@@ -153,25 +155,32 @@ Invoices are immutable from creation in the current schema. A correction require
 | Endpoint | Current behavior |
 |---|---|
 | `GET /health/live` | Process liveness only |
-| `GET /health/ready` | Migration and executable checks; readiness failure returns 503 |
+| `GET /health/ready` | Packaged migration-head, executable and evidence-encryption checks; readiness failure returns 503 |
 | `POST /api/poc/verify` | Bearer-token-protected receipt/raw-transaction content verification; no evidence persistence or allocation |
+| `GET /api/auth/me` | Identity derived from an active merchant credential |
+| `POST /api/invoices`, `GET /api/invoices/{id}` | Create/read owned immutable invoice and policy snapshots |
+| `POST /api/cases`, `GET /api/cases/{id}` | Open/read merchant-owned case detail and opening event |
+| `POST /api/cases/{id}/evidence`, `GET /api/cases/{id}/evidence/{evidence_id}` | Store encrypted merchant bundles and read metadata; no public plaintext route yet |
+| `POST /api/cases/{id}/verify` | Persist real verifier result, observation, evaluation and event |
+| `GET /api/cases/{id}/report` | Merchant history, independent statuses, current balances and chain-review flags |
+| `POST /api/cases/{id}/resolve` | Atomic merchant decision/allocation with reason, reviewed version and retries; offline credit stays blocked |
+| `POST /api/cases/{id}/chain-observations` | Idempotent merchant refresh, including after case closure |
 | `GET /docs` | Interactive API documentation |
 
-**Proposed minimum workflow API — not implemented at this baseline:**
+**Remaining or extended workflow interfaces — assigned, not implemented by this document:**
 
 | Endpoint | Intended capability |
 |---|---|
-| `POST /api/invoices` | Create a merchant-owned immutable invoice snapshot |
-| `POST /api/cases` | Open a case against an authorized invoice |
-| `GET /api/cases/{id}` | Return the caller's authorized view of a case, findings, and balances |
-| `POST /api/cases/{id}/claims` | Record a scoped customer or merchant claim |
-| `POST /api/cases/{id}/evidence` | Accept permitted evidence with provenance and size limits |
-| `POST /api/cases/{id}/verify` | Persist a verification attempt and evaluated findings |
-| `POST /api/cases/{id}/resolve` | Record an authorized decision and, when eligible and approved, atomically allocate credit |
-| `GET /api/cases/{id}/export` | Download an authorized case packet |
+| `GET /api/cases` | M4.3: merchant summaries, cursor pagination and state filter |
+| `POST /api/cases/{id}/claims` | M4.4: scoped merchant/customer claim with server-derived attribution |
+| `POST /api/cases/{id}/evidence` | M4.4 extension: customer consent, attribution and minimal acknowledgement; preserve merchant behavior |
+| `POST`, `GET /api/cases/{id}/grants`; `DELETE /api/cases/{id}/grants/{grant_id}` | M4.1: grant creation, secret-free metadata and revocation |
+| `POST`, `GET`, `DELETE /api/session` | M4.2: browser code exchange, access scope and logout |
+| `GET /api/cases/{id}/report` and evidence reads | M4.5: explicit reviewer projections and selected consented evidence; preserve merchant detail/report separation |
+| `GET /api/cases/{id}/export` | M5.2: authorized complete or explicitly limited replayable packet |
 | `POST /api/integrations/cipherpay/webhook` | P1 only: authenticated, replay-protected provider observations |
 
-Merchant and actor identity must come from authenticated application context, not arbitrary request fields. Request/response schemas for the proposed routes must be agreed before frontend integration. This PRD documents the intended interfaces; it does not add routes or modify the existing verifier contract.
+Merchant and actor identity must come from authenticated application context, not arbitrary request fields. Person 1 owns shared access interfaces, Person 2 owns disclosure/packet contracts, Person 3 owns submission/listing APIs, and Person 4 consumes their contracts in the frontend. Agree and merge prerequisite contracts before dependent implementation. This PRD documents interfaces; it does not add routes or modify the verifier contract.
 
 ### 6.5 Replayable JSON case packet
 
@@ -312,18 +321,16 @@ All internal times below use **WITA (Asia/Makassar)**. The official cutoff is **
 
 ## 10. Team & Roles
 
-Names, team composition, compensation, and document ownership have not been provided. The following responsibility areas are **unassigned**, not commitments made on behalf of particular people:
+The user assigned four implementation slots. Actual names, compensation, product decisions and submission authority have not been specified. Record the contributor and branch/PR when claiming a task in the [assignment board](IMPLEMENTATION_PLAN.md#ownership-and-coordination).
 
-| Responsibility | Deliverables |
+| Owner | Deliverables |
 |---|---|
-| Product / delivery owner | P0 decisions, acceptance tracking, discovery notes, document updates, and submission coordination |
-| Backend workflow owner | Invoice/case services, persisted evidence and verification, versioned policy context |
-| Resolution / access owner | Merchant identity, customer/reviewer grants, consent, atomic approvals, and idempotency |
-| Verification / integration owner | Pinned verifier behavior, fixtures, compatibility limits, and trusted chain observations |
-| Frontend owner | Merchant, customer, and reviewer flows; accurate balances and status presentation |
-| Evidence / release owner | Export replay, validation records, deployment rehearsal, screenshots, videos, and attribution |
+| Person 1 | Shared access/schema foundation, authentication, grants and browser sessions |
+| Person 2 | Scoped reports, packet contract, replay and authorized exports |
+| Person 3 | Case listing, customer submission backend, live chain validation, deployment and release evidence |
+| Person 4 | All frontend shell/client/types/screens/styles/accessibility/build configuration and browser tests; UI evidence for release |
 
-One person may cover multiple areas. Assign names before parallel implementation. Evidence capture and preservation of privacy boundaries are shared responsibilities.
+One feature has one accountable owner and one branch. Shared schema/authentication changes belong to Person 1; disclosure contracts to Person 2; deployment wiring to Person 3; frontend implementation to Person 4. Coordinate shared integration files and merge prerequisites first. M6 remains deferred despite its ownership assignment. Technical release evidence does not authorize outreach, submission on the team's behalf, or invented discovery results.
 
 ## 11. Risks
 
@@ -354,11 +361,11 @@ One person may cover multiple areas. Assign names before parallel implementation
 
 | Question | When it must be resolved | Current boundary |
 |---|---|---|
-| Who owns each work stream, the PRD, and submission? | Before assigning implementation work | Roles remain unassigned; no assumed team or budget |
+| Which contributors fill Person 1–4, and who holds product/submission authority? | Record contributor when claiming tasks; confirm submission authority before submission | Four implementation lanes are assigned in §10; names, budget and submission authority remain unspecified |
 | Can intended users obtain per-output receipts without exporting wallet-wide information? | During MVP discovery | Customer-provided selective evidence is the initial path; missing evidence remains acceptable input |
-| Which trusted chain source and confirmation policy will govern approval, including stale observations? | Before the live credit-approval milestone | Offline recovery stays unavailable; synthetic test observations are labeled and isolated |
+| Which trusted endpoint will pass real-node validation? | Before M3.1 and full release | Adapter and stored defaults (ten confirmations, 60-second freshness) exist; no trusted endpoint is supplied; simulated observations stay isolated |
 | Which provider fields are actually available and authenticated? | Before a P1 adapter is implemented | Do not infer amount, receiver, or confirmation semantics from a webhook event name |
-| How will identities, reviewer/customer grants, consent records, evidence retention, and deletion be implemented? | Before private evidence or public case access | The POC token is insufficient; public fixtures only until this gate is satisfied |
+| When will scoped access and the private-data lifecycle gates be satisfied? | Before real customer onboarding or public case access | Merchant identity/encrypted storage exist; grants/sessions/consent are M4 tasks; retention/deletion/rotation controls remain incomplete |
 | How are corrected invoice snapshots linked and existing cases re-reviewed? | Before invoice correction is exposed | Existing snapshots remain immutable; no in-place edits |
 | What disclosure can a cross-case allocation conflict export include without exposing another merchant? | Before reviewer export ships | Require scoped context and explicit limitations; never expose unrelated private case data |
 | Is newer/Ironwood payment evidence required by the first prospective users? | Before claiming suitability for their live payments | The current compatible historical-fixture POC does not establish that suitability |
@@ -370,27 +377,27 @@ These are product and implementation decisions still to be made, not reasons to 
 
 ### 13.1 Acceptance scenarios — required outcomes, not reported passes
 
-The coverage column identifies existing test sources or remaining work. **It is not a test execution log.** Record pass/fail outcomes, commands, revision, environment, and time separately when running release validation.
+The coverage column reflects October 11 implementation and [recorded development evidence](DEVELOPMENT.md). **It is not a new test execution log or a blanket release pass.** Record pass/fail outcomes, commands, revision, environment, and time separately when running release validation.
 
-| ID | Scenario and required outcome | Coverage at this baseline |
+| ID | Scenario and required outcome | Recorded coverage / remaining gate |
 |---|---|---|
 | A-01 | Historical Orchard receipt recovers 100,000 zatoshis from the bound mainnet transaction; chain state remains unavailable offline | Existing verifier fixture tests |
-| A-02 | Tampered OCK, transaction-ID mismatch, or invalid selected-output index is rejected without recovered credit or automatic invoice payment | Existing verifier negative tests; workflow assertion pending |
-| A-03 | Synthetic 200,000-zatoshi invoice with the unapproved 100,000-zatoshi output shows 0 credited, 200,000 outstanding, 100,000 candidate, and 100,000 projected outstanding | Existing rules test and POC script |
-| A-04 | Approved allocations of 600,000 and 400,000 satisfy a 1,000,000-zatoshi invoice | Existing pure rules test; persisted workflow test pending |
-| A-05 | Reusing an output for the same invoice returns the prior allocation outcome and adds no credit or duplicate approval side effect | Existing rule test; API/idempotency test pending |
-| A-06 | Reusing an allocated output for another invoice produces a conflict; simultaneous approvals produce exactly one allocation with consistent resolution/events | Existing rules and database race tests; atomic service test pending |
+| A-02 | Tampered OCK, transaction-ID mismatch, or invalid selected-output index is rejected without recovered credit or automatic invoice payment | Verifier negative tests and recorded persisted-verification/resolution safety coverage; browser gate remains |
+| A-03 | Synthetic 200,000-zatoshi invoice with the unapproved 100,000-zatoshi output shows 0 credited, 200,000 outstanding, 100,000 candidate, and 100,000 projected outstanding | Rules/POC and recorded real HTTP invoice-to-report workflow; browser gate remains |
+| A-04 | Approved allocations of 600,000 and 400,000 satisfy a 1,000,000-zatoshi invoice | Recorded M2 synthetic aggregation/service tests; not additional historical crypto fixtures |
+| A-05 | Reusing an output for the same invoice returns the prior allocation outcome and adds no credit or duplicate approval side effect | Recorded M2 semantic/key retry and concurrent replay tests; browser/restart rehearsal remains |
+| A-06 | Reusing an allocated output for another invoice produces a conflict; simultaneous approvals produce exactly one allocation with consistent resolution/events | Recorded M2 transaction/race tests and simulated demo; browser/release evidence remains |
 | A-07 | Two distinct outputs from one transaction may be allocated independently | Existing database test with synthetic rows |
-| A-08 | Missing receipt is `NONE`; unsupported input is `UNSUPPORTED`; absent data/binary is `UNAVAILABLE`; timeout or malformed raw transaction is `ERROR`; none is presented as tampering | Existing verifier/adapter/rules tests; UI and future chain-source paths pending |
-| A-09 | Receiver mismatch or absent invoice reference binding blocks eligibility; projected overpayment requires review | Existing rules tests; workflow presentation pending |
-| A-10 | A valid receipt with unavailable confirmation cannot become confirmed through request input or receive automatic credit | Existing offline contract and rules coverage; trusted observation/approval integration pending |
-| A-11 | Another merchant cannot read, modify, resolve, or export the case; customers and reviewers cannot exceed their grants | Full scoped authorization tests pending; current database ownership constraint is partial coverage only |
+| A-08 | Missing receipt is `NONE`; unsupported input is `UNSUPPORTED`; absent data/binary is `UNAVAILABLE`; timeout or malformed raw transaction is `ERROR`; none is presented as tampering | Verifier/adapter/rules and recorded persisted/RPC negative paths; browser/live validation remains |
+| A-09 | Receiver mismatch or absent invoice reference binding blocks eligibility; projected overpayment requires review | Recorded binding/policy/approval safety tests; frontend presentation remains |
+| A-10 | A valid receipt with unavailable confirmation cannot become confirmed through request input or receive automatic credit | Recorded offline blocking, simulated approval and trusted-RPC adapter tests; actual-node observation/approval remains M3.1 |
+| A-11 | Another merchant cannot read, modify, resolve, or export the case; customers and reviewers cannot exceed their grants | Recorded merchant API/service isolation; customer/reviewer route matrix is M4, exports M5, browser coverage M6 |
 | A-12 | Grant revocation stops future application access; disclosures explain that previously downloaded receipts remain reusable | Grant/consent implementation and tests pending |
 | A-13 | Authorized packet includes the §6.5 inputs, reproduces verification and historical rules, and identifies missing/redacted context without leaking other cases | Complete exporter and replay tests pending |
-| A-14 | A failed or stale approval commits no partial allocation/resolution/event; invoice corrections cannot rewrite the original snapshot | Existing immutability tests; transaction/review/version-linkage tests pending |
+| A-14 | A failed or stale approval commits no partial allocation/resolution/event; invoice corrections cannot rewrite the original snapshot | Recorded transaction rollback, stale-version, audit and immutability tests; correction/version-linkage workflow is outside P0 |
 | A-15 | Errors/logs/exports omit tokens and wallet-wide keys; limits constrain hostile inputs; deployment and demo are repeatable | Existing adapter/API tests and configurations; release/export/deployment validation pending |
 
-Existing suites are [verifier tests](../apps/api/tests/test_verifier.py), [rules tests](../apps/api/tests/test_rules.py), [API tests](../apps/api/tests/test_api.py), and [PostgreSQL tests](../apps/api/tests/test_postgres.py). The documented commands are `make test`, `make lint`, and `make test-db` against a disposable PostgreSQL database. `make poc` exercises the offline demonstration. Future case, access, export, and UI tests must be added when those capabilities exist. No blanket “all acceptance tests complete” claim is supported by this document.
+Existing suites are [verifier tests](../apps/api/tests/test_verifier.py), [rules tests](../apps/api/tests/test_rules.py), [API tests](../apps/api/tests/test_api.py), and [PostgreSQL tests](../apps/api/tests/test_postgres.py). The documented commands are `make test`, `make lint`, and `make test-db` against a disposable PostgreSQL database. `make poc` exercises the offline demonstration. Case, persisted-verification and resolution tests already exist; remaining grant/session, export/replay and UI acceptance is assigned in M4–M6. No blanket “all acceptance tests complete” claim is supported by this document.
 
 ### 13.2 Demonstration narrative
 
