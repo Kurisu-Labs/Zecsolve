@@ -5,7 +5,7 @@ COPY crates ./crates
 RUN cargo build --locked --release -p zecsolve-verifier
 
 FROM ghcr.io/astral-sh/uv:0.12.23 AS uv
-FROM python:3.14-slim-bookworm
+FROM python:3.14-slim-bookworm AS runtime
 COPY --from=uv /uv /usr/local/bin/uv
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
@@ -19,3 +19,17 @@ ENV PATH="/app/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 USER zecsolve
 EXPOSE 8000
 CMD ["uvicorn", "zecsolve.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+
+FROM node:24-bookworm-slim AS web
+WORKDIR /web
+COPY apps/web/package.json apps/web/package-lock.json ./
+RUN npm ci --ignore-scripts --no-audit --no-fund
+COPY apps/web ./
+RUN npm run build
+
+FROM runtime AS deployment
+COPY --from=web /web/dist /app/web
+CMD ["python", "-m", "zecsolve.deployment"]
+
+# Preserve the existing development Compose/default image behavior.
+FROM runtime AS development

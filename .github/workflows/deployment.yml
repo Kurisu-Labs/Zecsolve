@@ -1,0 +1,30 @@
+name: deployment preparation
+on:
+  push:
+    paths:
+      - 'apps/api/**'
+      - 'apps/web/**'
+      - 'crates/**'
+      - 'infra/**'
+      - 'Cargo.*'
+      - 'rust-toolchain.toml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - 'alembic.ini'
+      - '.dockerignore'
+      - 'scripts/check_deployment.py'
+      - '.github/workflows/deployment.yml'
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  container-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Validate actual TLS deployment with disposable data
+        run: python scripts/check_deployment.py

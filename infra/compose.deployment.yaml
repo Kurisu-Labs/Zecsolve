@@ -1,0 +1,126 @@
+name: zecsolve-deployment
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: zecsolve
+      POSTGRES_DB: zecsolve
+      POSTGRES_PASSWORD_FILE: /run/secrets/database_password
+    secrets: [database_password]
+    command: ["postgres", "-c", "log_statement=none", "-c", "log_min_error_statement=panic", "-c", "log_parameter_max_length_on_error=0"]
+    networks: [database]
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zecsolve -d zecsolve"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    logging: &logging
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.api
+      target: deployment
+    environment:
+      ZECSOLVE_DEPLOY_HOST: ${ZECSOLVE_DEPLOY_HOST:?Set the deployment hostname}
+      ZECSOLVE_DEPLOY_PROXY_IP: ${ZECSOLVE_DEPLOY_PROXY_IP:-172.30.7.2}
+      ZECSOLVE_VERIFIER_PATH: /usr/local/bin/zecsolve-verifier
+      ZECSOLVE_EVIDENCE_KEY_ID: ${ZECSOLVE_EVIDENCE_KEY_ID:?Set the evidence key ID}
+      ZECSOLVE_RPC_SOURCE_ID: ${ZECSOLVE_RPC_SOURCE_ID:-trusted-zebra}
+      ZECSOLVE_RPC_ALLOW_PRIVATE_HTTP: ${ZECSOLVE_RPC_ALLOW_PRIVATE_HTTP:-false}
+    secrets:
+      - source: database_url
+        target: ZECSOLVE_DATABASE_URL
+      - source: evidence_key
+        target: ZECSOLVE_EVIDENCE_KEY
+      - source: rpc_url
+        target: ZECSOLVE_RPC_URL
+      - source: rpc_username
+        target: ZECSOLVE_RPC_USERNAME
+      - source: rpc_password
+        target: ZECSOLVE_RPC_PASSWORD
+    networks:
+      edge:
+        ipv4_address: ${ZECSOLVE_DEPLOY_API_IP:-172.30.7.3}
+      database:
+    depends_on:
+      db: {condition: service_healthy}
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    init: true
+    mem_limit: 1g
+    cpus: 2
+    pids_limit: 128
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; r=urllib.request.Request('http://127.0.0.1:8000/health/ready',headers={'Host':os.environ['ZECSOLVE_DEPLOY_HOST']}); urllib.request.urlopen(r,timeout=5)"]
+      interval: 5s
+      timeout: 6s
+      retries: 24
+      start_period: 10s
+    logging: *logging
+  ingress:
+    image: nginxinc/nginx-unprivileged:stable-alpine@sha256:15c994d10d6d78658721c3bcafff14cb281fba2a4bdf9d5ba92c416a472516e3
+    environment:
+      ZECSOLVE_DEPLOY_HOST: ${ZECSOLVE_DEPLOY_HOST:?Set the deployment hostname}
+      NGINX_ENVSUBST_OUTPUT_DIR: /tmp
+      ZECSOLVE_DEPLOY_HTTPS_PORT: ${ZECSOLVE_DEPLOY_HTTPS_PORT:-8443}
+      NGINX_ENVSUBST_FILTER: ^ZECSOLVE_DEPLOY_(HOST|HTTPS_PORT)$$
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./site.conf.template:/etc/nginx/templates/default.conf.template:ro
+    secrets: [tls_certificate, tls_key]
+    ports:
+      - "${ZECSOLVE_DEPLOY_BIND:-127.0.0.1}:${ZECSOLVE_DEPLOY_HTTP_PORT:-8080}:8080"
+      - "${ZECSOLVE_DEPLOY_BIND:-127.0.0.1}:${ZECSOLVE_DEPLOY_HTTPS_PORT:-8443}:8443"
+    networks:
+      edge:
+        ipv4_address: ${ZECSOLVE_DEPLOY_PROXY_IP:-172.30.7.2}
+    depends_on:
+      api: {condition: service_healthy}
+    healthcheck:
+      # Listener probe only; the smoke test separately verifies certificate trust/hostname.
+      test: ["CMD-SHELL", "wget --no-check-certificate -q -O /dev/null --header=\"Host: $$ZECSOLVE_DEPLOY_HOST\" https://127.0.0.1:8443/health/ready"]
+      interval: 3s
+      timeout: 6s
+      retries: 20
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 32
+    logging: *logging
+networks:
+  edge:
+    ipam:
+      config:
+        - subnet: ${ZECSOLVE_DEPLOY_SUBNET:-172.30.7.0/24}
+  database:
+    internal: true
+volumes:
+  postgres_data:
+secrets:
+  database_password:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR:?Set the private secrets directory}/database_password
+  database_url:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR}/database_url
+  evidence_key:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR}/evidence_key
+  rpc_url:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR}/rpc_url
+  rpc_username:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR}/rpc_username
+  rpc_password:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR}/rpc_password
+  tls_certificate:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR}/tls_certificate
+  tls_key:
+    file: ${ZECSOLVE_DEPLOY_SECRETS_DIR}/tls_key
