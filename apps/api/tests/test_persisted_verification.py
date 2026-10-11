@@ -298,3 +298,78 @@ def test_storage_failure_is_persisted_as_error(database, verification_setup, mon
         "VERIFIER_PROCESS_ERROR",
     )
     assert counts(database) == [1, 1, 1, 1, 0]
+
+
+def test_foreign_access_and_idempotency_conflict_do_not_run_verifier(database, verification_setup):
+    service, principal, case, evidence, _ = verification_setup
+    request = CaseVerifyRequest(evidence_id=evidence.evidence_id)
+    service.verify(principal, case.case_id, request, "done")
+    service.verifier.verify = lambda *args: pytest.fail("Rejected requests must not invoke Rust")
+    with Session(database) as session, session.begin():
+        foreign = provision_merchant(session, "Foreign")
+    other = MerchantPrincipal(foreign.merchant_id, foreign.credential_id)
+    for actor, body, key, status in [
+        (other, request, "new", 404),
+        (principal, CaseVerifyRequest(evidence_id=uuid.uuid4()), "done", 409),
+    ]:
+        with pytest.raises(WorkflowError) as error:
+            service.verify(actor, case.case_id, body, key)
+        assert error.value.status == status
+    assert counts(database) == [1, 1, 1, 1, 0]
+
+
+def test_downgrade_waits_for_inflight_verification(database, root, verification_setup):
+    from alembic import command
+    from alembic.config import Config
+    from sqlalchemy import event
+
+    service, principal, case, evidence, _ = verification_setup
+    paused, release = threading.Event(), threading.Event()
+    role = threading.local()
+    request = CaseVerifyRequest(evidence_id=evidence.evidence_id)
+
+    def coordinate(connection, cursor, statement, parameters, context, executemany):
+        statement = statement.lstrip()
+        if (
+            getattr(role, "name", None) == "writer"
+            and "FROM invoices" in statement
+            and "FOR UPDATE" in statement
+        ):
+            paused.set()
+            assert release.wait(timeout=5)
+        if (
+            getattr(role, "name", None) == "migration"
+            and statement.startswith("LOCK TABLE ")
+            and "case_verification_requests" in statement
+        ):
+            release.set()
+
+    def verify():
+        role.name = "writer"
+        return service.verify(principal, case.case_id, request, "inflight")
+
+    def downgrade():
+        role.name = "migration"
+        config = Config(str(root / "alembic.ini"))
+        config.set_main_option("script_location", str(root / "apps/api/migrations"))
+        try:
+            with database.begin() as connection:
+                config.attributes["connection"] = connection
+                command.downgrade(config, "0005")
+            return "downgraded"
+        except RuntimeError as error:
+            return str(error)
+
+    event.listen(database, "before_cursor_execute", coordinate)
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            writer = executor.submit(verify)
+            assert paused.wait(timeout=5)
+            migration = executor.submit(downgrade)
+            attempt, _ = writer.result(timeout=10)
+            assert "forward migration" in migration.result(timeout=10)
+    finally:
+        release.set()
+        event.remove(database, "before_cursor_execute", coordinate)
+    assert service.verify(principal, case.case_id, request, "inflight") == (attempt, True)
+    assert counts(database) == [1, 1, 1, 1, 0]

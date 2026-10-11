@@ -295,8 +295,10 @@ def test_downgrade_waits_for_inflight_encrypted_submission(database, root, evide
         ):
             paused.set()
             assert release.wait(timeout=5)
-        if getattr(role, "name", None) == "migration" and statement.startswith(
-            "LOCK TABLE evidence_submission_requests"
+        if (
+            getattr(role, "name", None) == "migration"
+            and statement.startswith("LOCK TABLE ")
+            and "evidence_submission_requests" in statement
         ):
             release.set()
 
