@@ -67,7 +67,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 | M1 | Backend complete; development Items 01–06 | Authenticated invoice/case/evidence through persisted real verification | P0-01, P0-02, P0-05, merchant portion of P0-06 |
 | M2 | Backend complete; Item 07 uses simulated confirmation | Atomic merchant allocation, initial report, retries/conflicts/rollback | P0-03, P0-04, core P0-07 |
 | M3 | Adapter implemented, Item 08; live gate blocked | M3.1 live node/approval evidence | P0-02, P0-04, P0-05 |
-| M4 | In progress; M4.3 local acceptance passed | M4.0–M4.5 plus the route-wide role/consent matrix | Remaining P0-01 and P0-06 |
+| M4 | In progress; M4.0–M4.3 merged | M4.0–M4.5 plus the route-wide role/consent matrix | Remaining P0-01 and P0-06 |
 | M5 | Pending | M5.0–M5.2 authorized export/replay; live release still requires M3.1 | P0-08 |
 | M6 | Assigned to Person 4; deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
 | M7 | Incomplete | M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
@@ -93,7 +93,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 `Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
 
-Person 1 has implemented M4.0–M4.2; their API and authorization handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md). Person 3 has implemented M4.3. Person 2 can inspect packet requirements/fixtures and starts M5.0 implementation after M4.0 merges. Person 1 then progresses through M4.1/M4.2; Person 3 proceeds to M4.4; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
+Person 1 has implemented M4.0–M4.2; their API and authorization handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md). Person 3 has implemented M4.3. M4.0–M4.3 are merged. Person 2 can start M5.0 and Person 3 can proceed to M4.4; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
 
 All M6 tasks remain deferred and assigned to Person 4. When frontend is resumed, M6.0 can start against current contracts; fixtures may unblock development of dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
 
@@ -106,9 +106,9 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | [M3.1 — Live validation](#m3-1) | Person 3 | `docs/m3-live-validation` | Trusted compatible RPC endpoint supplied by the operator | Externally blocked |
 | [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Done: PR #14 merged |
 | [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Done: PR #15 merged |
-| [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Implemented; final PR validation in progress |
-| [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Implemented; local acceptance passed, PR integration gate applies |
-| [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Waiting |
+| [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Done: PR #16 merged |
+| [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Done: PR #13 merged |
+| [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Ready |
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Waiting |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Ready |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
@@ -120,7 +120,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | [M6.4 — Customer submission](#m6-4) | Person 4 | `feat/m6-customer-submission` | Frontend resumed; M6.1 and M4.4 merged | Deferred |
 | [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-reviewer-export` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Deferred |
 | [M6.6 — Browser acceptance](#m6-6) | Person 4 | `test/m6-browser-acceptance` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Deferred |
-| [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Waiting for completion dependencies |
+| [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend and TLS session preparation validated; browser integration pending |
 | [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-release-rehearsal` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | Waiting |
 
 ### Task cards
@@ -168,7 +168,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.2 — Browser sessions
 
-- **Owner:** Person 1. **Branch:** `feat/m4-browser-sessions`. **Status:** Implemented; final PR validation in progress.
+- **Owner:** Person 1. **Branch:** `feat/m4-browser-sessions`. **Status:** Done: PR #16 merged.
 - **Prerequisites:** M4.1 merged.
 - **Goal:** Exchange an initial merchant or grant code for revocable browser access.
 - **Owned code:** Session authentication, session router/service, Origin/CSRF handling, and relevant configuration/tests.
@@ -350,14 +350,14 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M7.1 — Deployment controls
 
-- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Waiting for completion dependencies.
+- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Backend preparation implemented and locally validated; full M7.1 remains incomplete pending Person 4 browser integration. PR review/CI/merge still apply to this preparation increment.
 - **Prerequisites:** Backend preparation can start on current main; completion requires M4.2 and M6.0.
 - **Goal:** Provide a bounded same-origin deployment of the backend and Person 4's built application.
 - **Owned code:** `infra/`, Compose/ingress deployment configuration, backend static-serving integration, readiness/logging/limits and coordinated CI wiring.
 - **Exclusions:** No frontend source/build-config edits owned by Person 4, private-customer pilot claim, live RPC substitute, or destructive database downgrade.
 - **Public interfaces:** Consume Person 4's frontend build output contract; serve `/api` and app through TLS. Preserve packaged-head/encryption/verifier readiness and separate chain capability.
 - **Acceptance checks:** Runtime validation confirms TLS, correct cookie deployment, request/rate and CPU/memory limits, secret-safe logs, same-origin app/API serving and disabled public POC. An RPC outage does not masquerade as receipt failure.
-- **Validation evidence:** Pending: sanitized configuration and actual container/ingress runtime results; configuration parsing alone is insufficient. All cards also require the common definition of done below.
+- **Validation evidence:** [Deployment guide](deployment.md) and [Item 13](DEVELOPMENT.md#item-13--m71-backend-deployment-preparation) record 19 boundary tests, full native checks and ten actual-container acceptance groups. The separate deployment CI workflow repeats TLS session/cookie/Origin/CSRF, serving, ingress/resource limits, readiness outage recovery and log-redaction checks. The current frontend build is consumed without frontend-source changes. Full browser workflow/accessibility evidence remains pending; configuration parsing alone is insufficient. All cards also require the common definition of done below.
 
 <a id="m7-2"></a>
 
@@ -614,7 +614,7 @@ Recorded M1/M2 and M3 adapter results are in [DEVELOPMENT.md](DEVELOPMENT.md), i
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** Person 1 has implemented M4.0–M4.2. After M4.2 merges, Person 3 can begin M4.4 using the shared actor/session contracts; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, then start M5.0 implementation after M4.0 merges. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** Person 1 has implemented M4.0–M4.2. M4.2 is merged, so Person 3 can begin M4.4 using the shared actor/session contracts; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, and start M5.0 implementation against the merged M4.0 foundation. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 

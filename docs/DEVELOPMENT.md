@@ -305,3 +305,28 @@ Final local validation (Linux, Python 3.14.7, Rust 1.99.0, disposable PostgreSQL
 Compose YAML parsed and includes browser-origin forwarding. The local Docker installation has no Compose subcommand, so Compose CLI/runtime validation was not available; this is not deployment evidence. HTTPS browser/proxy behavior and the frontend cookie flow remain deployment/browser acceptance work.
 
 See [sessions.md](sessions.md) for Person 4's cookie/CSRF contract and [access.md](access.md) for Person 2/3's transaction/disclosure boundaries. Person 1's M4.0/M4.1/M4.2 backend implementation is complete subject to this PR's integration; M4 as a whole still needs customer submissions and scoped reports.
+
+## Item 13 — M7.1 backend deployment preparation
+
+Implemented October 12, 2026, as Person 3 on `feat/m7-deployment-controls`, based on `87adfe3` after M4.0 merged. The branch was published before editing, with separately pushed application-boundary and runtime/acceptance increments. P1's separately developed M4.1/M4.2 then merged, and this branch integrated main `3eef944`; shared auth/schema and frontend source/build configuration were not edited.
+
+The optional deployment entry point reuses the current backend, applies forward migrations, serves Person 4's built Vue output, checks the public host and trusted TLS proxy, and always disables public POC/documentation routes. Startup requires a built frontend. Runtime logging excludes raw messages, request/SQL data and tracebacks; migration output is private. Final review disabled PostgreSQL container log retention because database error details can contain row contents even with statement logging off; the rehearsal inspects this driver setting. Existing development entry points retain their behavior.
+
+The standalone Compose composition adds certificate-backed nginx ingress, fixed/chunked request limits, per-client rate/connection limits, private API/database ports, mounted secrets, non-root/read-only API and ingress containers, explicit CPU/memory/PID budgets and bounded temporary storage. It preserves packaged-head/verifier/key readiness and independent chain-source behavior. The [deployment guide](deployment.md) documents operator configuration and TLS session configuration and remaining frontend integration.
+
+### Recorded validation
+
+macOS arm64, Python 3.12.14, Rust 1.99.0, disposable PostgreSQL 17.11 schemas, and a separate Colima Linux/arm64 Docker 29.5.2 daemon with Compose 5.6.0:
+
+```text
+make test: 12 Rust tests; 214 Python tests passed (19 new deployment boundary checks)
+make test-db: 190 PostgreSQL tests passed
+make lint: Rust formatting/Clippy and Python lint/formatting passed
+Actual Docker/Compose rehearsal: all ten acceptance groups passed
+```
+
+The session integration was validated and committed as `12e560b`; the final rehearsal including the database logging fix completed at 2026-10-11T16:49:30.466172+00:00 (October 12 local time). The container rehearsal used the real built frontend and verifier, fresh migrations through `0009`, disposable secrets/data and a short-lived localhost certificate verified against its explicit trust anchor. It passed HTTPS/redirect checks, SPA/asset/API separation, disabled POC/docs, actual TLS session exchange/secure-cookie scope/restoration/Origin/CSRF/logout/parent revocation, fixed/chunked oversized-body rejection, rate limiting despite spoofed forwarded headers, inspected CPU/memory/PID/non-root/read-only/capability settings, database-outage readiness/recovery, and secret-canary checks against container logs. All test containers, networks and data volumes were removed by the harness. The [CI workflow](../.github/workflows/deployment.yml) repeats this runtime rehearsal.
+
+The initial runtime checks exposed malformed tmpfs YAML and nginx temporary/template paths incompatible with a read-only root; the final configuration fixes those issues and waits for ingress readiness. Five unchanged native subprocess tests initially timed out under the macOS system Python; the complete suite passed outside the sandbox after the container build, without source changes to those tests. The existing Starlette/httpx deprecation warning remains.
+
+This is the completed backend-preparation slice, subject to its PR review/CI/merge gate. **M7.1 remains incomplete:** Person 4 must provide actual-backend browser workflow/accessibility evidence. No public deployment, live RPC observation, real-customer pilot, backup/restore acceptance, or full release completion is claimed. Earlier development entries remain historical evidence.

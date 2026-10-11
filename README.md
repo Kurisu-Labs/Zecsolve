@@ -78,6 +78,12 @@ docker compose up --build
 
 The backend image builds Rust in a separate stage, runs Python as an unprivileged user, and applies migrations before serving. Local ports bind only to loopback. Container runtime validation is separate from the native test suite.
 
+## Deployment preparation
+
+The separate [M7.1 deployment composition](docs/deployment.md) serves the built Vue app and API through TLS, with ingress limits, private API/database ports, non-root resource limits, and secret-safe runtime logs. Its production entry point disables the public POC and documentation routes. Run `python3 scripts/check_deployment.py` with Docker/Compose and OpenSSL for an isolated actual-container rehearsal.
+
+This completes the backend preparation slice only. M4.2 session cookies, Origin/CSRF, logout and revocation are validated through TLS; Person 4 retains frontend/browser acceptance. Live validation and full release/restore acceptance remain separate gates.
+
 ## Provision merchant identity
 
 Merchant credentials and the identity check are implemented as part of the completed M1 backend. Apply all pending migrations with `make migrate`, then run the operator CLI from the repository root:
@@ -92,7 +98,7 @@ Creation/issuance returns one JSON object containing the merchant ID, credential
 
 Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
 
-Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification, reports, and [merchant decisions](docs/resolutions.md) are available; customer/reviewer grants and browser sessions remain future increments. Credit approval remains blocked by default; see [trusted RPC configuration](docs/chain.md). Live-node validation is still pending.
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification, reports, and [merchant decisions](docs/resolutions.md) are available; case grants and secure browser sessions are available; customer submission and scoped reviewer reports remain separate increments. Credit approval remains blocked by default; see [trusted RPC configuration](docs/chain.md). Live-node validation is still pending.
 
 ## Create an invoice
 
@@ -146,7 +152,7 @@ Implemented: pinned verifier integration; fixture provenance; bounded subprocess
 
 The trusted read-only Zebra adapter, idempotent refresh route, and later reorganization review are implemented. [Live endpoint validation](docs/chain.md) remains pending.
 
-Current milestone status: **M1/M2 backend complete; M3 adapter implemented with live validation pending; M4 in progress with M4.3 locally validated; M5 pending; M6 partially implemented by Person 4; M7 release incomplete.** M4.0 shared access foundation (Person 1) remains ready. Person 3 has implemented M4.3 case listing; M4.4 customer submissions waits for M4.2 browser sessions. Person 2 can prepare packet requirements, then implement M5.0 after M4.0 merges. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
+Current milestone status: **M1/M2 backend complete; M3 adapter implemented with live validation pending; M4 in progress with M4.0–M4.3 merged; M5 pending; M6 partially implemented by Person 4; M7 release incomplete.** Person 1's access foundation/grants/sessions and Person 3's case listing are merged. M4.4 customer submissions and M5.0 packet contracts have their prerequisites. M7.1 backend deployment preparation is locally validated; full browser and release acceptance remain outstanding. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
 
 The deployed app blocks credit approval while offline; a server-configured trusted RPC source enables the policy-gated path. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed. Assigning or merging a feature does not close the separate live-validation or full-release gates.
 
