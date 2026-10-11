@@ -1,4 +1,4 @@
-"""Foundation schema. Case services and merchant authorization arrive in the next milestone."""
+"""Foundation and merchant invoice snapshots; case workflow services are the next increment."""
 
 import uuid
 from datetime import datetime
