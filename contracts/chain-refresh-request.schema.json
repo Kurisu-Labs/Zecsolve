@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "verification_id": {
+      "format": "uuid",
+      "title": "Verification Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "verification_id"
+  ],
+  "title": "RefreshChainRequest",
+  "type": "object"
+}

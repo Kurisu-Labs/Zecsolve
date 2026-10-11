@@ -14,8 +14,11 @@ router = APIRouter(prefix="/api/cases/{case_id}", tags=["resolution"])
 
 
 def service(request: Request):
-    # No simulated observer or trust-policy toggle is composed into the ASGI app.
-    return ResolutionService(request.app.state.engine)
+    return ResolutionService(
+        request.app.state.engine,
+        request.app.state.chain_observer,
+        request.app.state.chain_authority,
+    )
 
 
 @router.post(

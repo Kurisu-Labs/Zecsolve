@@ -205,8 +205,36 @@ Independent review found no blockers and independently ran 28 focused tests; add
 
 See [merchant decisions and isolated demo](resolutions.md). M2's first backend slice is now demonstrated with simulated confirmation; the deployed app permits noncredit decisions but continues to block approval while offline.
 
+## Item 08 — trusted chain adapter and review after loss of inclusion
+
+Implemented October 11, 2026, over `67f2b20`, with separately pushed adapter/contracts, workflow/migration, regression, and documentation increments. No Vue files were added.
+
+- Compose the offline default or an operator-configured read-only Zebra observer. Validate network, transaction ID/raw-byte hash, source synchronization and tip age, containing block, confirmation count, and a stable tip across the lookup. Bound HTTP work and response bytes; preserve sanitized provenance with an advertised node version, never credentials or receipt content.
+- Version new RPC observations as `decision-observation-v2` while preserving all existing observation-v1 and historical evaluation hashes. Simulated sources remain limited to test/demo composition.
+- Add merchant-only, idempotent `POST /api/cases/{id}/chain-observations`, including refresh after closure. Authorize before and after external work; serialize persistence with case mutations. A failed retry write rolls back the observation too. Approval independently refreshes each new candidate and enforces existing policy after lock waits.
+- Keep approved balances/history intact after later observed mempool/side-chain placement. Surface a report review finding and block additional credit in that case; an outage cannot erase the finding. A later confirmed observation can restore inclusion status. No automatic reversal or background monitoring was added.
+- Migration `0008` adds immutable scoped refresh retries and refuses downgrade when RPC history would become unreadable. Older downgrade-race tests now detect the common credential serialization lock at the new head, retaining their in-flight history assertions.
+- Document configuration, provider disclosure, wire response assumptions, and the real-node validation procedure in [chain.md](chain.md). Compose forwards the optional settings.
+
+### Validation and remaining gate
+
+Native checks use Python 3.14.7, Rust 1.99.0, and disposable PostgreSQL 18.6 schemas. The real fixture POC remains offline. Synthetic RPC responses test confirmed/mempool/side-chain placement, missing transactions, malformed data, wrong network/raw bytes, insufficient confirmations, timeouts, stale tips, changing tips, response limits, endpoint restrictions, spoofed fields, ownership, revocation, concurrent retry, rollback, and history preservation.
+
+Final local validation:
+
+```text
+make test: 12 Rust tests; 175 Python tests passed
+make test-db: 151 PostgreSQL tests passed
+make lint: Rust formatting/Clippy and Python lint/formatting passed
+make poc: historical recovery, tamper rejection, and offline balances preserved
+Generated contracts, local documentation links, git diff --check: passed
+docker compose config --quiet: passed (container runtime not exercised)
+```
+
+The existing Starlette/httpx deprecation warning remains. Final review added regressions ensuring insufficient re-inclusion does not clear a chain-review flag, unknown observation formats fail closed, and a failed refresh retry write rolls back its observation.
+
+The user confirmed **no trusted endpoint is available**. Actual node version/capabilities, a live historical transaction observation, and the merchant approval trace remain pending. M3's live release gate is incomplete; this implementation is not evidence of live chain inclusion.
+
 ## Next small item
 
-Implement M3's bounded, read-only trusted chain observer and its negative-path tests: network/raw-byte binding, current source health, best-chain inclusion, confirmation count, refresh failure, and stale observations. Keep offline default behavior until a compatible trusted endpoint is configured. A real historical-output observation and merchant approval trace are required before calling the credit path release-ready.
-
-Customer/reviewer grants, claim writers and case listing, frontend, authorized replay packets, retention/rotation, and release rehearsal remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for milestone order.
+Continue customer/reviewer scoped grants and consent, browser session exchange, case listing and claim writers, then authorized replay packets. Vue stays deferred. Retention/rotation and deployment/restore rehearsal also remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for milestone order and [chain.md](chain.md) for the independent live validation gate.

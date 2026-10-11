@@ -298,7 +298,7 @@ def test_downgrade_waits_for_inflight_encrypted_submission(database, root, evide
         if (
             getattr(role, "name", None) == "migration"
             and statement.startswith("LOCK TABLE ")
-            and "evidence_submission_requests" in statement
+            and "merchant_credentials" in statement
         ):
             release.set()
 

@@ -13,11 +13,14 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from zecsolve import __version__
 from zecsolve.adapters.address import AddressNormalizer
+from zecsolve.adapters.chain import OfflineObserver, no_trusted_source
 from zecsolve.adapters.evidence_crypto import EvidenceCipher
+from zecsolve.adapters.rpc import ZebraObserver
 from zecsolve.adapters.verifier import VerifierAdapter
 from zecsolve.api.cases import router as case_router
 from zecsolve.api.evidence import router as evidence_router
 from zecsolve.api.invoices import router as invoice_router
+from zecsolve.api.observations import router as observation_router
 from zecsolve.api.resolutions import router as resolution_router
 from zecsolve.api.verifications import router as verification_router
 from zecsolve.auth.credentials import MerchantPrincipal
@@ -72,6 +75,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="zecsolve", version=__version__, lifespan=lifespan)
     app.state.engine = engine
+    observer = ZebraObserver(settings) if settings.rpc_url.get_secret_value() else OfflineObserver()
+    app.state.chain_observer = observer
+    app.state.chain_authority = (
+        observer.authorizes if isinstance(observer, ZebraObserver) else no_trusted_source
+    )
     app.state.normalizer = AddressNormalizer(
         settings.verifier_path, settings.verifier_timeout_seconds
     )
@@ -83,6 +91,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(evidence_router)
     app.include_router(verification_router)
     app.include_router(resolution_router)
+    app.include_router(observation_router)
     app.add_middleware(BodyLimit)
     bearer = HTTPBearer(auto_error=False)
 

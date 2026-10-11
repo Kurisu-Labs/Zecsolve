@@ -7,6 +7,7 @@ from zecsolve.schemas.resolution import MerchantCaseReportV1
 from zecsolve.schemas.workflow_verification import ClaimViewV1, ResolutionViewV1
 from zecsolve.services.audit import load_event_chain
 from zecsolve.services.cases import load_owned_case
+from zecsolve.services.chain_review import chain_review
 from zecsolve.services.evidence import read_evidence_metadata
 from zecsolve.services.invoices import read_invoice_snapshot
 from zecsolve.services.observations import read_decision_observation
@@ -130,6 +131,7 @@ class CaseReportService:
                 )
             report = MerchantCaseReportV1(
                 report_scope=scope,
+                chain_review=chain_review(decisions, decision_observations),
                 decisions=decisions,
                 decision_observations=decision_observations,
                 decision_evaluations=[item.evaluation for item in decisions],
