@@ -1,3 +1,4 @@
+import json
 import uuid
 from datetime import UTC, datetime
 
@@ -69,4 +70,18 @@ def test_opening_event_hashes_bind_payload_actor_time_and_case():
     with pytest.raises(ValidationError):
         type(event).model_validate(
             {**event.model_dump(), "payload": {**event.payload, "memo": "unnecessary disclosure"}}
+        )
+
+
+def test_case_schemas_match_runtime_models(root):
+    from zecsolve.schemas.case import CaseCreateRequest, CaseDetailV1, CaseOpenedV1
+
+    for name, model in (
+        ("case-create-request", CaseCreateRequest),
+        ("case-opened", CaseOpenedV1),
+        ("case-detail", CaseDetailV1),
+    ):
+        assert (
+            json.loads((root / f"contracts/{name}.schema.json").read_text())
+            == model.model_json_schema()
         )

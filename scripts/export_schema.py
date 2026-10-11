@@ -1,9 +1,10 @@
-"""Regenerate the machine-readable Rust/Python boundary from its validation model."""
+"""Regenerate versioned service and verifier JSON contracts."""
 
 import json
 from pathlib import Path
 
 from zecsolve.schemas.address import AddressNormalizationReport, NormalizeAddressRequest
+from zecsolve.schemas.case import CaseCreateRequest, CaseDetailV1, CaseOpenedV1
 from zecsolve.schemas.invoice import InvoiceCreateRequest, InvoiceSnapshotV1
 from zecsolve.schemas.verification import VerificationReport
 
@@ -14,6 +15,9 @@ for name, model in (
     ("normalize-address-result", AddressNormalizationReport),
     ("invoice-create-request", InvoiceCreateRequest),
     ("invoice-snapshot", InvoiceSnapshotV1),
+    ("case-create-request", CaseCreateRequest),
+    ("case-opened", CaseOpenedV1),
+    ("case-detail", CaseDetailV1),
 ):
     target = root / f"contracts/{name}.schema.json"
     target.parent.mkdir(exist_ok=True)
