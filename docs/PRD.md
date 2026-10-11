@@ -1,6 +1,6 @@
 # Zecsolve — Product Requirements Document
 
-**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, server case listing, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, dashboard integration with the new case-list API, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
 
 **Project:** Zecsolve — a Shielded Payment Exception Engine
 
@@ -18,7 +18,7 @@
 
 **Funding / budget:** Not specified
 
-**Status:** Requirements consolidated. M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh is implemented but live-node validation is pending. M4/M5 remain pending; Person 4 owns all M6 frontend work, which remains deferred. M7 release acceptance is incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains recorded results; this documentation refresh does not report new acceptance runs.
+**Status:** Requirements consolidated. M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh is implemented but live-node validation is pending. M4 is in progress with M4.3 implemented and locally validated; M5 remains pending; Person 4 owns all M6 frontend work, which remains deferred. M7 release acceptance is incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains recorded results; the M4.3 entry records its local backend acceptance runs; PR review, CI and merge remain the integration gate.
 
 The cutoff above follows the [official hackathon rules, §5](https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf). The internal sprint is shorter than the full competition period.
 
@@ -109,7 +109,7 @@ The chosen architecture is a modular monolith: a planned Vue 3/TypeScript/Tailwi
 | Area | Present as of October 11 | Remaining for the target MVP |
 |---|---|---|
 | Verification | Pinned Glasspane integration, historical Orchard/tampered fixtures, persisted real verification | Historical Sapling fixture before claiming equivalent demonstrated coverage |
-| API | Owned invoices/cases/evidence, persisted verification, reports, atomic merchant resolutions, chain refresh, health and stateless POC | Case listing, claims, customer/reviewer access, sessions and export |
+| API | Owned invoices/cases/evidence, paginated merchant case listing, persisted verification, reports, atomic merchant resolutions, chain refresh, health and stateless POC | Claims, customer/reviewer access, sessions and export |
 | Database | Migrations through `0008`, immutable snapshots/history, encrypted bundles, atomic retries/allocations/events | Access/session/consent and customer-attribution additions; retention/rotation workflows |
 | Rules | Approved aggregation, candidate projection, binding/conflict findings, stored policy/evaluation context and decision-time observation gates | Preserve historical context in scoped reports and replay packets |
 | Access | Operator-provisioned expiring/revocable merchant credentials and scoped merchant services | Case-scoped customer/reviewer grants, browser sessions and disclosure consent |
@@ -161,6 +161,7 @@ Invoices are immutable from creation in the current schema. A correction require
 | `POST /api/poc/verify` | Bearer-token-protected receipt/raw-transaction content verification; no evidence persistence or allocation |
 | `GET /api/auth/me` | Identity derived from an active merchant credential |
 | `POST /api/invoices`, `GET /api/invoices/{id}` | Create/read owned immutable invoice and policy snapshots |
+| `GET /api/cases` | M4.3: owned summaries, newest-first cursor pagination, optional state filter; default 50/max 100 ([contract](cases.md#list-merchant-cases)) |
 | `POST /api/cases`, `GET /api/cases/{id}` | Open/read merchant-owned case detail and opening event |
 | `POST /api/cases/{id}/evidence`, `GET /api/cases/{id}/evidence/{evidence_id}` | Store encrypted merchant bundles and read metadata; no public plaintext route yet |
 | `POST /api/cases/{id}/verify` | Persist real verifier result, observation, evaluation and event |
@@ -173,7 +174,6 @@ Invoices are immutable from creation in the current schema. A correction require
 
 | Endpoint | Intended capability |
 |---|---|
-| `GET /api/cases` | M4.3: merchant summaries, cursor pagination and state filter |
 | `POST /api/cases/{id}/claims` | M4.4: scoped merchant/customer claim with server-derived attribution |
 | `POST /api/cases/{id}/evidence` | M4.4 extension: customer consent, attribution and minimal acknowledgement; preserve merchant behavior |
 | `POST`, `GET /api/cases/{id}/grants`; `DELETE /api/cases/{id}/grants/{grant_id}` | M4.1: grant creation, secret-free metadata and revocation |
