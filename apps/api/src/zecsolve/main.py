@@ -19,6 +19,7 @@ from zecsolve.adapters.rpc import ZebraObserver
 from zecsolve.adapters.verifier import VerifierAdapter
 from zecsolve.api.cases import router as case_router
 from zecsolve.api.evidence import router as evidence_router
+from zecsolve.api.grants import router as grant_router
 from zecsolve.api.invoices import router as invoice_router
 from zecsolve.api.observations import router as observation_router
 from zecsolve.api.resolutions import router as resolution_router
@@ -87,6 +88,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.verifier = verifier
     app.state.evidence_cipher = EvidenceCipher(settings.evidence_key_id, settings.evidence_key)
     app.include_router(invoice_router)
+    app.include_router(grant_router)
     app.include_router(case_router)
     app.include_router(evidence_router)
     app.include_router(verification_router)

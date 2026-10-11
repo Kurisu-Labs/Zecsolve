@@ -104,8 +104,8 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | Task | Owner | Branch | Prerequisites | Status |
 |---|---|---|---|---|
 | [M3.1 — Live validation](#m3-1) | Person 3 | `docs/m3-live-validation` | Trusted compatible RPC endpoint supplied by the operator | Externally blocked |
-| [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Implemented; validation and PR integration in progress |
-| [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Waiting |
+| [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Done: PR #14 merged |
+| [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Implemented; final PR validation in progress |
 | [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Waiting |
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Implemented; local acceptance passed, PR integration gate applies |
 | [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Waiting |
@@ -142,7 +142,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.0 — Access foundation
 
-- **Owner:** Person 1. **Branch:** `feat/m4-access-foundation`. **Status:** Implemented; validation and PR integration in progress.
+- **Owner:** Person 1. **Branch:** `feat/m4-access-foundation`. **Status:** Done: PR #14 merged.
 - **Prerequisites:** Existing M1/M2 and M3 implementation on main.
 - **Goal:** Provide one shared access and persistence foundation for the remaining backend tasks.
 - **Owned code:** `auth/`, shared workflow authorization, `db/models.py`, forward access migrations, and access contracts. Source paths in these cards are relative to `apps/api/src/zecsolve/` unless otherwise stated.
@@ -155,7 +155,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.1 — Grant lifecycle
 
-- **Owner:** Person 1. **Branch:** `feat/m4-case-grants`. **Status:** Waiting.
+- **Owner:** Person 1. **Branch:** `feat/m4-case-grants`. **Status:** Implemented; final PR validation in progress.
 - **Prerequisites:** M4.0 merged.
 - **Goal:** Let merchants manage bounded customer/reviewer access to one owned case.
 - **Owned code:** New grant schemas, services, API router, and focused tests; any shared model changes remain with Person 1.
