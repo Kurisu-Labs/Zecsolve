@@ -576,3 +576,37 @@ class CaseEvent(Identified, Base):
     # Legacy event hashes remain unchanged; their original payload is unknown.
     schema_version: Mapped[str | None] = mapped_column(String(16))
     payload: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
+
+
+class ObservationRequest(Identified, Timestamped, Base):
+    __tablename__ = "observation_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "merchant_id",
+            "credential_id",
+            "case_id",
+            "idempotency_key",
+            name="uq_observation_request_key",
+        ),
+        ForeignKeyConstraint(
+            ["credential_id", "merchant_id"],
+            ["merchant_credentials.id", "merchant_credentials.merchant_id"],
+            name="fk_observation_request_credential",
+        ),
+        ForeignKeyConstraint(
+            ["observation_id", "verification_id", "case_id", "merchant_id"],
+            [
+                "chain_observations.id",
+                "chain_observations.verification_id",
+                "chain_observations.case_id",
+                "chain_observations.merchant_id",
+            ],
+            name="fk_observation_request_owner",
+        ),
+    )
+    merchant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    credential_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    case_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    verification_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    observation_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))

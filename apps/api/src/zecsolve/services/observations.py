@@ -1,12 +1,18 @@
 import uuid
 
 from pydantic import ValidationError
+from sqlalchemy import select
 
 from zecsolve.adapters.chain import OfflineObserver, unavailable_observation
-from zecsolve.db.models import ChainObservation
+from zecsolve.db.models import Case, ChainObservation, ObservationRequest
 from zecsolve.schemas.resolution import DecisionObservationV1, observation_adapter
 from zecsolve.services.verification_records import read_attempt
-from zecsolve.services.workflow import WorkflowError, authorize_merchant, transaction
+from zecsolve.services.workflow import (
+    WorkflowError,
+    authorize_merchant,
+    transaction,
+    validate_idempotency_key,
+)
 
 
 def read_decision_observation(session, principal, case_id, observation_id):
@@ -45,9 +51,35 @@ class ObservationService:
         self.engine = engine
         self.observer = observer if observer is not None else OfflineObserver()
 
-    def refresh(self, principal, case_id, verification_id):
+    def replay(self, session, principal, case_id, verification_id, key):
+        row = session.scalar(
+            select(ObservationRequest).where(
+                ObservationRequest.merchant_id == principal.merchant_id,
+                ObservationRequest.credential_id == principal.credential_id,
+                ObservationRequest.case_id == case_id,
+                ObservationRequest.idempotency_key == key,
+            )
+        )
+        if row is None:
+            return None
+        if row.verification_id != verification_id:
+            raise WorkflowError(409, "IDEMPOTENCY_CONFLICT")
+        return read_decision_observation(session, principal, case_id, row.observation_id)
+
+    def refresh_request(self, principal, case_id, verification_id, key):
         with transaction(self.engine) as session:
             authorize_merchant(session, principal)
+            key = validate_idempotency_key(key)
+        return self.refresh(principal, case_id, verification_id, key=key)
+
+    def refresh(self, principal, case_id, verification_id, *, key=None):
+        with transaction(self.engine) as session:
+            authorize_merchant(session, principal)
+            if key is not None:
+                previous = self.replay(session, principal, case_id, verification_id, key)
+                if previous is not None:
+                    authorize_merchant(session, principal)
+                    return previous, True
             attempt = read_attempt(session, principal, case_id, verification_id)
             authorize_merchant(session, principal)
         report = attempt.result
@@ -57,7 +89,8 @@ class ObservationService:
         try:
             data = self.observer.observe(network, txid, report.raw_tx_sha256)
             observation = observation_adapter.validate_python(
-                dict(data)
+                {"schema_version": "decision-observation-v1"}
+                | dict(data)
                 | {
                     "observation_id": uuid.uuid4(),
                     "verification_id": verification_id,
@@ -72,6 +105,12 @@ class ObservationService:
         with transaction(self.engine) as session:
             authorize_merchant(session, principal)
             read_attempt(session, principal, case_id, verification_id)
+            session.execute(select(Case).where(Case.id == case_id).with_for_update()).scalar_one()
+            authorize_merchant(session, principal)
+            if key is not None:
+                previous = self.replay(session, principal, case_id, verification_id, key)
+                if previous is not None:
+                    return previous, True
             session.add(
                 ChainObservation(
                     id=observation.observation_id,
@@ -88,4 +127,16 @@ class ObservationService:
                 )
             )
             authorize_merchant(session, principal)
-        return observation
+            if key is not None:
+                session.flush()
+                session.add(
+                    ObservationRequest(
+                        merchant_id=principal.merchant_id,
+                        credential_id=principal.credential_id,
+                        case_id=case_id,
+                        verification_id=verification_id,
+                        observation_id=observation.observation_id,
+                        idempotency_key=key,
+                    )
+                )
+        return (observation, False) if key is not None else observation

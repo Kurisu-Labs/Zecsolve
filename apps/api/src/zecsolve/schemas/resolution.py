@@ -19,6 +19,10 @@ from zecsolve.schemas.workflow_verification import (
 Action = Literal["APPROVE_OUTPUT", "REQUEST_EVIDENCE", "REJECT_EVIDENCE", "CLOSE_UNRESOLVED"]
 
 
+class RefreshChainRequest(Contract):
+    verification_id: uuid.UUID
+
+
 class ResolveRequest(Contract):
     action: Action
     verification_id: uuid.UUID | None = None
@@ -164,7 +168,14 @@ class ResolutionEventV1(UTCRecord):
         return value
 
 
+class ChainReviewV1(Contract):
+    code: Literal["APPROVED_OUTPUT_CHAIN_REVIEW"] = "APPROVED_OUTPUT_CHAIN_REVIEW"
+    resolution_id: uuid.UUID
+    observation_id: uuid.UUID
+
+
 class MerchantCaseReportV1(CaseReportV1):
+    chain_review: list[ChainReviewV1] = Field(default_factory=list)
     report_scope: Literal["INITIAL_OFFLINE", "MERCHANT_DECISIONS", "SIMULATED_DECISIONS"] = (
         "INITIAL_OFFLINE"
     )

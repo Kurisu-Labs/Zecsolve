@@ -1,4 +1,4 @@
-"""No network source is configured for M2; production confirmation stays unavailable."""
+"""Offline fallback; deployments explicitly compose their trusted RPC source."""
 
 from datetime import UTC, datetime
 
@@ -22,5 +22,5 @@ class OfflineObserver:
 
 
 def no_trusted_source(observation):
-    # Future deployments must explicitly compose an authenticated source policy.
+    # No source is implicitly authorized.
     return False

@@ -1,0 +1,145 @@
+{
+  "$defs": {
+    "ChainState": {
+      "enum": [
+        "CONFIRMED",
+        "UNCONFIRMED",
+        "UNAVAILABLE"
+      ],
+      "title": "ChainState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "decision-observation-v2",
+      "default": "decision-observation-v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "observation_id": {
+      "format": "uuid",
+      "title": "Observation Id",
+      "type": "string"
+    },
+    "verification_id": {
+      "format": "uuid",
+      "title": "Verification Id",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/ChainState"
+    },
+    "source_kind": {
+      "const": "RPC",
+      "default": "RPC",
+      "title": "Source Kind",
+      "type": "string"
+    },
+    "source": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    },
+    "reason_code": {
+      "pattern": "^[A-Z0-9_]{1,80}$",
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "network": {
+      "const": "mainnet",
+      "default": "mainnet",
+      "title": "Network",
+      "type": "string"
+    },
+    "txid": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Txid"
+    },
+    "raw_tx_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Raw Tx Sha256"
+    },
+    "confirmations": {
+      "anyOf": [
+        {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confirmations"
+    },
+    "block_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Block Hash"
+    },
+    "block_height": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Block Height"
+    },
+    "rpc": {
+      "additionalProperties": true,
+      "title": "Rpc",
+      "type": "object"
+    }
+  },
+  "required": [
+    "observation_id",
+    "verification_id",
+    "state",
+    "source",
+    "reason_code",
+    "observed_at",
+    "rpc"
+  ],
+  "title": "DecisionObservationV2",
+  "type": "object"
+}

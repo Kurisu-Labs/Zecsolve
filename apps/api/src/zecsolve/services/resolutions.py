@@ -20,6 +20,7 @@ from zecsolve.schemas.resolution import DecisionSnapshotV1, ResolutionEventV1, R
 from zecsolve.schemas.workflow_verification import OwnedAllocationV1
 from zecsolve.services.audit import load_event_chain
 from zecsolve.services.cases import load_owned_case
+from zecsolve.services.chain_review import read_chain_review
 from zecsolve.services.invoices import read_invoice_snapshot
 from zecsolve.services.observations import ObservationService, read_decision_observation
 from zecsolve.services.resolution_records import read_resolution
@@ -189,6 +190,10 @@ class ResolutionService:
                 observation = read_decision_observation(
                     session, principal, case_id, observation.observation_id
                 )
+            if request.action == "APPROVE_OUTPUT" and read_chain_review(
+                session, principal, case_id
+            ):
+                raise WorkflowError(409, "APPROVED_OUTPUT_CHAIN_REVIEW")
             authorized = self.source_authority(observation) is True if observation else False
             try:
                 evaluated = evaluate_decision(

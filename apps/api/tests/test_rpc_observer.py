@@ -227,3 +227,29 @@ def test_missing_binding_does_not_call_provider():
     node = Node()
     assert node.observer().observe("mainnet", None, None)["reason_code"] == "RPC_MISSING_BINDING"
     assert not node.requests
+
+
+def test_asgi_composition_is_offline_by_default_and_never_trusts_simulation():
+    from zecsolve.adapters.chain import OfflineObserver
+    from zecsolve.main import create_app
+
+    offline = create_app(Settings(_env_file=None))
+    assert isinstance(offline.state.chain_observer, OfflineObserver)
+    assert not offline.state.chain_authority(None)
+    app = create_app(Settings(_env_file=None, rpc_url="https://node.invalid"))
+    assert isinstance(app.state.chain_observer, ZebraObserver)
+    observation = observe(Node())
+    assert app.state.chain_authority(observation)
+    assert not app.state.chain_authority(
+        observation.model_copy(update={"source_kind": "SIMULATED"})
+    )
+    app.state.engine.dispose()
+    offline.state.engine.dispose()
+
+
+def test_duplicate_json_fields_are_not_accepted():
+    node = Node()
+    node.failure = lambda *_: httpx.Response(
+        200, content=b'{"id":"getnetworkinfo","id":"getnetworkinfo","result":{}}'
+    )
+    assert observe(node).reason_code == "RPC_MALFORMED_RESPONSE"

@@ -31,6 +31,15 @@ def hash_value(value):
     return value
 
 
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise RpcFailure("RPC_MALFORMED_RESPONSE")
+        result[key] = value
+    return result
+
+
 def validate_endpoint(endpoint, allow_private_http):
     try:
         url = httpx.URL(endpoint)
@@ -94,7 +103,7 @@ class ZebraObserver:
                 if len(body) + len(chunk) > MAX_RESPONSE_BYTES:
                     raise RpcFailure("RPC_RESPONSE_TOO_LARGE")
                 body.extend(chunk)
-        data = json.loads(body)
+        data = json.loads(body, object_pairs_hook=unique_object)
         if not isinstance(data, dict) or data.get("id") != method:
             raise RpcFailure("RPC_MALFORMED_RESPONSE")
         if data.get("error") is not None:
@@ -257,4 +266,6 @@ class ZebraObserver:
             result.update(state="UNAVAILABLE", reason_code="RPC_TRANSPORT_FAILED")
         except (ValueError, TypeError, RecursionError):
             result.update(state="UNAVAILABLE", reason_code="RPC_MALFORMED_RESPONSE")
+        if result["state"] == "UNAVAILABLE":
+            result.update(confirmations=None, block_hash=None, block_height=None)
         return result
