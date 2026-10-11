@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from zecsolve.domain.snapshots import digest
 from zecsolve.schemas.case import CaseOpeningEventV1
 from zecsolve.schemas.evidence import EvidenceSubmittedEventV1
+from zecsolve.schemas.workflow_verification import VerificationEventV1
 
 
 def opening_event(
@@ -92,3 +93,26 @@ def validate_event_chain(events, case_id, case_version):
         if sequence > 1 and event.payload["case_version"] != sequence:
             raise ValueError("Event version mismatch")
         previous = event.event_hash
+
+
+def verification_event(*, event_id, case_id, credential_id, sequence, at, previous_hash, payload):
+    if at.tzinfo is None or at.utcoffset() is None or payload.get("case_version") != sequence:
+        raise ValueError("Invalid event time or version")
+    event = VerificationEventV1(
+        event_id=event_id,
+        case_id=case_id,
+        sequence=sequence,
+        actor="credential:" + str(credential_id),
+        at=at,
+        payload=payload,
+        payload_hash=digest(payload),
+        previous_hash=previous_hash,
+        event_hash="0" * 64,
+    )
+    return event.model_copy(
+        update={
+            "event_hash": digest(
+                event.model_dump(mode="json", exclude={"event_id", "payload", "event_hash"})
+            )
+        }
+    )
