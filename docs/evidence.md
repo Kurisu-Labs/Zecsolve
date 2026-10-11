@@ -54,7 +54,7 @@ with httpx.Client(base_url="http://127.0.0.1:8000") as client:
 PY
 ```
 
-Only metadata is returned. There is no public plaintext-download route. An internal `EvidenceService.read_content` method authorizes the merchant/case/evidence relationship before decryption and reauthorizes afterward; it is intended for the next persisted-verification service.
+Only metadata is returned. There is no public plaintext-download route. An internal `EvidenceService.read_content` method authorizes the merchant/case/evidence relationship before decryption and reauthorizes afterward; the [persisted-verification service](verification.md) now uses it before running the real verifier.
 
 ## Input, acknowledgement, and source meaning
 
@@ -86,4 +86,4 @@ Unauthenticated/revoked/expired credentials return 401, foreign or unknown objec
 
 Migration `0005` preserves existing evidence hashes/references without pretending old evidence is encrypted or inventing ownership metadata. Old records are not served as new encrypted bundles. New evidence metadata, content, and retry records reject ordinary edits/deletes. Downgrade serializes with creators and refuses to discard encrypted evidence. Database administrators can still alter those controls; the application does not claim protection from an administrator rewriting metadata or schema.
 
-Published contracts: [request](../contracts/evidence-submit-request.schema.json), [stored metadata](../contracts/evidence-stored.schema.json), and [audit event](../contracts/evidence-submitted-event.schema.json). Persisted verification, customer/reviewer access, export, and purge/rotation workflows remain subsequent work.
+Published contracts: [request](../contracts/evidence-submit-request.schema.json), [stored metadata](../contracts/evidence-stored.schema.json), and [audit event](../contracts/evidence-submitted-event.schema.json). The [persisted verification and initial report](verification.md) are now implemented. Customer/reviewer access, export, and purge/rotation workflows remain subsequent work.
