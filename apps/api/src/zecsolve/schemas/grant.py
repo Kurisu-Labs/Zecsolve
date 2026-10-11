@@ -26,7 +26,9 @@ class GrantMetadataV1(Contract):
 
 class GrantCreatedV1(Contract):
     grant: GrantMetadataV1
-    access_code: Annotated[str, Field(pattern=r"^zsg_[A-Za-z0-9_-]{43}$", repr=False)] | None = None
+    access_code: Annotated[str, Field(pattern=r"^zsg_[A-Za-z0-9_-]{43}$")] | None = Field(
+        default=None, repr=False
+    )
 
 
 class GrantListV1(Contract):
