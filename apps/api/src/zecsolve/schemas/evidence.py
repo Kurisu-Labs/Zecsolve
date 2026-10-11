@@ -1,6 +1,6 @@
 import uuid
 from datetime import UTC
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import AwareDatetime, Field, field_validator
 
@@ -63,3 +63,41 @@ class EvidenceStoredV1(Contract):
     @classmethod
     def utc_time(cls, value):
         return value.astimezone(UTC)
+
+
+class EvidenceSubmittedEventV1(Contract):
+    schema_version: Literal["1"] = "1"
+    event_id: uuid.UUID
+    case_id: uuid.UUID
+    sequence: Annotated[int, Field(strict=True, ge=2)]
+    actor: Annotated[str, Field(pattern=r"^credential:[0-9a-f-]{36}$")]
+    action: Literal["EVIDENCE_SUBMITTED"] = "EVIDENCE_SUBMITTED"
+    at: AwareDatetime
+    payload: dict[str, Any]
+    payload_hash: HexDigest
+    previous_hash: HexDigest
+    event_hash: HexDigest
+
+    @field_validator("at")
+    @classmethod
+    def utc_time(cls, value):
+        return value.astimezone(UTC)
+
+    @field_validator("payload")
+    @classmethod
+    def submission_references_only(cls, value):
+        if set(value) != {"evidence_id", "payload_sha256", "case_version", "case_state"}:
+            raise ValueError("Invalid evidence audit payload")
+        uuid.UUID(value["evidence_id"])
+        checksum = value["payload_sha256"]
+        if (
+            not isinstance(checksum, str)
+            or len(checksum) != 64
+            or any(c not in "0123456789abcdef" for c in checksum)
+        ):
+            raise ValueError("Invalid payload hash")
+        if type(value["case_version"]) is not int or value["case_version"] < 2:
+            raise ValueError("Invalid case version")
+        if value["case_state"] not in ("OPEN", "AWAITING_EVIDENCE", "UNDER_REVIEW"):
+            raise ValueError("Invalid submission state")
+        return value
