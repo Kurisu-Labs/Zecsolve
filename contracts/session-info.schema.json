@@ -1,0 +1,185 @@
+{
+  "$defs": {
+    "AccessContextV1": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1",
+          "default": "1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "merchant",
+            "customer",
+            "reviewer"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "merchant_id": {
+          "format": "uuid",
+          "title": "Merchant Id",
+          "type": "string"
+        },
+        "credential_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credential Id"
+        },
+        "grant_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Grant Id"
+        },
+        "session_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Session Id"
+        },
+        "case_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Case Id"
+        },
+        "permissions": {
+          "items": {
+            "enum": [
+              "case:summary",
+              "case:manage",
+              "claim:submit",
+              "evidence:submit",
+              "report:read",
+              "evidence:read",
+              "case:export",
+              "case:verify",
+              "case:resolve"
+            ],
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "report_sections": {
+          "items": {
+            "enum": [
+              "case",
+              "invoice",
+              "claims",
+              "evidence",
+              "verifications",
+              "observations",
+              "evaluations",
+              "balances",
+              "decisions",
+              "events"
+            ],
+            "type": "string"
+          },
+          "title": "Report Sections",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "allow_export": {
+          "default": false,
+          "title": "Allow Export",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "role",
+        "merchant_id",
+        "permissions"
+      ],
+      "title": "AccessContextV1",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "access": {
+      "$ref": "#/$defs/AccessContextV1"
+    },
+    "csrf_header": {
+      "const": "X-CSRF-Token",
+      "default": "X-CSRF-Token",
+      "title": "Csrf Header",
+      "type": "string"
+    },
+    "csrf_cookie": {
+      "const": "__Host-zecsolve_csrf",
+      "default": "__Host-zecsolve_csrf",
+      "title": "Csrf Cookie",
+      "type": "string"
+    }
+  },
+  "required": [
+    "session_id",
+    "created_at",
+    "expires_at",
+    "access"
+  ],
+  "title": "SessionInfoV1",
+  "type": "object"
+}

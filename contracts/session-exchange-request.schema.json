@@ -1,0 +1,17 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "maxLength": 47,
+      "minLength": 47,
+      "pattern": "^zs[mg]_[A-Za-z0-9_-]{43}$",
+      "title": "Code",
+      "type": "string"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "title": "SessionExchangeRequest",
+  "type": "object"
+}
