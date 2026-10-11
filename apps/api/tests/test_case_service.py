@@ -186,6 +186,32 @@ def test_legacy_case_is_not_given_a_fabricated_opening_event(database, setup_cas
     assert counts(database) == [1, 0, 0]
 
 
+def test_legacy_invoice_cannot_start_a_new_workflow(database, setup_cases):
+    from zecsolve.db.models import Invoice
+
+    service, principal, _, _, _ = setup_cases
+    identity = uuid.uuid4()
+    with database.begin() as connection:
+        connection.execute(
+            Invoice.__table__.insert().values(
+                id=identity,
+                merchant_id=principal.merchant_id,
+                network="mainnet",
+                pool="orchard",
+                expected_zat=1,
+                expected_receiver="legacy",
+                receiver_hex="00" * 43,
+                snapshot_hash="ab" * 32,
+                policy_version="legacy",
+            )
+        )
+    with pytest.raises(WorkflowError) as error:
+        service.create(principal, CaseCreateRequest(invoice_id=identity), "legacy-invoice")
+    assert error.value.status == 409
+    assert error.value.code == "LEGACY_INVOICE_POLICY_UNAVAILABLE"
+    assert counts(database) == [0, 0, 0]
+
+
 def test_event_and_retry_record_are_immutable(database, setup_cases):
     from sqlalchemy.exc import DBAPIError
 
