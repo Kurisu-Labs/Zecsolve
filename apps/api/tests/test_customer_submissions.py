@@ -478,3 +478,14 @@ def test_expiry_after_case_lock_wait_prevents_commit(database, submissions, oper
     finally:
         event.remove(database, "before_cursor_execute", reached_lock)
     assert counts(database) == [0, 0, 0, 0, 0, 1, 0, 0]
+
+
+def test_merchant_report_rejects_claim_content_changed_outside_the_writer(database, submissions):
+    _, claims, merchant, case, _, actor, _ = submissions
+    claim, _ = claims.submit(actor, case, claim_request(), "claim")
+    with database.begin() as connection:
+        connection.execute(
+            update(Claim).where(Claim.id == claim.submission_id).values(note="rewritten claim")
+        )
+    with pytest.raises(WorkflowError, match="CLAIM_CONTEXT_UNAVAILABLE"):
+        CaseReportService(database).get(merchant, case)

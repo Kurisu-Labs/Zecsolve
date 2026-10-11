@@ -7,7 +7,7 @@ from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.db.models import AccessSubmissionRequest, CaseEvent, Claim
 from zecsolve.domain.events import scoped_submission_event
 from zecsolve.domain.snapshots import digest
-from zecsolve.schemas.submission import SubmissionAcknowledgementV1
+from zecsolve.schemas.submission import ClaimSubmitRequest, SubmissionAcknowledgementV1
 from zecsolve.services.audit import load_event_chain
 from zecsolve.services.submissions import (
     actor_columns,
@@ -16,6 +16,49 @@ from zecsolve.services.submissions import (
     lock_submission_case,
 )
 from zecsolve.services.workflow import WorkflowError, transaction, validate_idempotency_key
+
+
+def validate_claim_record(claim, events):
+    """Preserve legacy claims; bind attributed claims to their recorded request and consent."""
+    if claim.actor_credential_id is None and claim.actor_grant_id is None:
+        return
+    matching = [
+        event
+        for event in events
+        if event.action == "CLAIM_SUBMITTED" and event.payload.get("claim_id") == str(claim.id)
+    ]
+    try:
+        if len(matching) != 1:
+            raise ValueError("Missing claim event")
+        event = matching[0]
+        request = ClaimSubmitRequest(
+            note=claim.note,
+            reported_txid=claim.reported_txid,
+            **{
+                name: event.payload[name]
+                for name in (
+                    "disclosure_version",
+                    "processing_authorized",
+                    "share_with_reviewers",
+                )
+            },
+        )
+        merchant = claim.actor_credential_id is not None
+        actor = (
+            f"credential:{claim.actor_credential_id}"
+            if merchant
+            else f"grant:{claim.actor_grant_id}"
+        )
+        if (
+            event.case_id != claim.case_id
+            or event.actor != actor
+            or event.at != claim.created_at
+            or claim.claimant_role != ("merchant" if merchant else "customer")
+            or event.payload["request_sha256"] != digest(request.model_dump(mode="json"))
+        ):
+            raise ValueError("Claim history mismatch")
+    except (ValueError, KeyError):
+        raise WorkflowError(409, "CLAIM_CONTEXT_UNAVAILABLE") from None
 
 
 class ClaimService:

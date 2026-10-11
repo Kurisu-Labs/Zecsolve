@@ -8,6 +8,7 @@ from zecsolve.schemas.workflow_verification import ClaimViewV1, ResolutionViewV1
 from zecsolve.services.audit import load_event_chain
 from zecsolve.services.cases import load_owned_case
 from zecsolve.services.chain_review import chain_review
+from zecsolve.services.claims import validate_claim_record
 from zecsolve.services.evidence import read_evidence_metadata
 from zecsolve.services.invoices import read_invoice_snapshot
 from zecsolve.services.observations import read_decision_observation
@@ -69,6 +70,15 @@ class CaseReportService:
                 balances = evaluate_offline(invoice, result, allocations, foreign)
             except ValueError:
                 raise WorkflowError(409, "EVALUATION_UNAVAILABLE") from None
+            claim_rows = list(
+                session.scalars(
+                    select(Claim)
+                    .where(Claim.case_id == case_id)
+                    .order_by(Claim.created_at, Claim.id)
+                )
+            )
+            for row in claim_rows:
+                validate_claim_record(row, events)
             claims = [
                 ClaimViewV1(
                     claim_id=row.id,
@@ -77,11 +87,7 @@ class CaseReportService:
                     note=row.note,
                     created_at=row.created_at,
                 )
-                for row in session.scalars(
-                    select(Claim)
-                    .where(Claim.case_id == case_id)
-                    .order_by(Claim.created_at, Claim.id)
-                )
+                for row in claim_rows
             ]
             resolutions = [
                 ResolutionViewV1(
