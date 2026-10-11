@@ -1,0 +1,83 @@
+{
+  "additionalProperties": false,
+  "description": "Explicit disclosure opt-in; old merchant requests keep their exact v1 representation.",
+  "properties": {
+    "receipt_json": {
+      "anyOf": [
+        {
+          "maxLength": 16384,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Receipt Json"
+    },
+    "raw_tx_hex": {
+      "anyOf": [
+        {
+          "maxLength": 4000002,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Raw Tx Hex"
+    },
+    "source": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    },
+    "source_kind": {
+      "default": "customer_submission",
+      "enum": [
+        "public_fixture",
+        "merchant_submission",
+        "customer_submission"
+      ],
+      "title": "Source Kind",
+      "type": "string"
+    },
+    "disclosure_version": {
+      "const": "evidence-disclosure-v2",
+      "title": "Disclosure Version",
+      "type": "string"
+    },
+    "processing_authorized": {
+      "const": true,
+      "title": "Processing Authorized",
+      "type": "boolean"
+    },
+    "share_with_reviewers": {
+      "default": false,
+      "title": "Share With Reviewers",
+      "type": "boolean"
+    },
+    "claim_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Claim Id"
+    }
+  },
+  "required": [
+    "source",
+    "disclosure_version",
+    "processing_authorized"
+  ],
+  "title": "EvidenceSubmitRequestV2",
+  "type": "object"
+}

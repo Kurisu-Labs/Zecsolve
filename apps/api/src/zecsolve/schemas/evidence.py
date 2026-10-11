@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC
 from typing import Annotated, Any, Literal
 
-from pydantic import AwareDatetime, Field, field_validator
+from pydantic import AwareDatetime, Field, field_validator, model_validator
 
 from zecsolve.domain.statuses import CaseState
 from zecsolve.schemas.verification import Contract, HexDigest
@@ -103,3 +103,31 @@ class EvidenceSubmittedEventV1(Contract):
         if value["case_state"] not in ("OPEN", "AWAITING_EVIDENCE", "UNDER_REVIEW"):
             raise ValueError("Invalid submission state")
         return value
+
+
+class EvidenceSubmitRequestV2(EvidenceSubmitRequest):
+    """Explicit disclosure opt-in; old merchant requests keep their exact v1 representation."""
+
+    disclosure_version: Literal["evidence-disclosure-v2"]
+    source_kind: Literal["public_fixture", "merchant_submission", "customer_submission"] = (
+        "customer_submission"
+    )
+    share_with_reviewers: bool = False
+    claim_id: uuid.UUID | None = None
+
+
+class EvidenceStoredV2(EvidenceStoredV1):
+    schema_version: Literal["2"] = "2"
+    submitted_by: uuid.UUID | None
+    actor_grant_id: uuid.UUID | None
+    source_kind: Literal["public_fixture", "merchant_submission", "customer_submission"]
+    disclosure_version: Literal["evidence-disclosure-v2"]
+    share_with_reviewers: bool
+    consent_id: uuid.UUID
+    claim_id: uuid.UUID | None
+
+    @model_validator(mode="after")
+    def exactly_one_actor(self):
+        if (self.submitted_by is None) == (self.actor_grant_id is None):
+            raise ValueError("Exactly one authenticated actor is required")
+        return self
