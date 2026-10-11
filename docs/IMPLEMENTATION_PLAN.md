@@ -104,7 +104,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | Task | Owner | Branch | Prerequisites | Status |
 |---|---|---|---|---|
 | [M3.1 — Live validation](#m3-1) | Person 3 | `docs/m3-live-validation` | Trusted compatible RPC endpoint supplied by the operator | Externally blocked |
-| [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Ready |
+| [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Implemented; validation and PR integration in progress |
 | [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Waiting |
 | [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Waiting |
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Implemented; local acceptance passed, PR integration gate applies |
@@ -142,14 +142,14 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.0 — Access foundation
 
-- **Owner:** Person 1. **Branch:** `feat/m4-access-foundation`. **Status:** Ready.
+- **Owner:** Person 1. **Branch:** `feat/m4-access-foundation`. **Status:** Implemented; validation and PR integration in progress.
 - **Prerequisites:** Existing M1/M2 and M3 implementation on main.
 - **Goal:** Provide one shared access and persistence foundation for the remaining backend tasks.
 - **Owned code:** `auth/`, shared workflow authorization, `db/models.py`, forward access migrations, and access contracts. Source paths in these cards are relative to `apps/api/src/zecsolve/` unless otherwise stated.
 - **Exclusions:** No customer UI, packet implementation, grant/session HTTP lifecycle, or parallel identity model. Preserve existing merchant bearer credentials and historical hashes.
 - **Public interfaces:** Publish the common actor/access context and transaction-time authorization interfaces, plus grant/session/consent/claim-attribution and retry references. Agree report/evidence/export permission vocabulary with Person 2; downstream services consume it.
 - **Acceptance checks:** Migrations preserve existing rows, evidence decryption, audit/retry records, and merchant behavior; customer attribution does not require a fake merchant credential. Expiry/revocation and case scoping can be rechecked after waits; shared contract tests pass.
-- **Validation evidence:** Pending: migration preservation/downgrade safety results, merchant regression results, generated access contracts, and foundation PR. All cards also require the common definition of done below.
+- **Validation evidence:** Shared contracts and transaction/persistence handoff: [access.md](access.md). Migration preservation, post-lock expiry, role isolation and merchant regressions are tested; see the development record and feature PR for final validation. All cards also require the common definition of done below.
 
 <a id="m4-1"></a>
 
