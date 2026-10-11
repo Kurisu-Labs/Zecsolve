@@ -17,6 +17,7 @@ from zecsolve.schemas.evidence import (
     EvidenceSubmitRequest,
     EvidenceSubmittedEventV1,
 )
+from zecsolve.schemas.grant import GrantCreatedV1, GrantCreateRequest, GrantListV1
 from zecsolve.schemas.invoice import InvoiceCreateRequest, InvoiceSnapshotV1
 from zecsolve.schemas.resolution import (
     DecisionObservationV2,
@@ -36,6 +37,9 @@ root = Path(__file__).resolve().parents[1]
 for name, model in (
     ("access-context", AccessContextV1),
     ("grant-scope", GrantScopeV1),
+    ("grant-create-request", GrantCreateRequest),
+    ("grant-created", GrantCreatedV1),
+    ("grant-list", GrantListV1),
     ("verifier-result", VerificationReport),
     ("normalize-address-request", NormalizeAddressRequest),
     ("normalize-address-result", AddressNormalizationReport),

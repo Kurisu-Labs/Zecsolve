@@ -159,3 +159,44 @@ def test_failed_creation_commit_leaves_no_grant_or_secret_result(database, verif
     with Session(database) as session:
         assert session.scalar(select(func.count()).select_from(CaseGrant)) == 0
         assert session.scalar(select(func.count()).select_from(GrantCreationRequest)) == 0
+
+
+def test_grant_authentication_checks_expiry_revocation_and_role(database, verification_setup):
+    from datetime import timedelta
+
+    from zecsolve.auth.access import GrantPrincipal, authorize_grant
+    from zecsolve.services.grants import GrantService, authenticate_grant, grant_digest
+    from zecsolve.services.workflow import transaction
+
+    _, principal, case, _, _ = verification_setup
+    created, _ = GrantService(database).create(
+        principal, case.case_id, GrantCreateRequest(scope={"role": "customer"}), "auth"
+    )
+    with transaction(database) as session:
+        actor = authenticate_grant(session, created.access_code)
+        assert actor.grant_id == created.grant.grant_id
+        with pytest.raises(WorkflowError):
+            authorize_grant(
+                session,
+                GrantPrincipal(principal.merchant_id, case.case_id, actor.grant_id, "reviewer"),
+            )
+    GrantService(database).revoke(principal, case.case_id, created.grant.grant_id)
+    expired_code = "zsg_" + "a" * 43
+    with Session(database) as session, session.begin():
+        now = session.scalar(select(func.clock_timestamp()))
+        session.add(
+            CaseGrant(
+                merchant_id=principal.merchant_id,
+                case_id=case.case_id,
+                issued_by=principal.credential_id,
+                role="customer",
+                token_sha256=grant_digest(expired_code),
+                scope={"role": "customer"},
+                created_at=now - timedelta(hours=2),
+                expires_at=now - timedelta(hours=1),
+            )
+        )
+    with Session(database) as session:
+        assert authenticate_grant(session, created.access_code) is None
+        assert authenticate_grant(session, expired_code) is None
+        assert authenticate_grant(session, "invalid") is None
