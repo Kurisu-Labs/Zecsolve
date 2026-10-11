@@ -93,7 +93,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 `Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
 
-Person 1 has implemented M4.0–M4.2; their API and authorization handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md). Person 3 has implemented M4.3. M4.0–M4.3 are merged. Person 2 can start M5.0 and Person 3 can proceed to M4.4; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
+Person 1 has implemented M4.0–M4.2; their API and authorization handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md). Person 3 has implemented M4.3. M4.0–M4.3 are merged. Person 2 can start M5.0; Person 3 has implemented M4.4 pending its PR integration; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
 
 All M6 tasks remain deferred and assigned to Person 4. When frontend is resumed, M6.0 can start against current contracts; fixtures may unblock development of dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
 
@@ -108,7 +108,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Done: PR #15 merged |
 | [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Done: PR #16 merged |
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Done: PR #13 merged |
-| [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Ready |
+| [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Implemented; PR integration pending |
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Waiting |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Ready |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
@@ -194,14 +194,14 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.4 — Customer submissions
 
-- **Owner:** Person 3. **Branch:** `feat/m4-customer-submissions`. **Status:** Waiting.
+- **Owner:** Person 3. **Branch:** `feat/m4-customer-submissions`. **Status:** Implemented; PR integration pending.
 - **Prerequisites:** M4.2 merged, including the M4.0 persistence interfaces.
 - **Goal:** Accept scoped customer claims and evidence with honest attribution and recorded disclosure consent.
 - **Owned code:** Claim writer/router/contracts and submission changes to evidence service/router; new audit payload versions and focused tests. Request additional shared schema work from Person 1 before using it.
 - **Exclusions:** No grant/session implementation, reviewer report projection, frontend, allocation, or automatic verification.
 - **Public interfaces:** `POST /api/cases/{id}/claims` and the extended evidence submission API accept authorized merchants/customers. Record actor/grant, processing permission, disclosure version/time, and reviewer-sharing choice; sharing defaults false. Customer responses are minimal acknowledgements.
 - **Acceptance checks:** Exact evidence bytes remain encrypted; claim/evidence links stay within the case. Consent, version/event and retry outcome commit atomically; failed writes roll back. Same-key replay adds nothing; terminal cases, foreign IDs, revoked sessions and attempts to verify/approve are rejected. Existing merchant inputs remain supported.
-- **Validation evidence:** Pending: customer/merchant submission, consent default, attribution, idempotency/concurrency and rollback tests; acknowledgement examples. All cards also require the common definition of done below.
+- **Validation evidence:** [Customer submission guide](customer-submissions.md) and [Item 14](DEVELOPMENT.md#item-14--customer-claims-and-encrypted-evidence-m44) record the contracts, 17 contract/audit tests and 20 PostgreSQL/HTTP submission tests, with the full validation results. P2 consumes explicit consent/attribution; P4 consumes minimal acknowledgements. All cards also require the common definition of done below.
 
 <a id="m4-5"></a>
 
@@ -350,7 +350,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M7.1 — Deployment controls
 
-- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Backend preparation implemented and locally validated; full M7.1 remains incomplete pending Person 4 browser integration. PR review/CI/merge still apply to this preparation increment.
+- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Backend preparation merged in PR #17; full M7.1 remains incomplete pending Person 4 browser integration.
 - **Prerequisites:** Backend preparation can start on current main; completion requires M4.2 and M6.0.
 - **Goal:** Provide a bounded same-origin deployment of the backend and Person 4's built application.
 - **Owned code:** `infra/`, Compose/ingress deployment configuration, backend static-serving integration, readiness/logging/limits and coordinated CI wiring.
@@ -614,7 +614,7 @@ Recorded M1/M2 and M3 adapter results are in [DEVELOPMENT.md](DEVELOPMENT.md), i
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** Person 1 has implemented M4.0–M4.2. M4.2 is merged, so Person 3 can begin M4.4 using the shared actor/session contracts; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, and start M5.0 implementation against the merged M4.0 foundation. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** Person 1 has implemented M4.0–M4.2. Person 3 has implemented M4.4 using the shared actor/session contracts, pending PR integration; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, and start M5.0 implementation against the merged M4.0 foundation. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 

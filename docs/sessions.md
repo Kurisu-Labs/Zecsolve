@@ -1,6 +1,6 @@
 # Secure browser sessions
 
-M4.2 adds `POST`, `GET`, and `DELETE /api/session`. Initial merchant credentials and case-grant codes can be exchanged for revocable browser sessions. Existing merchant bearer clients remain supported. This supplies backend browser authentication, not a frontend login screen or customer/reviewer report/submission routes.
+M4.2 adds `POST`, `GET`, and `DELETE /api/session`. Initial merchant credentials and case-grant codes can be exchanged for revocable browser sessions. Existing merchant bearer clients remain supported. This supplies backend browser authentication, not a frontend login screen or reviewer report routes. M4.4 adds scoped [customer submission routes](customer-submissions.md).
 
 ## Operator configuration
 
@@ -22,7 +22,7 @@ Session and CSRF values each contain 256 random bits and are stored only as SHA-
 
 Authentication derives the actor from persisted rows. Transaction-time checks lock the underlying credential/grant before the session and recheck the database clock after waiting. Invoice/evidence/verification/resolution/grant services reauthorize the merchant session inside their existing transactions, including after external normalization/verification. Revocation during external work prevents the later write. Credential identity remains the audit actor for merchant actions, preserving prior hashes and retry scoping; the session is an authentication transport, not a new merchant identity.
 
-Customer/reviewer sessions can currently read their session scope but are denied all existing merchant-only endpoints, including case listing/full reports, verification, decisions, and grant management. Person 3's M4.4 routes should use `require_actor` and `authorize_case_access` for customer submission. Person 2's M4.5 routes must use explicit disclosure projections. Never substitute a grant principal for a merchant principal or authorize from a client-supplied context.
+Customer/reviewer sessions can currently read their session scope but are denied all existing merchant-only endpoints, including case listing/full reports, verification, decisions, and grant management. Person 3's M4.4 claim/evidence routes use `require_actor` and `authorize_case_access`, with minimal acknowledgements and the same Origin/CSRF requirements. Person 2's M4.5 routes must use explicit disclosure projections. Never substitute a grant principal for a merchant principal or authorize from a client-supplied context.
 
 ## Failure and deployment boundaries
 
