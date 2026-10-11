@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import pytest
@@ -36,3 +37,21 @@ def test_offline_observation_cannot_claim_confirmation():
     ):
         with pytest.raises(ValidationError):
             OfflineObservationV1(**base, **change)
+
+
+def test_workflow_contract_files_match_models(root):
+    from zecsolve.schemas.workflow_verification import (
+        CaseReportV1,
+        CaseVerifyRequest,
+        VerificationAttemptV1,
+    )
+
+    for name, model in (
+        ("case-verify-request", CaseVerifyRequest),
+        ("verification-attempt", VerificationAttemptV1),
+        ("case-report", CaseReportV1),
+    ):
+        assert (
+            json.loads((root / f"contracts/{name}.schema.json").read_text())
+            == model.model_json_schema()
+        )
