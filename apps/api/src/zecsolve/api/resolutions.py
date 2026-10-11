@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from zecsolve.api.workflow import execute
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_merchant
-from zecsolve.schemas.resolution import ResolveRequest, ResolutionOutcomeV1
+from zecsolve.schemas.resolution import ResolutionOutcomeV1, ResolveRequest
 from zecsolve.services.resolutions import ResolutionService
 
 router = APIRouter(prefix="/api/cases/{case_id}", tags=["resolution"])
