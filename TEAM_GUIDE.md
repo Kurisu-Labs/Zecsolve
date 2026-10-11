@@ -1,5 +1,7 @@
 # zecsolve teammate guide
 
+**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, server case listing, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+
 This guide explains the foundation and backend milestones completed through October 11. Use [README.md](README.md) for runnable setup commands.
 
 ## What we are building

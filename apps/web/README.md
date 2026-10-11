@@ -4,9 +4,11 @@ Vue 3 + TypeScript + Tailwind v4 frontend for the merchant case workflow: a scro
 
 ## Run
 
+Use Node.js 24 or newer. `npm test` runs the workflow-contract regressions; CI also checks the production build.
+
 ```sh
 cd apps/web
-npm install
+npm ci
 npm run dev        # http://localhost:5173, proxies /api and /health to FastAPI on :8000
 npm run build      # vue-tsc + vite build → dist/
 ```
@@ -38,4 +40,6 @@ With no credential the app runs on **demo data**: the real historical mainnet re
 
 - FastAPI does not serve `dist/` yet (the implementation plan calls for same-origin hosting).
 - The API has no `GET /api/cases` list route, so live mode lists only cases opened in this browser.
-- Customer and reviewer links reuse the merchant credential; scoped access is still a backend task.
+- Live submission and report pages are merchant-only previews, not customer/reviewer grants. Do not share a merchant credential to enable those links. Scoped access remains backend work.
+- Report JSON is a merchant snapshot, not the complete replayable export packet.
+- Live approval submits a request for fresh server-side evaluation; offline report balances never establish approval eligibility.

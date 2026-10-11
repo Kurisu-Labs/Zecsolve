@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
-import { cases } from '@/api/store'
+import { cases, session } from '@/api/store'
 import type { CaseReport } from '@/api/types'
 import AuditTimeline from '@/components/case/AuditTimeline.vue'
 import BalanceBar from '@/components/case/BalanceBar.vue'
@@ -58,7 +58,7 @@ watch(() => props.id, () => load(), { immediate: true })
           </p>
         </div>
         <div class="head-actions">
-          <RouterLink :to="`/submit/${report.case.case_id}`" class="btn">Customer link</RouterLink>
+          <RouterLink :to="`/submit/${report.case.case_id}`" class="btn">{{ session.mode === 'demo' ? 'Customer preview' : 'Submit evidence' }}</RouterLink>
           <RouterLink :to="`/report/${report.case.case_id}`" class="btn">Report</RouterLink>
         </div>
       </header>

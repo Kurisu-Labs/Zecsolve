@@ -1,5 +1,7 @@
 # zecsolve
 
+**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, server case listing, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+
 Resolve shielded-payment exceptions with scoped evidence and explainable merchant decisions.
 
 The October 10 foundation runs real Glasspane output recovery against a bundled historical Zcash mainnet transaction. The valid receipt recovers **100,000 zatoshis (0.001 ZEC)**; the tampered receipt fails. Chain confirmation remains `UNAVAILABLE` because this proof of concept is offline.

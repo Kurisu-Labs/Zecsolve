@@ -94,6 +94,7 @@ async function submit() {
 
     <div v-else class="column">
       <header>
+        <p v-if="session.mode === 'live'" class="hint">Merchant submission only. Customer grants are not available yet; do not share your merchant credential.</p>
         <h1>Help the store find your payment</h1>
         <p class="lede">
           Shielded payments are private, so the store cannot see yours. A receipt lets it read one payment and nothing else.
@@ -110,7 +111,7 @@ async function submit() {
           The store can now see a payment of <strong class="mono">{{ result.output.amount_zat.toLocaleString('en-US') }} zat</strong>.
           It will review it against your order; nothing is credited automatically.
         </p>
-        <p v-else-if="result.receipt_state === 'NONE'">Your claim is recorded. The store may ask you for a receipt later.</p>
+        <p v-else-if="result.receipt_state === 'NONE'">Your evidence submission is recorded without a receipt. No payment has been verified.</p>
         <p v-else>{{ receiptView[result.receipt_state].detail }} You can share a different receipt.</p>
         <div class="row">
           <button v-if="result.receipt_state !== 'VALID'" type="button" class="btn" @click="(result = null), (step = 1)">Try another receipt</button>
@@ -137,7 +138,7 @@ async function submit() {
                 <button type="button" class="btn btn-quiet" @click="useTampered">Use a tampered copy</button>
               </div>
             </template>
-            <p v-else class="hint">That's fine. Your claim is recorded as unverified, which is different from a failed payment.</p>
+            <p v-else class="hint">You can submit without a receipt. This records missing evidence, not a verified payment.</p>
             <button type="button" class="btn btn-primary" :disabled="!canContinue" @click="step = 2">Continue</button>
           </div>
         </li>
@@ -172,7 +173,7 @@ async function submit() {
             <p>The store's verifier checks the receipt against the transaction. It takes a few seconds.</p>
             <div class="row">
               <button type="button" class="btn btn-primary" :disabled="busy" @click="submit">
-                {{ busy ? 'Verifying…' : hasReceipt ? 'Share receipt' : 'Send claim' }}
+                {{ busy ? 'Verifying…' : hasReceipt ? 'Share receipt' : 'Submit without receipt' }}
               </button>
               <button type="button" class="btn btn-quiet" :disabled="busy" @click="step = 2">Back</button>
             </div>
