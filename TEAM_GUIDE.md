@@ -21,10 +21,10 @@ The originals were relocated without rewriting their contents. In particular, en
 | Area | Implemented now | Still needed |
 |---|---|---|
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
-| API | Health, readiness, token-protected stateless POC verification, merchant invoice create/read | Case/claim/evidence/resolve/export endpoints |
-| Database | Models, migrations, output uniqueness, immutable invoice/policy snapshots, atomic invoice retries | Case/evidence/resolution services, access grants, broader workflow idempotency |
+| API | Health, readiness, stateless POC verification, merchant invoice and case create/read | Case list/full report, claim/evidence/resolve/export endpoints |
+| Database | Invoice/policy snapshots, one case per invoice, opening-event payload/hashes, atomic creation retries | Evidence/resolution writers, later event sequencing, access grants |
 | Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Integrate the stored policy with real allocations and chain observations |
-| Access | Development POC token; expiring/revocable merchant credentials, identity endpoint, owned invoice create/read | Merchant-scoped case authorization, customer submission grants, reviewer consent and scoped evidence permissions |
+| Access | Development POC token; expiring/revocable merchant credentials; owned invoice/case create/read | Evidence authorization, customer submission grants, reviewer consent and scoped evidence permissions |
 | Frontend | Planned Vue 3 + TypeScript + Tailwind architecture | Dashboard, customer submission and reviewer report |
 | Export | Versioned verifier result and fixture manifest | Complete replayable case packet |
 
@@ -41,6 +41,9 @@ The POC runs without PostgreSQL; readiness requires a migrated database. Databas
 | `apps/api/src/zecsolve/config.py` | Typed environment settings; secret values use `SecretStr` |
 | `apps/api/src/zecsolve/auth/` | Merchant credential issuance/revocation CLI and server-derived authentication dependency |
 | `apps/api/src/zecsolve/api/invoices.py`, `services/invoices.py` | Merchant-owned invoice routes, atomic snapshot creation, and idempotent retries |
+| `apps/api/src/zecsolve/api/cases.py`, `services/cases.py` | Case creation/read, initial event persistence, and semantic/idempotent replay |
+| `apps/api/src/zecsolve/services/workflow.py`, `api/workflow.py` | Shared transaction, post-lock credential checks, key validation, and safe HTTP errors |
+| `apps/api/src/zecsolve/domain/events.py` | Versioned opening event and separate payload/header hashes |
 | `apps/api/src/zecsolve/domain/snapshots.py` | Versioned deterministic serialization and invoice snapshot hashes |
 | `crates/zecsolve-verifier/src/address.rs`, `src/normalize_cli.rs` | Mainnet shielded receiver decoding/validation and bounded normalization CLI |
 | `apps/api/src/zecsolve/adapters/address.py`, `schemas/address.py` | Python normalizer adapter and versioned request/result contracts |
@@ -106,7 +109,7 @@ The POC constructs a synthetic 200,000-zatoshi invoice over the historical 100,0
 
 `output_allocations` use the full output identity as their primary key and contain only approved allocations. Pending candidates belong in verification/rule results. Allocations reference both a verification and a resolution. Database tests confirm only one concurrent insert can win.
 
-Invoice updates are rejected by a trigger. Verification attempts, resolutions, output allocations and case events reject updates/deletes. A database administrator can still alter these controls; do not describe the history as immutable against an operator or independently notarized. Event sequencing and hashes still need a transactional writer.
+Invoice/policy snapshots, creation retry records, verification attempts, resolutions, output allocations, and case events reject updates/deletes. A database administrator can still alter these controls; do not describe the history as immutable against an operator or independently notarized. The opening event now has a transactional writer and verifiable payload/header hashes; later state-transition writers and event sequencing remain pending.
 
 Use Alembic for future changes. Do not call `Base.metadata.create_all()` at application startup. Once teammates have applied a migration, add a new one rather than rewriting it.
 
@@ -114,7 +117,7 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 
 | Work stream | First deliverable | Integration boundary |
 |---|---|---|
-| Backend workflow | Case ownership over the existing invoice snapshots, evidence references and persisted verification attempts | FastAPI schemas + application services; no business logic in route handlers |
+| Backend workflow | Private evidence and persisted verification over owned invoice/case records | FastAPI schemas + application services; no business logic in route handlers |
 | Resolution and access | Integrate the merchant dependency, add scoped grants, idempotency and atomic allocation | PostgreSQL constraints and pure rules; avoid accepting actor/merchant identity from arbitrary request fields |
 | Frontend | Vue shell and the four independent status/balance displays | Generate TypeScript types from OpenAPI; work against explicit fixtures until routes exist |
 | Evidence and export | Authorized private storage and a packet containing snapshot, receipt, raw tx, provenance, versions and decision | Preserve original bytes; disclose only authorized case evidence |

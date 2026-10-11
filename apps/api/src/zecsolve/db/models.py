@@ -1,4 +1,4 @@
-"""Foundation and merchant invoice snapshots; case workflow services are the next increment."""
+"""Foundation, merchant invoice snapshots, and case opening/audit records."""
 
 import uuid
 from datetime import datetime

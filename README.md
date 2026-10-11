@@ -49,6 +49,8 @@ An existing PostgreSQL installation also works: create a dedicated database and 
 | `GET /api/auth/me` | Returns merchant/credential IDs derived from an active merchant credential |
 | `POST /api/invoices` | Creates an immutable merchant-owned invoice and server-selected policy; requires `Idempotency-Key` |
 | `GET /api/invoices/{id}` | Returns the authenticated merchant's invoice snapshot; inaccessible IDs return 404 |
+| `POST /api/cases` | Opens one case per owned invoice and atomically records its opening event; requires `Idempotency-Key` |
+| `GET /api/cases/{id}` | Returns current case state/version and its immutable opening event; merchant only |
 | `GET /docs` | Interactive API contract; use **Authorize** to enter the POC token |
 
 Paste the contents of `fixtures/mainnet/receipt.json` into the `receipt_json` string and `fixtures/mainnet/transaction.hex` into `raw_tx_hex`. The endpoint accepts content, never server file paths or fetch URLs. It does not write evidence or recovered fields to the database.
@@ -75,13 +77,15 @@ Creation/issuance returns one JSON object containing the merchant ID, credential
 
 Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
 
-Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Merchant case endpoints, customer/reviewer grants, browser sessions, and private evidence storage remain future increments.
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Evidence/decision endpoints, customer/reviewer grants, browser sessions, and private evidence storage remain future increments.
 
 ## Create an invoice
 
 Apply migration `0003` with `make migrate`, then use a merchant credential to call `POST /api/invoices` with an `Idempotency-Key`. Supply integer `expected_zat`, `network="mainnet"`, `pool="orchard"` or `"sapling"`, `receiver_address`, and optional `expected_memo`/`expires_at`. The server normalizes the receiver through Rust and stores invoice terms, policy, and retry record in one transaction.
 
 Creation returns 201 and a `Location` header. Retrying the same credential/key/body returns the original snapshot with 200; changing the body for that key returns 409. The response contains a versioned policy and hash, not a paid status. See [the invoice API guide](docs/invoices.md) for an executable public-fixture example, exact limits, policy defaults, and migration boundaries.
+
+After creating an invoice, use `POST /api/cases` with its `invoice_id` to open a case. Migration `0004` enforces one case per invoice and preserves historical rows. The [case API guide](docs/cases.md) explains retry behavior, audit hashes, legacy limits, and why this view is not yet a complete verification report.
 
 ## Normalize an invoice recipient
 
@@ -123,9 +127,9 @@ ZECSOLVE_TEST_DATABASE_URL='postgresql+psycopg://zecsolve:zecsolve@127.0.0.1:543
 
 ## Current boundary
 
-Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials with expiry/revocation and identity endpoint; mainnet recipient normalization CLI and Python adapter; merchant invoice/policy creation and retrieval with atomic idempotent persistence; tests; development container configuration.
+Implemented: pinned verifier integration; fixture provenance; bounded subprocess adapter; POC API; PostgreSQL models and migrations; deterministic rule contracts; operator-provisioned merchant credentials with expiry/revocation and identity endpoint; mainnet recipient normalization CLI and Python adapter; merchant invoice/policy creation and retrieval; one case per invoice with atomic opening event and safe retries; tests; development container configuration.
 
-Next: merchant-scoped case endpoints, customer/reviewer authentication and permissions, private evidence storage, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
+Next: claims and private evidence, persisted workflow verification and full reports, customer/reviewer authentication and permissions, resolution services with idempotency, trusted chain observations, Vue frontend, and replayable case exports. These are not simulated behind working-looking routes.
 
 The current Rust wrapper accepts mainnet receipt v0 and v5 transaction branches NU5 through NU6.2. Orchard has a real historical fixture test. The Sapling recovery path uses the upstream library but does not yet have an end-to-end historical Sapling fixture in this repository. No Ironwood compatibility is claimed.
 

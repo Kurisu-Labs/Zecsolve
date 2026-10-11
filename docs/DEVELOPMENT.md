@@ -92,8 +92,34 @@ Commands explicitly selected `RUSTUP_TOOLCHAIN=1.99.0`, disabled local debug inf
 
 This is still part of M1. Invoice creation does not create a case, allocate payment, or perform chain confirmation. See [the invoice API guide](invoices.md) for request/replay behavior, hashing, and migration limitations.
 
+## Item 04 — merchant case opening and initial audit event
+
+Implemented on October 11, 2026, over baseline `9c6087a`, with separate commits for contracts, shared workflow safeguards, migration, service, HTTP routes, review fixes, schema exports, regressions, and documentation.
+
+- `POST /api/cases` accepts only an owned, supported invoice ID. Create an `OPEN`, version-1 case and `CASE_OPENED` event in the same transaction as its scoped retry record. `GET /api/cases/{id}` returns current state/version and the immutable opening event.
+- Enforce one case per invoice. Same-key retries and new-key/same-invoice requests return the original opening outcome without a second event, including calls from another active credential of the same merchant. A conflicting key used for another invoice rolls back the losing case/event/record.
+- Preserve original opening actor/outcome independently of later case state. Event payload contains only invoice ID/hash and policy ID, with separate canonical payload/header hashes, sequence 1, and a null previous hash. Reject unneeded payload fields and timezone-free event timestamps.
+- Migration `0004` rejects duplicate historical invoice cases with a remediation report instead of deleting data. Preserve legacy hashes and null payload/version fields; do not invent policy or audit history. Reject destructive downgrade when workflow evidence exists, including a concurrent in-flight creator.
+- Reuse invoice transaction/credential/key/error safeguards and retain invoice-before-case lock ordering. Recheck expiry after lock waits. Unknown/foreign IDs return 404; legacy context returns 409; errors do not disclose database internals.
+
+### Recorded validation
+
+Linux, Python 3.14.7, Rust 1.99.0, and disposable PostgreSQL 17 with isolated test schemas:
+
+```text
+make test: 12 Rust tests passed; 95 Python tests passed
+Final PostgreSQL suite: 70 passed (including invoice and case regressions)
+make lint: Rust formatting/Clippy and Python lint/formatting passed
+make poc: original receipt recovery, tamper rejection, and offline balances preserved
+Generated-schema consistency, documentation links, and git diff --check: passed
+```
+
+Independent review reproduced a concurrent downgrade that could discard newly committed audit payloads. A deterministic two-connection regression failed before the fix and passed after request/case/event locks were acquired before the guard. Follow-up review found no remaining blockers. Additional tests cover historical data preservation, key conflicts, new credentials, immutable records, expiry during invoice locks, and complete rollback after commit failure. The existing Starlette/httpx warning remains.
+
+`CaseOpenedV1` and `CaseDetailV1` are deliberately limited to creation/current state and the opening event. They are not the full `CaseReportV1`; case listing, claims/evidence, later event writers, verification, and resolution remain pending. See [case API behavior and boundaries](cases.md).
+
 ## Next small item
 
-Create a merchant-owned case from an existing supported invoice snapshot, enforce one case per invoice, and write its initial audit event transactionally. Follow with encrypted evidence bundles and persisted verification/report services to finish M1.
+Implement private encrypted evidence bundles and merchant submission tied to owned cases, including source/consent metadata and transactional audit events. Follow with persisted verification and the initial reasoned report to complete the remaining M1 path.
 
-Customer/reviewer grants, encrypted evidence, case services, approval/idempotency, trusted chain observations, frontend, and replayable exports remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the full milestone order.
+Customer/reviewer grants, encrypted evidence, remaining case workflow services, approval/idempotency, trusted chain observations, frontend, and replayable exports remain pending. See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the full milestone order.
