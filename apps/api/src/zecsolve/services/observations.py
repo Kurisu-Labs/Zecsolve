@@ -4,7 +4,7 @@ from pydantic import ValidationError
 
 from zecsolve.adapters.chain import OfflineObserver, unavailable_observation
 from zecsolve.db.models import ChainObservation
-from zecsolve.schemas.resolution import DecisionObservationV1
+from zecsolve.schemas.resolution import DecisionObservationV1, observation_adapter
 from zecsolve.services.verification_records import read_attempt
 from zecsolve.services.workflow import WorkflowError, authorize_merchant, transaction
 
@@ -14,7 +14,7 @@ def read_decision_observation(session, principal, case_id, observation_id):
     if row is None or (row.case_id, row.merchant_id) != (case_id, principal.merchant_id):
         raise WorkflowError(404, "OBSERVATION_NOT_FOUND")
     try:
-        obs = DecisionObservationV1.model_validate(row.provenance)
+        obs = observation_adapter.validate_python(row.provenance)
         if (
             obs.observation_id,
             obs.verification_id,
@@ -56,7 +56,7 @@ class ObservationService:
         # External work occurs without a database transaction. Failure is a new diagnostic.
         try:
             data = self.observer.observe(network, txid, report.raw_tx_sha256)
-            observation = DecisionObservationV1.model_validate(
+            observation = observation_adapter.validate_python(
                 dict(data)
                 | {
                     "observation_id": uuid.uuid4(),

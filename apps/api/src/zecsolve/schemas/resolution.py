@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated, Literal
 
-from pydantic import AwareDatetime, Field, StrictBool, field_validator, model_validator
+from pydantic import AwareDatetime, Field, StrictBool, TypeAdapter, field_validator, model_validator
 
 from zecsolve.domain.statuses import CaseState, ChainState
 from zecsolve.schemas.case import CaseOpeningEventV1
@@ -73,6 +73,27 @@ class DecisionObservationV1(UTCRecord):
         return self
 
 
+class DecisionObservationV2(DecisionObservationV1):
+    schema_version: Literal["decision-observation-v2"] = "decision-observation-v2"
+    source_kind: Literal["RPC"] = "RPC"
+    rpc: dict
+
+    @field_validator("rpc")
+    @classmethod
+    def safe_json(cls, value):
+        from zecsolve.domain.snapshots import canonical_bytes
+
+        if len(canonical_bytes(value)) > 8192:
+            raise ValueError("RPC provenance exceeds limit")
+        return value
+
+
+DecisionObservation = Annotated[
+    DecisionObservationV1 | DecisionObservationV2, Field(discriminator="schema_version")
+]
+observation_adapter = TypeAdapter(DecisionObservation)
+
+
 class DecisionEvaluationV1(OfflineEvaluationV1):
     eligible_for_credit: StrictBool
 
@@ -86,7 +107,7 @@ class DecisionSnapshotV1(UTCRecord):
     invoice: InvoiceSnapshotV1
     verification_id: uuid.UUID | None
     verification: VerificationReport | None
-    observation: DecisionObservationV1 | None
+    observation: DecisionObservation | None
     source_authorized: StrictBool
     approved_allocations: list[OwnedAllocationV1]
     foreign_conflict: StrictBool
@@ -147,7 +168,7 @@ class MerchantCaseReportV1(CaseReportV1):
     report_scope: Literal["INITIAL_OFFLINE", "MERCHANT_DECISIONS", "SIMULATED_DECISIONS"] = (
         "INITIAL_OFFLINE"
     )
-    decision_observations: list[DecisionObservationV1] = Field(default_factory=list)
+    decision_observations: list[DecisionObservation] = Field(default_factory=list)
     decision_evaluations: list[DecisionSnapshotV1] = Field(default_factory=list)
     decisions: list[ResolutionOutcomeV1] = Field(default_factory=list)
     events: list[
