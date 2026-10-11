@@ -1,7 +1,8 @@
 import uuid
+from datetime import UTC
 from typing import Literal
 
-from pydantic import AwareDatetime, Field
+from pydantic import AwareDatetime, Field, field_validator
 
 from zecsolve.schemas.access import AccessContextV1
 from zecsolve.schemas.verification import Contract
@@ -21,3 +22,8 @@ class SessionInfoV1(Contract):
     access: AccessContextV1
     csrf_header: Literal["X-CSRF-Token"] = "X-CSRF-Token"
     csrf_cookie: Literal["__Host-zecsolve_csrf"] = "__Host-zecsolve_csrf"
+
+    @field_validator("created_at", "expires_at")
+    @classmethod
+    def utc_times(cls, value):
+        return value.astimezone(UTC)
