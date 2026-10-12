@@ -258,3 +258,128 @@ def test_export_http_permission_matrix_and_download_contract(
             assert api.get(f"/api/cases/{uuid.uuid4()}/export").status_code == 404
             GrantService(database).revoke(merchant, case, grant.grant.grant_id)
             assert api.get(f"/api/cases/{case}/export").status_code == 401
+
+
+def test_case_only_export_excludes_all_originals_and_expired_access(database, submissions):
+    from datetime import timedelta
+
+    from sqlalchemy import func, select
+    from zecsolve.auth.access import GrantPrincipal
+    from zecsolve.db.models import CaseGrant
+    from zecsolve.schemas.access import GrantScopeV1
+
+    evidence, _, merchant, case, _, customer, request = submissions
+    hidden, _ = evidence.submit(customer, case, request, "hidden")
+    _, actor = reviewer(database, merchant, case, ["case"], [], True)
+    packet = CaseExportService(database, evidence.cipher, evidence.slots).export(actor, case)
+    assert packet.payload.evidence == []
+    assert packet.payload.report.evidence is None
+    assert str(hidden.evidence_id) not in packet.model_dump_json()
+    assert request.receipt_json not in packet.model_dump_json()
+    with Session(database) as session, session.begin():
+        now = session.scalar(select(func.clock_timestamp()))
+        grant = CaseGrant(
+            id=uuid.uuid4(),
+            merchant_id=merchant.merchant_id,
+            case_id=case,
+            issued_by=merchant.credential_id,
+            role="reviewer",
+            scope=GrantScopeV1(
+                role="reviewer", report_sections=["case"], allow_export=True
+            ).model_dump(mode="json"),
+            token_sha256=uuid.uuid4().hex * 2,
+            created_at=now - timedelta(hours=2),
+            expires_at=now - timedelta(hours=1),
+        )
+        session.add(grant)
+        expired = GrantPrincipal(merchant.merchant_id, case, grant.id, "reviewer")
+    with pytest.raises(WorkflowError) as error:
+        CaseExportService(database, evidence.cipher, evidence.slots).export(expired, case)
+    assert error.value.status == 401
+
+
+def test_browser_logout_during_decryption_blocks_export(database, monkeypatch, submissions):
+    from zecsolve.services.sessions import SessionService
+
+    evidence, _, merchant, case, _, customer, request = submissions
+    stored, _ = evidence.submit(
+        customer, case, request.model_copy(update={"share_with_reviewers": True}), "shared"
+    )
+    granted, _ = reviewer(database, merchant, case, ["evidence"], [stored.evidence_id], True)
+    sessions = SessionService(database)
+    issued = sessions.exchange(granted.access_code)
+    actor, _, _ = sessions.authenticate(issued.token)
+    decrypt = evidence.cipher.decrypt
+
+    def logout(*args, **kwargs):
+        result = decrypt(*args, **kwargs)
+        sessions.logout(issued.token)
+        return result
+
+    monkeypatch.setattr(evidence.cipher, "decrypt", logout)
+    with pytest.raises(WorkflowError) as error:
+        CaseExportService(database, evidence.cipher, evidence.slots).export(actor, case)
+    assert error.value.status == 401
+
+
+def test_foreign_allocation_export_is_opaque_and_replays(database, root, submissions):
+    from sqlalchemy import insert
+    from test_postgres import allocation, seed
+    from zecsolve.db.models import OutputAllocation
+
+    evidence, _, merchant, case, _, customer, request = submissions
+    stored, _ = evidence.submit(customer, case, request, "evidence")
+    adapter = VerifierAdapter(root / "target/debug/zecsolve-verifier")
+    attempt, _ = VerificationService(database, evidence.cipher, adapter, evidence.slots).verify(
+        merchant, case, CaseVerifyRequest(evidence_id=stored.evidence_id), "verify"
+    )
+    foreign = seed(database)[0]
+    record = allocation(foreign)
+    record.update(txid=attempt.result.output.txid, output_index=attempt.result.output.output_index)
+    with database.begin() as connection:
+        connection.execute(insert(OutputAllocation).values(**record))
+    packet = CaseExportService(database, evidence.cipher, evidence.slots).export(merchant, case)
+    assert packet.payload.balance_context.foreign_conflict
+    assert packet.payload.balance_context.approved_allocations == []
+    assert str(foreign["invoice_id"]) not in packet.model_dump_json()
+    result = replay_packet(packet.model_dump_json().encode(), adapter)
+    assert result.status == "REPRODUCED", result.model_dump_json()
+    assert "ALLOCATION_AND_SOURCE_AUTHORITY_ARE_EXTERNAL_ASSERTIONS" in result.external_assertions
+
+
+def test_export_size_limit_fails_before_decryption(database, monkeypatch, submissions):
+    evidence, _, merchant, case, _, customer, request = submissions
+    evidence.submit(customer, case, request, "evidence")
+    monkeypatch.setattr("zecsolve.services.exports.MAX_PACKET_BYTES", 1)
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("Oversized export reached decryption")
+
+    monkeypatch.setattr(evidence.cipher, "decrypt", forbidden)
+    with pytest.raises(WorkflowError) as error:
+        CaseExportService(database, evidence.cipher, evidence.slots).export(merchant, case)
+    assert error.value.status == 413
+
+
+@pytest.mark.parametrize("value", [None, ""])
+def test_export_preserves_missing_and_empty_inputs_in_negative_replay(
+    database, root, submissions, value
+):
+    evidence, _, merchant, case, _, customer, request = submissions
+    stored, _ = evidence.submit(
+        customer,
+        case,
+        request.model_copy(update={"receipt_json": value, "raw_tx_hex": value}),
+        "missing",
+    )
+    adapter = VerifierAdapter(root / "target/debug/zecsolve-verifier")
+    VerificationService(database, evidence.cipher, adapter, evidence.slots).verify(
+        merchant, case, CaseVerifyRequest(evidence_id=stored.evidence_id), "verify"
+    )
+    packet = CaseExportService(database, evidence.cipher, evidence.slots).export(merchant, case)
+    inputs = packet.payload.evidence[0]
+    assert inputs.receipt.text() == inputs.raw_transaction_hex.text() == value
+    assert inputs.receipt.availability == ("NOT_SUBMITTED" if value is None else "PRESENT")
+    result = replay_packet(packet.model_dump_json().encode(), adapter)
+    assert result.status == "REPRODUCED", result.model_dump_json()
+    assert any(check.code == "NEGATIVE_RESULT_REPRODUCED" for check in result.checks)
