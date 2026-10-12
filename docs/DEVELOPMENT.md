@@ -526,3 +526,26 @@ progress-board label. Export final-head CI remains its integration gate.
 
 M5.2 integration is tracked in [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23),
 with the full final validation results and the reviewed export-only diff.
+
+
+## Item 20 — M7.2 export/replay recovery integration
+
+Implemented October 12, 2026 as Person 3 from main `640b1b1`, after P2 scoped reports, packet contracts, replay and authorized export merged in PRs #20–#23. No open PR or remote feature branch overlapped when checked. `test/m7-export-recovery` was published before implementation; the runtime rehearsal and five comparison regressions were committed/pushed as `4c47e4b` before this documentation increment. Items 01–19 are retained unchanged as historical evidence.
+
+The existing disposable TLS/restore harness now exercises the merged HTTP report/evidence/export interfaces before interruption, after API SIGKILL/restart, after PostgreSQL restart and after encrypted fresh-database restore. Reviewer access uses real exchanged browser-session cookies. A private linked claim, nonconsented legacy evidence and a consented but unselected submission stay undisclosed. Report-only grants cannot export; anonymous/customer/revoked access is denied. A grant revoked before backup stays revoked after restore, and revoking the restored active reviewer denies new report/content/export reads.
+
+At every checkpoint the merchant packet reproduces real output recovery and historical accounting through the installed `replay-case` CLI (`0/REPRODUCED`); selected reviewer and case-only packets return `2/LIMITED` with explicit omissions. Original receipt/transaction bytes match the fixture exactly. A one-byte change without rehashing returns `1/FAILED` at integrity validation. Replay uses the built application image and packaged Rust verifier, with no networking, database or secret mounts, a read-only root and bounded tmpfs, and Docker logging disabled. The sanitized CI artifact contains only hashes and expected statuses for these packets.
+
+The entire exported payload remains equal across recovery after excluding only the fresh `report.generated_at` timestamp. This compares historical identities, consent/provenance projections, evidence components, allocations and audit history as well as amounts. Existing full-table row fingerprints remain equal after all reads/replays/retries. Five regression checks prove timestamp tolerance without mutating inputs, and detect changed amounts, evidence, historical hashes and omissions.
+
+### Recorded validation
+
+[Linux deployment/recovery CI](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38218166043) passed all **24 actual-container groups** at **2026-10-12T07:34:34.032559Z**, revision `4c47e4bf9f3c603c9ae6853c82de1fb0f207d8da`, `working_tree_changes=false`. Environment: Linux 6.17.0-1022-azure x86_64, Python 3.14.8, Docker 28.0.4, PostgreSQL 17 and the packaged real Rust verifier. Its `backend-recovery-evidence` artifact records all four export/replay checkpoints, equal per-role history hashes, unchanged database rows, correct CLI exits, tamper rejection and restored reviewer revocation. It retains `live_confirmation=false`, `release_complete=false` and the remaining live/browser/full-release gates.
+
+[Foundation and web CI](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38218166014) passed on the same revision: Rust/Python lint, **12 Rust tests, 275 non-database Python tests and 236 PostgreSQL tests**, the offline POC, frontend tests and production build. No frontend source or build configuration, production API/auth/schema, packet contract, verifier behavior or dependency version changed in this increment.
+
+Local macOS validation passed all **236 PostgreSQL tests**, the **five new comparison tests**, Rust format/Clippy, Python lint/format and all **12 Rust tests**. Native `make test` passed 267 Python tests and failed eight existing system-Python subprocess cases using a 0.2-second deadline (three normalizer, two process-runner and three verifier assertions timed out before their intended failure). This is the previously recorded native timeout limitation; no timeout or production behavior was altered to make it pass. The complete Linux suite above passed unchanged. The existing Starlette/httpx deprecation warning remains.
+
+The full local container rehearsal also passed all **24 groups** at **2026-10-12T07:38:39.967846+00:00**, revision `4c47e4b` with `working_tree_changes=true` (documentation edits; runtime code matches that commit). Host: macOS-27.0.1-arm64-arm-64bit, Python 3.12.14, Docker 29.5.2. It cleaned up its containers, volumes and private rehearsal directory after success. This local run and the clean Linux CI artifact independently exercised the same four export/replay checkpoints.
+
+Full M7.2 remains incomplete: M3.1 needs the operator's trusted RPC endpoint and live merchant approval trace; P4 owns actual-browser/download/accessibility results and screenshots; operator and team release/demo evidence remains outstanding. Public historical inputs and explicitly simulated accounting do not prove live chain inclusion or authorize a private-customer pilot. Final review, current-head CI and PR merge are still required for this integration slice.
