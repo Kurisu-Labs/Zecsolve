@@ -1,8 +1,8 @@
 // One interface for both modes. Demo mode replays recorded fixture outcomes in memory;
-// live mode calls the FastAPI workflow with the merchant credential.
+// live mode calls the FastAPI workflow through the authenticated browser session.
 
 import { reactive, readonly } from 'vue'
-import { api, idempotencyKey, readCredential, writeCredential } from './client'
+import { api, idempotencyKey } from './client'
 import {
   DEMO_CREDENTIAL,
   FIXTURE,
@@ -30,43 +30,16 @@ export interface CaseListItem {
   creditedZat: number
   receipt: VerificationReport['receipt_state']
   chain: ChainObservation['state']
+  simulated: boolean
   updatedAt: string
 }
 
-const KNOWN_CASES_KEY = 'zecsolve.knownCases'
-
-const state = reactive({
-  mode: (readCredential() ? 'live' : 'demo') as Mode,
-  demo: createDemoCases(),
-})
-
-export const session = readonly(state)
-
-export function setLiveCredential(token: string | null): void {
-  writeCredential(token)
-  state.mode = token ? 'live' : 'demo'
-}
-
+export { session } from './session'
+import { session } from './session'
+const state = reactive({ demo: createDemoCases() })
+export const demoState = readonly(state)
 export function resetDemo(): void {
   state.demo = createDemoCases()
-}
-
-function knownLiveCases(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(KNOWN_CASES_KEY) ?? '[]') as string[]
-  } catch {
-    return []
-  }
-}
-
-export function rememberLiveCase(caseId: string): void {
-  const ids = new Set(knownLiveCases())
-  ids.add(caseId)
-  try {
-    localStorage.setItem(KNOWN_CASES_KEY, JSON.stringify([...ids]))
-  } catch {
-    /* ignore */
-  }
 }
 
 function demoCase(caseId: string): DemoCase {
@@ -89,6 +62,7 @@ function summarize(report: CaseReport, title: string, customer: string): CaseLis
     creditedZat: report.balances.credited_zat,
     receipt: latest?.result.receipt_state ?? 'NONE',
     chain: obs?.state ?? 'UNAVAILABLE',
+    simulated: obs?.source_kind === 'SIMULATED',
     updatedAt: lastEvent?.at ?? report.case.created_at,
   }
 }
@@ -110,17 +84,13 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const cases = {
   async list(): Promise<CaseListItem[]> {
-    if (state.mode === 'demo') return state.demo.map((c) => summarize(toReport(c), c.title, c.customer))
-    const reports = await Promise.allSettled(knownLiveCases().map((id) => api.report(id)))
-    return reports.flatMap((r) =>
-      r.status === 'fulfilled' ? [summarize(r.value, 'Merchant case', r.value.invoice.invoice_id.slice(0, 8))] : [],
-    )
+    if (session.mode === 'demo') return state.demo.map((c) => summarize(toReport(c), c.title, c.customer))
+    throw new Error('Use the paginated case-list API in live mode.')
   },
 
   async report(caseId: string, verificationId?: string | null): Promise<CaseReport> {
-    if (state.mode === 'demo') return toReport(demoCase(caseId), verificationId)
+    if (session.mode === 'demo') return toReport(demoCase(caseId), verificationId)
     const report = await api.report(caseId, verificationId)
-    rememberLiveCase(report.case.case_id)
     return report
   },
 
@@ -143,7 +113,7 @@ export const cases = {
     caseId: string,
     input: { receiptJson: string | null; rawTxHex: string | null; source: string },
   ): Promise<{ verificationId: string | null; report: VerificationReport }> {
-    if (state.mode === 'live') {
+    if (session.mode === 'live') {
       const stored = await api.submitEvidence(
         caseId,
         {
@@ -166,7 +136,9 @@ export const cases = {
     const at = new Date().toISOString()
     let report: VerificationReport = noReceiptReport
     if (input.receiptJson) {
-      report = input.receiptJson.includes('pNVZw22HvhbkKcYDNV_bo6eMjukjcfaxMDQYOEF1mkI') ? validReport : tamperedReport
+      report = input.receiptJson.includes('pNVZw22HvhbkKcYDNV_bo6eMjukjcfaxMDQYOEF1mkI')
+        ? validReport
+        : tamperedReport
     }
     const n = c.evidence.length + 1
     const evidenceId = demoUuid(`${c.caseId}:evidence:${n}:${at}`)
@@ -186,7 +158,12 @@ export const cases = {
       return { verificationId: null, report }
     }
     const verificationId = demoUuid(`${c.caseId}:verification:${n}:${at}`)
-    c.verifications.push({ verification_id: verificationId, evidence_id: evidenceId, created_at: at, result: report })
+    c.verifications.push({
+      verification_id: verificationId,
+      evidence_id: evidenceId,
+      created_at: at,
+      result: report,
+    })
     c.observations.push({
       observation_id: demoUuid(`${verificationId}:offline`),
       verification_id: verificationId,
@@ -202,7 +179,7 @@ export const cases = {
 
   /** Demo mode records a clearly labelled simulated confirmation. */
   async refreshChain(caseId: string, verificationId: string): Promise<void> {
-    if (state.mode === 'live') {
+    if (session.mode === 'live') {
       await api.refreshChain(caseId, verificationId, idempotencyKey())
       return
     }
@@ -214,6 +191,7 @@ export const cases = {
       verification_id: verificationId,
       state: 'CONFIRMED',
       source: 'Simulated chain source (demo only)',
+      source_kind: 'SIMULATED',
       reason_code: 'CONFIRMATIONS_MET',
       observed_at: at,
       confirmations: 12,
@@ -223,7 +201,7 @@ export const cases = {
   },
 
   async resolve(caseId: string, request: ResolveRequest): Promise<void> {
-    if (state.mode === 'live') {
+    if (session.mode === 'live') {
       await api.resolve(caseId, request, idempotencyKey())
       return
     }
@@ -242,7 +220,13 @@ export const cases = {
         ? [...c.observations].reverse().find((o) => o.verification_id === verification.verification_id)
         : undefined
       if (!verification?.result.output) throw new Error('Pick a verified output before approving.')
-      const balances = evaluate(c.invoiceId, c.terms, verification.result, c.ledger, obs?.state ?? 'UNAVAILABLE')
+      const balances = evaluate(
+        c.invoiceId,
+        c.terms,
+        verification.result,
+        c.ledger,
+        obs?.state ?? 'UNAVAILABLE',
+      )
       if (!balances.eligible_for_credit) {
         throw new Error('This output is not eligible for credit. Check the findings first.')
       }
@@ -253,7 +237,10 @@ export const cases = {
     }
     const nextState: CaseState =
       request.action === 'APPROVE_OUTPUT'
-        ? approvalState(c.ledger.filter((a) => a.invoice_id === c.invoiceId).reduce((sum, a) => sum + a.amount_zat, 0), c.terms.expected_zat)
+        ? approvalState(
+            c.ledger.filter((a) => a.invoice_id === c.invoiceId).reduce((sum, a) => sum + a.amount_zat, 0),
+            c.terms.expected_zat,
+          )
         : request.action === 'REQUEST_EVIDENCE'
           ? 'AWAITING_EVIDENCE'
           : request.action === 'CLOSE_UNRESOLVED'

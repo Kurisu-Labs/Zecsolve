@@ -1,6 +1,6 @@
 # zecsolve teammate guide
 
-**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, dashboard integration with the new case-list API, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status; review/CI/merge still govern completion.
 
 This guide explains the foundation and backend milestones completed through October 12. Use [README.md](README.md) for runnable setup commands.
 
@@ -133,10 +133,10 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 |---|---|---|
 | Person 1 — access | M4.0–M4.2 access foundation, grants and sessions merged | Own shared auth/models/migrations; consumers reuse the same authorization context |
 | Person 2 — reports/export | M4.5/M5 backend merged in PRs #20–#23 | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
-| Person 3 — workflow/integration/release | Listing, submissions and deployment/recovery/export integration merged, including PR #24; live QuickNode fixture/approval evidence recorded, pending review/CI/merge | Own submission services and deployment; consume access contracts and Person 4's built app |
-| Person 4 — all frontend | Complete remaining M6 integration and browser acceptance after resumption | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
+| Person 3 — workflow/integration/release | Listing, submissions and deployment/recovery/export integration merged, including PR #24; live QuickNode fixture/approval evidence merged in PR #27 | Own submission services and deployment; consume access contracts and Person 4's built app |
+| Person 4 — all frontend | Local M6 integration and browser evidence complete; PR #26 published; review/CI/merge pending | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
-These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. The initial frontend is partial; remaining M6 integration/acceptance retains its explicit-resumption gate. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
+These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. Person 4's M6 scope was explicitly resumed on October 12 and is locally integrated/browser-validated; PR #26 is published; review/CI/merge remain pending. See [frontend evidence](docs/frontend.md). No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
 
 Person 3 maintains the [release evidence index](docs/release-evidence.md): recorded A-01–A-15 scenarios, sanitized CI recovery results, offline demo steps and operator/P4/team handoffs. Full M7 remains incomplete until its required gates pass.
 
@@ -152,7 +152,7 @@ Commit source and lockfiles, not `.env`, `.venv`, `.cache`, `target`, or real cu
 
 Read [docs/chain.md](docs/chain.md) before configuring a node. The adapter is composed only from server settings; request bodies cannot supply URLs or trust assertions. New approvals always refresh; a merchant can also refresh an already resolved case with `POST /api/cases/{id}/chain-observations`. Keep the existing observation-v1 snapshot format intact: observation-v2 adds sanitized RPC provenance without changing older decision hashes.
 
-The operator selected QuickNode’s public demo endpoint for M3.1. The [live historical-fixture observation and merchant approval trace](docs/chain.md#recorded-live-run) passed with Zebra 6.4.2 on October 12; evidence review/CI/merge remain required. No new payment was sent. The initial frontend is recorded in PR #12. M4/M5 backend now supplies merchant listing, grants, sessions, claims, scoped reports and replay packets. Browser acceptance and full release validation remain separate gates.
+The operator selected QuickNode’s public demo endpoint for M3.1. The [live historical-fixture observation and merchant approval trace](docs/chain.md#recorded-live-run) passed with Zebra 6.4.2 on October 12; evidence merged in PR #27; final release association remains required. No new payment was sent. The initial frontend is recorded in PR #12. M4/M5 backend now supplies merchant listing, grants, sessions, claims, scoped reports and replay packets. Browser acceptance and full release validation remain separate gates.
 
 ## P2 report/export/replay handoff
 

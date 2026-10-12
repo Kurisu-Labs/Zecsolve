@@ -15,7 +15,7 @@
   --color-line-strong: #3a3a3a;
   --color-snow: #f9f9f9;
   --color-mute: #a3a3a3;
-  --color-faint: #6b6b6b;
+  --color-faint: #858585;
   --color-paper: #fafaf7;
   --color-zec: #fefb30;
   --color-zec-dim: #8f8d1b;
@@ -168,3 +168,19 @@ html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after 
   animation-duration: 1ms !important;
   transition-duration: 1ms !important;
 }
+
+/* Shared accessible workflow forms use the established app tokens. */
+.workflow-page { padding: 2.5rem 0; max-width: 900px; display: grid; gap: 1.5rem; }
+.workflow-page h1 { font-size: var(--step-3); }
+.workflow-page h2 { font-size: var(--step-1); }
+.workflow-card { border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: 1.25rem; display: grid; gap: 1rem; min-width: 0; }
+.workflow-fields { border: 0; padding: 0; display: grid; gap: 1rem; min-width: 0; }
+.workflow-fields label { display: grid; gap: .4rem; }
+.workflow-fields label { min-width: 0; }
+.workflow-fields input:not([type='checkbox']), .workflow-fields select, .workflow-fields textarea { min-width: 0; max-width: 100%; width: 100%; box-sizing: border-box; }
+.workflow-fields label.check { display: flex; gap: .65rem; align-items: baseline; }
+.workflow-fields input[type=checkbox] { accent-color: var(--color-zec); }
+.workflow-page .error { color: var(--color-fail); }
+.workflow-page .mono, .workflow-card p { overflow-wrap: anywhere; }
+.workflow-page .btn { justify-self: start; }
+.workflow-row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }

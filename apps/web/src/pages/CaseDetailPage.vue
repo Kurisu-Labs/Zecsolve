@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import { api, idempotencyKey } from '@/api/client'
 import { cases, session } from '@/api/store'
 import type { CaseReport } from '@/api/types'
 import AuditTimeline from '@/components/case/AuditTimeline.vue'
@@ -31,13 +32,30 @@ async function load(verificationId?: string | null) {
   }
 }
 
+const verifying = ref(false)
+async function verify(evidenceId: string) {
+  verifying.value = true
+  error.value = null
+  try {
+    const result = await api.verify(props.id, evidenceId, idempotencyKey())
+    await load(result.verification_id)
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Verification failed.'
+  } finally {
+    verifying.value = false
+  }
+}
 async function onChanged(message: string) {
   await load()
   notice.value = message
   window.setTimeout(() => (notice.value = null), 4000)
 }
 
-watch(() => props.id, () => load(), { immediate: true })
+watch(
+  () => props.id,
+  () => load(),
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -45,20 +63,28 @@ watch(() => props.id, () => load(), { immediate: true })
     <RouterLink to="/cases" class="back">All cases</RouterLink>
 
     <p v-if="error" class="error" role="alert">{{ error }}</p>
-    <p v-else-if="!report" class="muted">Loading case…</p>
+    <button v-if="error" class="btn" @click="load()">Refresh case and review</button>
+    <p v-if="!report && !error" class="muted">Loading case…</p>
 
-    <template v-else>
+    <template v-if="report && !error">
       <header class="head">
         <div class="titles">
           <h1>{{ meta?.title ?? 'Case' }}</h1>
           <p class="lede">{{ meta?.summary ?? `Invoice ${report.invoice.invoice_id}` }}</p>
           <p class="ids">
             <span>Case <HashText :value="report.case.case_id" :head="8" :tail="4" label="case id" /></span>
-            <span>Invoice <HashText :value="report.invoice.invoice_id" :head="8" :tail="4" label="invoice id" /></span>
+            <span
+              >Invoice <HashText :value="report.invoice.invoice_id" :head="8" :tail="4" label="invoice id"
+            /></span>
           </p>
         </div>
         <div class="head-actions">
-          <RouterLink :to="`/submit/${report.case.case_id}`" class="btn">{{ session.mode === 'demo' ? 'Customer preview' : 'Submit evidence' }}</RouterLink>
+          <RouterLink :to="`/submit/${report.case.case_id}`" class="btn">{{
+            session.mode === 'demo' ? 'Customer preview' : 'Submit evidence'
+          }}</RouterLink>
+          <RouterLink v-if="session.mode === 'live'" :to="`/cases/${id}/grants`" class="btn"
+            >Manage access</RouterLink
+          >
           <RouterLink :to="`/report/${report.case.case_id}`" class="btn">Report</RouterLink>
         </div>
       </header>
@@ -77,9 +103,37 @@ watch(() => props.id, () => load(), { immediate: true })
           </section>
 
           <section class="card">
-            <FindingsList :findings="report.balances.findings" :rules-version="report.balances.rules_version" />
+            <FindingsList
+              :findings="report.balances.findings"
+              :rules-version="report.balances.rules_version"
+            />
           </section>
 
+          <section v-if="session.mode === 'live'" class="card">
+            <h2 class="card-title">Submitted evidence</h2>
+            <p v-if="!report.evidence.length">No evidence submitted.</p>
+            <div v-for="e in report.evidence" :key="e.evidence_id" class="card">
+              <p>{{ e.source }} · {{ e.evidence_id }}</p>
+              <p>
+                Receipt: {{ e.receipt_sha256 ? 'supplied' : 'missing' }}. Raw transaction:
+                {{ e.raw_tx_hex_sha256 ? 'supplied' : 'missing' }}.
+              </p>
+              <button
+                class="btn"
+                :disabled="verifying || ['RESOLVED', 'CLOSED_UNRESOLVED'].includes(report.case.state)"
+                @click="verify(e.evidence_id)"
+              >
+                {{ verifying ? 'Verifying…' : 'Verify evidence' }}
+              </button>
+            </div>
+          </section>
+          <section v-if="report.claims.length" class="card">
+            <h2 class="card-title">Claims (unverified assertions)</h2>
+            <article v-for="claim in report.claims" :key="claim.claim_id">
+              <p>{{ claim.note }}</p>
+              <p class="mono">{{ claim.reported_txid }}</p>
+            </article>
+          </section>
           <section v-if="selected?.result.output" class="card">
             <OutputDetails :output="selected.result.output" :terms="report.invoice.terms" />
           </section>
@@ -113,27 +167,111 @@ watch(() => props.id, () => load(), { immediate: true })
 </template>
 
 <style scoped>
-.page { padding: 2rem 0; display: grid; gap: 1.5rem; }
-.back { color: var(--color-mute); text-decoration: none; font-size: var(--step--1); justify-self: start; }
-.back:hover { color: var(--color-snow); }
-.head { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: flex-end; }
-h1 { font-size: var(--step-4); }
-.lede { color: var(--color-mute); margin-top: 0.6rem; max-width: 60ch; }
-.ids { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 0.9rem; color: var(--color-mute); font-size: var(--step--1); }
-.ids > span { display: inline-flex; align-items: center; gap: 0.4rem; }
-.head-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.page {
+  padding: 2rem 0;
+  display: grid;
+  gap: 1.5rem;
+}
+.back {
+  color: var(--color-mute);
+  text-decoration: none;
+  font-size: var(--step--1);
+  justify-self: start;
+}
+.back:hover {
+  color: var(--color-snow);
+}
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+h1 {
+  font-size: var(--step-4);
+}
+.lede {
+  color: var(--color-mute);
+  margin-top: 0.6rem;
+  max-width: 60ch;
+}
+.ids {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.9rem;
+  color: var(--color-mute);
+  font-size: var(--step--1);
+}
+.ids > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.head-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 .notice {
-  padding: 0.75rem 1rem; border-radius: var(--radius-md); background: var(--color-zec); color: var(--color-ink); font-weight: 550;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-zec);
+  color: var(--color-ink);
+  font-weight: 550;
   animation: drop var(--dur-base) var(--ease-enter);
 }
-.grid { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 1000px) { .grid { grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr); align-items: start; } }
-.main, .side { display: grid; gap: 1.5rem; }
-@media (min-width: 1000px) { .side { position: sticky; top: 88px; } }
-.card { border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: 1.25rem; }
-.card-title { font-size: var(--step-1); margin-bottom: 1rem; }
-.attempts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.muted { color: var(--color-mute); }
-.error { color: var(--color-fail); }
-@keyframes drop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 1000px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+    align-items: start;
+  }
+}
+.main,
+.side {
+  display: grid;
+  gap: 1.5rem;
+}
+@media (min-width: 1000px) {
+  .side {
+    position: sticky;
+    top: 88px;
+  }
+}
+.card {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+.card-title {
+  font-size: var(--step-1);
+  margin-bottom: 1rem;
+}
+.attempts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.muted {
+  color: var(--color-mute);
+}
+.error {
+  color: var(--color-fail);
+}
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 </style>
