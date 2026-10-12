@@ -737,3 +737,80 @@ reports; the retained historical bytes remain unchanged. This metadata-only
 change does not alter any recovery assertion. PR review, current CI and merge
 remain required for task completion; no public deployment or full M7 release is
 claimed.
+
+## Item 24 — M7.2 final release bundle and demo rehearsal
+
+**Owner:** Person 3. **Branch:** `test/m7-final-release-bundle`.
+Started from clean updated main `ded49e1` (merged PR #28). Remote branches were
+fetched and open PRs checked; none overlapped and the remaining P4 branch had no
+commits outside main. Published the task branch before implementation. Items
+01–23 and the previously retained reports remain unchanged.
+
+### Implementation and evidence boundary
+
+`bc0cd95` added a repeatable, asserting three-scenario release rehearsal and
+shared CI artifact registration. `775ca5d` added an authorized public demo export
+and verified its offline replay. Each increment was committed/pushed separately.
+No production application, authorization, schema, contract, chain policy, frontend
+source or browser scenario changed.
+
+`scripts/rehearse_release.py` executes the actual POC, isolated service demo and
+replay CLI. It checks exact candidate balances, blocked offline approval,
+simulated partial credit, identical retry, opaque second-invoice conflict,
+tampered evidence/rejection with zero credit, and temporary-schema cleanup.
+Complete v1/v2, tampered, scoped, missing-version and unsupported-version packets
+must produce the expected six exit/status pairs. Public fixture and license
+hashes must match. Failure removes previous success output and withholds raw
+child diagnostics. The source service demo optionally exports its newly created
+merchant case using the existing authorization/decryption service and checks the
+original receipt/transaction bytes against the public fixture. No private case ID
+or evidence is accepted by this rehearsal.
+
+CI retains the sanitized report and known public/synthetic packet as
+`release-demo-evidence`. The sample contains generated actors/business history
+and explicitly SIMULATED approval; no access token or encryption key is retained.
+The runner replays it before publication. Separately, the existing deployed
+browser/recovery job proves HTTP export authorization and exact history across
+restart/restore. Service export is not mislabeled as browser/HTTP execution.
+
+The [technical bundle](release-bundle.md), machine inventory and E-10–E-13 in the
+[release index](release-evidence.md) pin candidate `775ca5d`, all fifteen
+acceptance rows, exact jobs, UTC times, environments, verified artifact ZIP/member
+hashes, a repeatable demo cue sheet, limitations and attribution. Follow-up
+commits assemble documentation/evidence only. The historical M3.1 source is an
+ancestor and its backend/migration/verifier/contracts/live-runner files have no
+diff to this candidate. This is an explicit association of the existing live
+result, not a fresh RPC call, new payment or live browser test.
+
+### Validation
+
+- Local lint/format passed. Six focused runner/demo checks passed, including
+  failure/timeout/malformed child output privacy, stale-success removal, real
+  three-scenario execution and authorized public export/replay.
+- `make test-db` passed 237 PostgreSQL tests on a fresh PostgreSQL 17.11 instance.
+  The test instance had zero remaining demo schemas and was stopped afterwards.
+- `make test` passed 12 Rust tests; local Python had 280 passes and five existing
+  macOS 0.2-second process/address timeout failures. This is not a local full-suite
+  pass. As in prior items, production timeouts and tests were not weakened.
+- The first clean runner revision `bc0cd95` passed locally at
+  2026-10-12 15:22:42.267479–15:22:43.695972 UTC on macOS 27.0.1 arm64,
+  Python 3.12.14, Rust 1.99.0 and PostgreSQL 17.11. That run predates the authorized
+  export addition and is not presented as final-candidate export evidence.
+- Linux CI at clean `775ca5d` passed lint, 12 Rust + 285 non-database Python +
+  237 PostgreSQL tests, POC and the release rehearsal. Web passed 8 unit tests,
+  generated-contract drift and production build/typecheck. Packaged deployment
+  passed 26 groups, including eight browser cases and four export/replay recovery
+  checkpoints. The separate simulated browser case passed with zero skips/retries.
+  Exact source jobs and unchanged reports are recorded in E-10–E-13.
+- The retained authorized sample was also replayed locally as `0/REPRODUCED`;
+  original public components and SHA-256 matched, and raw credential/key fields
+  were absent. Evidence inventory, documentation links, preserved historical
+  bytes and `git diff --check` were checked before publication.
+
+README, PRD, assignment board and current handoff/security pages now acknowledge
+merged PR #28 and recorded M3.1/M6 work. Full M7 remains incomplete: actual target
+controls, reviewed P4 screenshots, genuine discovery notes, presentation/demo
+recording and team submission evidence are still outstanding. Private-customer
+retention/purge remains a separate prerequisite. This task does not deploy,
+contact anyone, submit to an event or fabricate missing evidence. PR review,
+current CI and merge remain required for this slice's completion.

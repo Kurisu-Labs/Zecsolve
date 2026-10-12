@@ -48,10 +48,9 @@ The reproduction procedure, environment variables and platform limits are in [ap
 browser evidence above. Its foundation, web and container checks passed; those
 checks did not yet execute Playwright.
 
-Person 3 owns [browser CI and deployment integration](browser-ci.md) on
-`test/m7-browser-release-integration`: repeat the eight offline scenarios through
-the actual packaged nginx ingress, run the simulated scenario separately, and
-retain sanitized evidence. Both Linux CI compositions passed at `7d4ffcf`;
+Person 3's [browser CI and deployment integration](browser-ci.md) merged in
+PR #28: it repeats the eight offline scenarios through the actual packaged nginx
+ingress, runs the simulated scenario separately, and retains sanitized evidence. Both Linux CI compositions passed at `7d4ffcf`;
 see E-07/E-08 in the [release evidence index](release-evidence.md). This consumes
 P4’s suite and does not transfer UI ownership. M3.1 live evidence merged in PR #27. Operator deployment, reviewed UI
 screenshots, retention/deletion for private-customer use and the assembled final

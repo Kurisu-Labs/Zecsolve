@@ -1,14 +1,18 @@
 # M7.2 release evidence index
 
-Person 3 maintains this index. Current integration baseline:
-`8e8843dce410aaed30e10d960af5de2c857e0edd`, the merge of
-[PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26) on October 12, 2026.
-M4/M5 and backend deployment/recovery/export are merged; PR #25's evidence
-consolidation is in main. **M3.1 live evidence merged in PR #27 and P4's frontend
-implementation/browser evidence merged in PR #26. Full release remains incomplete.**
-P3’s browser CI and packaged deployment rehearsal passed on
-`test/m7-browser-release-integration` (E-07–E-09); review/CI/merge of this slice and
-the operator/team/final-bundle handoffs remain below.
+Person 3 maintains this index. The merged integration baseline is
+`ded49e1f6a38cd3d88bc475ed8c688dcf4acec9f`, the merge of
+[PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28) on October 12, 2026.
+M4/M5, live M3.1 (PR #27), P4 browser implementation (PR #26), and P3 packaged
+browser CI/recovery integration (PR #28) are merged. PR #25's evidence changes
+are in main; its GitHub state remains closed, not merged.
+
+The [technical release bundle and demo runbook](release-bundle.md) pin candidate
+`775ca5d80956a79c836e9cccd209f26025af310a`, retain fresh demo/browser/recovery
+reports and an authorized public/synthetic sample, and associate the historical
+live trace without rewriting it. E-10–E-13 identify this candidate's runs.
+**Full release remains incomplete:** operator deployment, reviewed screenshots,
+team artifacts and this slice's PR/CI/merge gate remain explicit.
 
 This index preserves separately attributed historical, simulated, live and
 browser runs. A result applies to its recorded revision and environment; it is
@@ -36,6 +40,10 @@ Times are UTC; later browser/live runs have separate entries.
 | E-07 | `uv run --locked python scripts/check_deployment.py --recovery --browser`: 26 check groups passed, including all 8 offline browser scenarios through packaged nginx/TLS and all four export/replay recovery checkpoints | Clean `7d4ffcf49a4b9348be4c2034b1a2614f2ec6fa9e`; [container job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38264285389/job/114862387139), October 12 14:40:20–14:45:32 UTC; browser 14:42:26.771594–14:43:35.849717. Linux 6.17 x86_64, Python 3.14.8, Node 24.21.0, Playwright 1.64.0 Chromium, Docker 28.0.4, PostgreSQL 17. [Retained JSON](evidence/m7-browser-recovery-7d4ffcf.json). |
 | E-08 | `uv run --locked python scripts/browser_acceptance.py --simulated-chain`: 1 simulated approval/retry/cross-invoice conflict browser scenario passed, zero skips/retries | Same clean `7d4ffcf`; [simulated browser job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38264285335/job/114862387270), October 12 14:39:10.486977–14:39:15.673935 UTC. Linux 6.17 x86_64, Python 3.14.8, Node 24.21.0, Playwright 1.64.0 Chromium, PostgreSQL 17, Rust 1.99.0. [Retained JSON](evidence/m7-browser-simulated-7d4ffcf.json). No live confirmation. |
 | E-09 | `make lint`, `make test`, `make test-db`, `make poc`: passed, 12 Rust + 281 Python + 236 PostgreSQL tests. Frontend: 8 unit tests, generated-contract drift and build/typecheck passed | Same `7d4ffcf`; [foundation job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38264285335/job/114862387291) and [web job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38264285335/job/114862386925), October 12, Ubuntu/Python 3.14/Node 24/Rust 1.99.0. The native macOS timing failures remain recorded in [Item 23](DEVELOPMENT.md#item-23--m7-browser-ci-and-release-integration). |
+| E-10 | Candidate `775ca5d`: lint, 12 Rust + 285 non-database Python + 237 PostgreSQL tests and POC passed; 8 frontend unit tests, generated-contract drift and production build/typecheck passed | [Foundation job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805166), 2026-10-12T15:29:50Z–2026-10-12T15:33:02Z; [web job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805398). Linux CI, Python 3.14, Rust 1.99, Node 24, PostgreSQL 17. Full candidate links in the [bundle inventory](evidence/m7-release-bundle.json). |
+| E-11 | `uv run --locked python scripts/rehearse_release.py`: all three PRD demo scenes, authorized public/synthetic export `0/REPRODUCED`, six replay variants, fixture/license hashes and schema cleanup passed | Same clean `775ca5d`; [foundation job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805166), 2026-10-12T15:32:54.790387+00:00–2026-10-12T15:32:58.373334+00:00; Linux-6.17.0-1022-azure-x86_64-with-glibc2.39, Python 3.14.8, PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2). [Report](evidence/m7-demo-775ca5d.json), [authorized public sample](evidence/m7-public-demo-packet-775ca5d.json). Service/CLI rehearsal, explicitly simulated credit; no live RPC. |
+| E-12 | `uv run --locked python scripts/check_deployment.py --recovery --browser`: 26 groups, eight packaged-nginx/TLS browser scenarios and four authorized export/replay recovery checkpoints passed | Same clean `775ca5d`; [container job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655845/job/114883805973), 2026-10-12T15:29:51Z–2026-10-12T15:35:39Z; report 2026-10-12T15:35:33.863901+00:00. [Retained JSON](evidence/m7-browser-recovery-775ca5d.json). Disposable deployment, public/synthetic inputs; no live confirmation. |
+| E-13 | Separate simulated approval/retry/conflict browser scenario passed with zero skips/retries | Same clean `775ca5d`; [simulated browser job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805501), 2026-10-12T15:31:16.438762+00:00–2026-10-12T15:31:21.570898+00:00. [Retained JSON](evidence/m7-browser-simulated-775ca5d.json). Test-only simulated observer; no live confirmation. |
 
 E-02's retained JSON is the byte-for-byte `recovery-result.json` member of
 GitHub artifact **11732947385**, named `backend-recovery-evidence`, from run
@@ -74,10 +82,39 @@ project status. The current harness labels this `outside_recovery_scope`; E-07's
 outer browser result and E-05 supply separately attributed browser/live proof.
 Neither file establishes target-specific operator controls or the complete release.
 
+
+### Candidate bundle artifact provenance
+
+E-11–E-13 retain the CI artifact members byte-for-byte at clean `775ca5d`.
+Each downloaded ZIP matched GitHub's reported SHA-256 before extraction. The
+[machine-readable bundle](evidence/m7-release-bundle.json) records artifact IDs,
+ZIP/member hashes, exact jobs, revisions, timestamps and remaining handoffs.
+
+| Artifact / run | ZIP SHA-256 | Report SHA-256 |
+|---|---|---|
+| `11757460625` / `38270655846` / `release-demo-evidence` | `625123dea7bcced1fe689775a1dc4ee9d094f6cf25fd9c081253db50372790b6` | `b054ea2ce43db47886e1822fcf257fb70e69deb4202a4aa438bdac19d4c7aa47` |
+| `11756552514` / `38270655846` / `browser-simulated-evidence` | `d3b3c2ae442dc13d1eb12dc4085396269b268922c5fb1d2dec5a00bf1624db65` | `49094b36c8a60b67933eb25a171a84240baf94de63045826416b02d225ae65fb` |
+| `11757510978` / `38270655845` / `backend-recovery-evidence` | `212352233b72c8ae180f486848bbaac7e67bd6f1c0ab80a37c0c8c83765a3902` | `776b223ed53598945f39804c6876323649379113d186c4bb0564876ddbc6f5f1` |
+
+The E-11 ZIP also contains the authorized public demo packet, SHA-256
+`71fe7a47e1f6842657757ac4abf91ac9add271fac1d299a7c2d9a517374c4c4a`. It is the output of the ordinary
+merchant export service over a newly created synthetic case, preserving the exact
+public receipt/transaction bytes. Its invoice, actors, timestamps and approval
+history are demo data; confirmation is explicitly `SIMULATED`. No access tokens,
+encryption keys, private customer packets or raw logs are retained. Local replay
+of this unchanged sample must return `0/REPRODUCED`.
+
+The candidate adds no application/schema/verifier changes since E-05's live run;
+[the bundle](release-bundle.md#candidate-and-provenance) records the ancestry and
+unchanged paths. Live inclusion was not rerun here. Full M7 remains incomplete.
+
 ## A-01–A-15 traceability
 
-Every row below has recorded backend evidence, with E-01 identifying the full
-unit/database execution and E-02 identifying runtime checks. Named tests are
+Every row below has recorded backend evidence. E-01/E-02 identify historical
+unit/database and runtime checks; E-10 repeats the full suites at the pinned
+candidate, E-11 adds the asserted demo/export, and E-12/E-13 repeat browser/recovery.
+The [candidate matrix](release-bundle.md#acceptance-coverage-at-this-candidate) maps
+all fifteen outcomes to that execution without relabeling historical runs. Named tests are
 entry points within those runs, not newly claimed individual executions. To
 repeat one, use `uv run --locked pytest path/to/test_file.py::test_name`; database
 tests also require `ZECSOLVE_TEST_DATABASE_URL` for a disposable PostgreSQL
@@ -85,23 +122,29 @@ database. Preserve the full-suite command/result when using E-01 as evidence.
 
 | ID | Demonstrated backend outcome and exact scenario | Evidence | Outstanding acceptance / owner |
 |---|---|---|---|
-| A-01 | Public Orchard fixture recovers 100,000 zatoshis; offline state remains unavailable. [test_verifier.py](../apps/api/tests/test_verifier.py): `test_mainnet_fixture_recovers_expected_fields`; E-02 public-fixture check. | E-01, E-02, E-05, E-07 | M3.1 merged in PR #27. P3 associates its recorded live revision and the final release bundle. |
+| A-01 | Public Orchard fixture recovers 100,000 zatoshis; offline state remains unavailable. [test_verifier.py](../apps/api/tests/test_verifier.py): `test_mainnet_fixture_recovers_expected_fields`; E-02 public-fixture check. | E-01, E-02, E-05, E-07 | M3.1 merged in PR #27; its unchanged implementation is associated in the candidate bundle, not rerun as fresh inclusion. |
 | A-02 | Tampered OCK has no recovered output; txid/output-index failures stay distinct. [test_verifier.py](../apps/api/tests/test_verifier.py): `test_tampered_ock_is_invalid_without_recovered_fields`, `test_distinct_failure_reasons`; [demo test](../apps/api/tests/test_resolution_demo.py): `test_isolated_demo_uses_real_recovery_and_labels_simulated_credit` checks tampered approval denial. | E-01, E-07 | E-06 records tampered/missing browser evidence with zero credit; E-07 repeats it through nginx CI. |
 | A-03 | Unapproved 100,000 on a synthetic 200,000 invoice gives 0 credited, 200,000 outstanding, 100,000 candidate/projected outstanding. [test_rules.py](../apps/api/tests/test_rules.py): `test_unapproved_recovery_is_only_a_projection`; [test_verification_api.py](../apps/api/tests/test_verification_api.py): `test_authenticated_invoice_to_evidence_verification_and_report`. | E-01, E-07 | E-06 records the actual-backend first workflow; E-07 repeats it through nginx CI. |
-| A-04 | Synthetic 600,000 + 400,000 approvals cover 1,000,000. [test_resolution_safety.py](../apps/api/tests/test_resolution_safety.py): `test_two_synthetic_outputs_accumulate_to_full_balance`. These are synthetic accounting inputs. | E-01 | Backend scenario demonstrated; P3 retains its reference in the final revision's evidence. |
+| A-04 | Synthetic 600,000 + 400,000 approvals cover 1,000,000. [test_resolution_safety.py](../apps/api/tests/test_resolution_safety.py): `test_two_synthetic_outputs_accumulate_to_full_balance`. These are synthetic accounting inputs. | E-01 | Repeated in the candidate foundation suite (E-10); synthetic inputs remain labeled. |
 | A-05 | Same-output/key retries preserve the original decision and add no credit; recovery preserves accepted retries. [test_resolutions.py](../apps/api/tests/test_resolutions.py): `test_simulated_partial_approval_and_semantic_replay_are_atomic`; E-02 crash/database/restore retry groups. | E-01, E-02, E-07, E-08 | E-06 records evidence/noncredit retries and separate simulated approval retry; E-07/E-08 run both CI compositions. |
-| A-06 | One winner for competing invoices; same-invoice concurrency commits once; conflict is opaque. [test_resolution_safety.py](../apps/api/tests/test_resolution_safety.py): `test_concurrent_two_invoices_one_output_has_one_winner_and_opaque_conflict`, `test_concurrent_same_output_same_invoice_commits_once`. | E-01; E-02 restored uniqueness, E-08 | E-06 records the simulated cross-invoice conflict; E-08 repeats its isolated CI case; P3 retains the final demo trace. |
-| A-07 | Distinct output identities in one transaction allocate independently using synthetic rows. [test_postgres.py](../apps/api/tests/test_postgres.py): `test_two_outputs_in_one_transaction_can_be_allocated`. | E-01 | Backend scenario demonstrated; P3 retains its reference in the final revision's evidence. |
-| A-08 | Missing, unsupported, unavailable and execution-error outcomes remain distinct from invalid evidence. [test_verifier.py](../apps/api/tests/test_verifier.py): `test_missing_evidence_and_missing_binary_are_not_invalid`, `test_unknown_consensus_branch_is_unsupported`, `test_invalid_transaction_data_does_not_accuse_receipt`, `test_subprocess_is_bounded`; [test_persisted_verification.py](../apps/api/tests/test_persisted_verification.py): `test_unsuccessful_attempts_are_persisted_honestly`. | E-01, E-07 | E-06 records missing/tampered/offline displays; E-05 records actual-source behavior. Final acceptance still preserves each negative backend outcome. |
-| A-09 | Receiver/reference mismatch blocks eligibility; overpayment requires review. [test_rules.py](../apps/api/tests/test_rules.py): `test_recipient_and_memo_mismatch_block_matching`, `test_missing_reference_requires_review_without_unique_receiver`, `test_overpayment_requires_review`; [test_decision_rules.py](../apps/api/tests/test_decision_rules.py): `test_approval_gates_preserve_memo_overpayment_and_allocation_rules`. | E-01 | E-06 records candidate/partial-payment displays; retain remaining policy scenarios and reviewed UI evidence in the final bundle. |
+| A-06 | One winner for competing invoices; same-invoice concurrency commits once; conflict is opaque. [test_resolution_safety.py](../apps/api/tests/test_resolution_safety.py): `test_concurrent_two_invoices_one_output_has_one_winner_and_opaque_conflict`, `test_concurrent_same_output_same_invoice_commits_once`. | E-01; E-02 restored uniqueness, E-08 | E-06 records the simulated cross-invoice conflict; E-08 repeats its isolated CI case; E-11 retains the candidate demo trace and E-13 repeats browser conflict. |
+| A-07 | Distinct output identities in one transaction allocate independently using synthetic rows. [test_postgres.py](../apps/api/tests/test_postgres.py): `test_two_outputs_in_one_transaction_can_be_allocated`. | E-01 | Repeated in the candidate foundation suite (E-10); synthetic inputs remain labeled. |
+| A-08 | Missing, unsupported, unavailable and execution-error outcomes remain distinct from invalid evidence. [test_verifier.py](../apps/api/tests/test_verifier.py): `test_missing_evidence_and_missing_binary_are_not_invalid`, `test_unknown_consensus_branch_is_unsupported`, `test_invalid_transaction_data_does_not_accuse_receipt`, `test_subprocess_is_bounded`; [test_persisted_verification.py](../apps/api/tests/test_persisted_verification.py): `test_unsuccessful_attempts_are_persisted_honestly`. | E-01, E-07 | E-06 records missing/tampered/offline displays; E-05 records actual-source behavior. E-10 repeats the negative backend outcomes at the candidate. |
+| A-09 | Receiver/reference mismatch blocks eligibility; overpayment requires review. [test_rules.py](../apps/api/tests/test_rules.py): `test_recipient_and_memo_mismatch_block_matching`, `test_missing_reference_requires_review_without_unique_receiver`, `test_overpayment_requires_review`; [test_decision_rules.py](../apps/api/tests/test_decision_rules.py): `test_approval_gates_preserve_memo_overpayment_and_allocation_rules`. | E-01 | E-06 records candidate/partial-payment displays; E-10 repeats policy tests; reviewed UI screenshots remain a P4 handoff. |
 | A-10 | Offline approval is denied and request fields cannot invent chain trust. [test_resolutions.py](../apps/api/tests/test_resolutions.py): `test_offline_approval_is_blocked_without_partial_decision`; [test_verification_api.py](../apps/api/tests/test_verification_api.py): `test_verification_and_report_require_ownership_and_reject_chain_spoofing`. RPC regression tests use synthetic responses; E-05 separately proves a real authorized refresh/approval and identical retries. | E-01, E-02, E-05 | M3.1 evidence merged in PR #27. Ongoing deployment requires explicit operator RPC configuration. |
 | A-11 | Merchant isolation and customer/reviewer read/write/export scopes enforced. [test_resolution_safety.py](../apps/api/tests/test_resolution_safety.py): `test_foreign_merchant_and_wrong_case_cannot_decide`; [test_reviewer_reports.py](../apps/api/tests/test_reviewer_reports.py): `test_route_role_matrix_and_exact_component_response`; [test_exports.py](../apps/api/tests/test_exports.py): `test_export_http_permission_matrix_and_download_contract`. | E-01, E-02 scoped HTTPS checkpoints, E-07 | E-06 records all-role browser scenarios; E-07 repeats them through nginx CI. |
 | A-12 | Expiry/revocation and evidence consent enforced, including after restore. [test_grants.py](../apps/api/tests/test_grants.py): `test_grant_authentication_checks_expiry_revocation_and_role`, `test_reviewer_selection_requires_actual_sharing_consent`; [test_exports.py](../apps/api/tests/test_exports.py): `test_revocation_during_export_decryption_prevents_disclosure`. | E-01, E-02 restored customer/reviewer revocation, E-07 | E-06 records disclosure, consent, revocation and session screens; final UI evidence must retain downloaded-copy limits. |
 | A-13 | Authorized packets preserve exact components and historical context; scoped exports remain limited; concurrent export stays consistent; tampering fails. [test_exports.py](../apps/api/tests/test_exports.py): `test_merchant_export_replays_current_claim_consent_and_exact_evidence`, `test_export_snapshot_does_not_mix_concurrent_approval`; [test_replay.py](../apps/api/tests/test_replay.py): `test_real_recovery_and_both_historical_rules_reproduce_without_network`. | E-01, E-02 all four export/replay checkpoints, E-04, E-07 | E-06 records reviewer/merchant downloads and real replay; E-07 repeats deployed browser export and the four recovery checkpoints. |
-| A-14 | Failed decisions leave no business rows; stale concurrent review is rejected; invoice/event history stays immutable. [test_resolution_safety.py](../apps/api/tests/test_resolution_safety.py): `test_failed_decision_rolls_back_all_business_records_but_keeps_refresh`, `test_different_outputs_serialize_and_require_fresh_review_before_overpayment`; [test_postgres.py](../apps/api/tests/test_postgres.py): `test_snapshots_and_events_reject_edits`. | E-01, E-02 migration/restore invariants, E-07 | E-06 records stale-version renewed review. P3 retains the final evidence reference; correction/version linkage remains outside P0. |
+| A-14 | Failed decisions leave no business rows; stale concurrent review is rejected; invoice/event history stays immutable. [test_resolution_safety.py](../apps/api/tests/test_resolution_safety.py): `test_failed_decision_rolls_back_all_business_records_but_keeps_refresh`, `test_different_outputs_serialize_and_require_fresh_review_before_overpayment`; [test_postgres.py](../apps/api/tests/test_postgres.py): `test_snapshots_and_events_reject_edits`. | E-01, E-02 migration/restore invariants, E-07 | E-06 records stale-version renewed review. E-10/E-12 retain the candidate evidence; correction/version linkage remains outside P0. |
 | A-15 | Actual TLS, request/process limits, disabled public POC/docs, readiness recovery and secret-canary log checks pass; restart/restore/export can be repeated. [Deployment procedure](deployment.md), [recovery checks and limits](recovery.md#what-is-exercised), [harness](../scripts/check_deployment.py). | E-01 deployment regressions, E-02, E-07 | E-06 records safe text rendering/keyboard/mobile/axe. E-07 repeats deployment/browser checks; operator controls and final demo/artifacts remain below. |
 
 ## Repeatable demonstrations without RPC
+
+The [release runner and cue sheet](release-bundle.md#reproduce-the-three-scenario-demo)
+assert these three PRD scenes plus the authorized public sample and six replay
+outcomes in one command: `uv run --locked python scripts/rehearse_release.py`.
+It requires disposable PostgreSQL and writes a sanitized report plus a known
+public/synthetic packet; it does not contact RPC or replace browser acceptance.
 
 Run from the repository root. Install the [README prerequisites](../README.md#run-the-proof-of-concept)
 and run `make setup` first; initial dependency installation can use the network.
@@ -180,10 +223,10 @@ Add `--browser` after installing the [browser CI prerequisites](browser-ci.md) t
 
 | Gate / owner | Evidence required to close it | Current state |
 |---|---|---|
-| M3.1 / operator + P3 | Operator selected the QuickNode public demo endpoint. E-05 records node/version/method compatibility, bound fixture/network/block/confirmation facts, freshness and the ordinary merchant approval trace. Follow [chain.md](chain.md#recorded-live-run). | Done for the recorded M3.1 run: PR #27 merged. Public demo availability is not an operating guarantee; final revision association remains explicit. |
-| M6 and full M7.1 / P4, then P3 | P4 provides actual-backend merchant/customer/reviewer browser results, retry/conflict/session/negative paths, authorized export download, keyboard/responsive checks and screenshots. P3 associates them with the same-origin deployed revision and integrates deployment/CI changes if required. | P4 implementation/browser evidence merged in PR #26 (E-06). P3’s deployed browser/recovery and simulated CI passed (E-07/E-08); integration PR review/merge and reviewed UI screenshots remain handoffs. |
+| M3.1 / operator + P3 | Operator selected the QuickNode public demo endpoint. E-05 records node/version/method compatibility, bound fixture/network/block/confirmation facts, freshness and the ordinary merchant approval trace. Follow [chain.md](chain.md#recorded-live-run). | Done for the recorded M3.1 run: PR #27 merged. Public demo availability is not an operating guarantee; candidate association is recorded in [release-bundle.md](release-bundle.md#candidate-and-provenance). |
+| M6 and full M7.1 / P4, then P3 | P4 provides actual-backend merchant/customer/reviewer browser results, retry/conflict/session/negative paths, authorized export download, keyboard/responsive checks and screenshots. P3 associates them with the same-origin deployed revision and integrates deployment/CI changes if required. | P4 implementation/browser evidence merged in PR #26 (E-06). P3 deployed browser/recovery and simulated CI merged in PR #28 (E-07/E-08), repeated at the bundle candidate (E-12/E-13). Reviewed UI screenshots remain a P4 handoff. |
 | Operator deployment / operator + P3 | Record the actual target/image revision, TLS and access provisioning, volume encryption, external evidence/backup key custody, backup/recovery point and restore procedure. Confirm the recovery limitations and reconcile revocations newer than any restored backup. | Disposable-container evidence exists; target-specific operator confirmation outstanding. No production backup, PITR or recovery-time guarantee is claimed. |
-| Final acceptance/demo / P3 + team | Collect the final revision's test/CI results, all scenario outcomes, live trace, authorized packet/replay evidence, P4 screenshots and a repeatable demo with known limitations and attribution. Identify every public, synthetic, simulated and live input. | Evidence index and offline procedures available; assembled final release bundle incomplete. |
+| Final acceptance/demo / P3 + team | Collect the final revision's test/CI results, all scenario outcomes, live trace, authorized packet/replay evidence, P4 screenshots and a repeatable demo with known limitations and attribution. Identify every public, synthetic, simulated and live input. | Technical bundle, A-01–A-15 references, asserted three-scenario demo and authorized public/synthetic sample assembled at the pinned candidate (E-10–E-13). This slice still requires PR review/CI/merge; target evidence, screenshots and team artifacts keep full release incomplete. |
 | Discovery and submission / team lead + team; P3 indexes supplied artifacts | Two actual merchant/payment-provider discovery notes including negative feedback/evidence availability; English presentation/demo artifacts and team-managed registration/submission confirmation per PRD. | Team-supplied artifacts not yet recorded here. No outreach or submission is implied by this task. |
 | Private-customer pilot / operator + team | Document retention/deletion across originals, derived fields, claims/decisions and backups, with an authorized purge process consistent with immutable history. | Separate prerequisite before private-customer use; not required to run the public-fixture demonstration. |
 

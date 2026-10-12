@@ -1,0 +1,336 @@
+{
+  "schema_version": "release-bundle-v1",
+  "owner": "Person 3",
+  "candidate_revision": "775ca5d80956a79c836e9cccd209f26025af310a",
+  "base_merge_revision": "ded49e1f6a38cd3d88bc475ed8c688dcf4acec9f",
+  "release_complete": false,
+  "public_deployment_performed": false,
+  "live_rpc_rerun": false,
+  "assembly_status": "technical evidence assembled; review/CI/merge required",
+  "ci_jobs": [
+    {
+      "id": 114883805166,
+      "name": "foundation",
+      "conclusion": "success",
+      "started_at": "2026-10-12T15:29:50Z",
+      "completed_at": "2026-10-12T15:33:02Z",
+      "html_url": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805166"
+    },
+    {
+      "id": 114883805398,
+      "name": "web",
+      "conclusion": "success",
+      "started_at": "2026-10-12T15:29:50Z",
+      "completed_at": "2026-10-12T15:30:03Z",
+      "html_url": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805398"
+    },
+    {
+      "id": 114883805501,
+      "name": "browser-simulated",
+      "conclusion": "success",
+      "started_at": "2026-10-12T15:29:50Z",
+      "completed_at": "2026-10-12T15:31:26Z",
+      "html_url": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805501"
+    },
+    {
+      "id": 114883805973,
+      "name": "container-smoke",
+      "conclusion": "success",
+      "started_at": "2026-10-12T15:29:51Z",
+      "completed_at": "2026-10-12T15:35:39Z",
+      "html_url": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655845/job/114883805973"
+    }
+  ],
+  "foundation_evidence": {
+    "evidence_id": "E-10",
+    "job": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805166",
+    "counts": {
+      "rust": 12,
+      "python_non_database": 285,
+      "postgres": 237
+    },
+    "commands": [
+      "make lint",
+      "make test",
+      "make test-db",
+      "make poc"
+    ],
+    "web_job": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38270655846/job/114883805398",
+    "web_unit_tests": 8,
+    "web_contract_drift": "passed",
+    "web_build": "passed"
+  },
+  "artifacts": [
+    {
+      "id": 11757460625,
+      "name": "release-demo-evidence",
+      "run_id": 38270655846,
+      "zip_sha256": "625123dea7bcced1fe689775a1dc4ee9d094f6cf25fd9c081253db50372790b6",
+      "path": "docs/evidence/m7-demo-775ca5d.json",
+      "sha256": "b054ea2ce43db47886e1822fcf257fb70e69deb4202a4aa438bdac19d4c7aa47",
+      "recorded_at": "2026-10-12T15:32:58.373334+00:00",
+      "evidence_id": "E-11",
+      "recorded_revision": "775ca5d80956a79c836e9cccd209f26025af310a",
+      "classification": "public fixture and synthetic application data; explicitly simulated credit only in isolated test compositions",
+      "environment": {
+        "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.14.8",
+        "rust": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "postgres": "17.11 (Debian 17.11-1.pgdg12+2)"
+      }
+    },
+    {
+      "id": 11756552514,
+      "name": "browser-simulated-evidence",
+      "run_id": 38270655846,
+      "zip_sha256": "d3b3c2ae442dc13d1eb12dc4085396269b268922c5fb1d2dec5a00bf1624db65",
+      "path": "docs/evidence/m7-browser-simulated-775ca5d.json",
+      "sha256": "49094b36c8a60b67933eb25a171a84240baf94de63045826416b02d225ae65fb",
+      "recorded_at": "2026-10-12T15:31:21.570898+00:00",
+      "evidence_id": "E-13",
+      "recorded_revision": "775ca5d80956a79c836e9cccd209f26025af310a",
+      "classification": "public fixture and synthetic application data; explicitly simulated credit only in isolated test compositions",
+      "environment": {
+        "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.14.8"
+      }
+    },
+    {
+      "id": 11757510978,
+      "name": "backend-recovery-evidence",
+      "run_id": 38270655845,
+      "zip_sha256": "212352233b72c8ae180f486848bbaac7e67bd6f1c0ab80a37c0c8c83765a3902",
+      "path": "docs/evidence/m7-browser-recovery-775ca5d.json",
+      "sha256": "776b223ed53598945f39804c6876323649379113d186c4bb0564876ddbc6f5f1",
+      "recorded_at": "2026-10-12T15:35:33.863901+00:00",
+      "evidence_id": "E-12",
+      "recorded_revision": "775ca5d80956a79c836e9cccd209f26025af310a",
+      "classification": "public fixture and synthetic application data; explicitly simulated credit only in isolated test compositions",
+      "environment": {
+        "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.14.8"
+      }
+    },
+    {
+      "evidence_id": "E-11-packet",
+      "path": "docs/evidence/m7-public-demo-packet-775ca5d.json",
+      "sha256": "71fe7a47e1f6842657757ac4abf91ac9add271fac1d299a7c2d9a517374c4c4a",
+      "recorded_revision": "775ca5d80956a79c836e9cccd209f26025af310a",
+      "recorded_at": "2026-10-12T15:32:58.373334+00:00",
+      "classification": "authorized public-fixture service export; synthetic business history; SIMULATED observation",
+      "source_evidence": "E-11",
+      "replay": {
+        "packet_file": "release-demo-packet.json",
+        "sha256": "71fe7a47e1f6842657757ac4abf91ac9add271fac1d299a7c2d9a517374c4c4a",
+        "exit_code": 0,
+        "status": "REPRODUCED",
+        "boundary": "authorized merchant export service",
+        "inputs": "exact public fixture; synthetic invoice; SIMULATED approval history"
+      }
+    },
+    {
+      "evidence_id": "E-05",
+      "path": "docs/evidence/m3-live-f8a594f.json",
+      "sha256": "c7e9c885978313878a97c31a6c986f26339d9d8768b77ac27845e29d0486c2b1",
+      "recorded_revision": "f8a594fa7364a47fd94d961054b1f88429195b90",
+      "recorded_at": "2026-10-12T13:23:30.760930+00:00",
+      "classification": "public historical mainnet receipt; synthetic invoice; real QuickNode public-demo RPC observation and merchant approval",
+      "source": "https://github.com/Kurisu-Labs/zecsolve/pull/27",
+      "rerun_for_this_bundle": false
+    }
+  ],
+  "live_association": {
+    "ancestor_verified": true,
+    "unchanged_paths": [
+      "apps/api/src",
+      "apps/api/migrations",
+      "crates",
+      "contracts",
+      "Cargo.toml",
+      "Cargo.lock",
+      "scripts/validate_live_chain.py"
+    ],
+    "limit": "Historical source result; not fresh confirmation or a live browser/ingress run"
+  },
+  "acceptance": [
+    {
+      "id": "A-01",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-12",
+        "E-05"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-02",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-03",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-04",
+      "automated_evidence": [
+        "E-10"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-05",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-12",
+        "E-13"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-06",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-13"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-07",
+      "automated_evidence": [
+        "E-10"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-08",
+      "automated_evidence": [
+        "E-10",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-09",
+      "automated_evidence": [
+        "E-10",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-10",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-05"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-11",
+      "automated_evidence": [
+        "E-10",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-12",
+      "automated_evidence": [
+        "E-10",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-13",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-11-packet",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-14",
+      "automated_evidence": [
+        "E-10",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    },
+    {
+      "id": "A-15",
+      "automated_evidence": [
+        "E-10",
+        "E-11",
+        "E-12"
+      ],
+      "required_behavior": "docs/PRD.md#131-acceptance-scenarios--required-outcomes-not-reported-passes"
+    }
+  ],
+  "attribution": [
+    {
+      "path": "fixtures/manifest.json",
+      "sha256": "000b9b9fdd7da9ab88144abf95e9b2ca6b4558df285b92516c5f1f3ace121833"
+    },
+    {
+      "path": "third_party/glasspane/LICENSE",
+      "sha256": "44f231cab575574d56d6382686ffa28d88d3331352cde5cc45a7e651995feb25"
+    }
+  ],
+  "remaining_handoffs": [
+    {
+      "id": "review-merge",
+      "owner": "Person 3 / reviewer",
+      "status": "pending",
+      "required_for_full_release": true
+    },
+    {
+      "id": "actual-operator-deployment",
+      "owner": "Operator + Person 3",
+      "status": "not_run",
+      "required_for_full_release": true
+    },
+    {
+      "id": "reviewed-ui-screenshots",
+      "owner": "Person 4",
+      "status": "not_supplied",
+      "required_for_full_release": true
+    },
+    {
+      "id": "discovery-presentation-submission",
+      "owner": "Team lead + team",
+      "status": "not_supplied",
+      "required_for_full_release": true
+    },
+    {
+      "id": "private-customer-retention-purge",
+      "owner": "Operator + team",
+      "status": "not_supplied",
+      "required_for_full_release": false,
+      "boundary": "required before private-customer pilot; public-fixture demo only here"
+    }
+  ],
+  "limits": [
+    "CI/demo success is not a production or market-validation claim",
+    "Retained public packet is service-authorized; separate browser/recovery reports prove actual HTTP exports",
+    "Historical records keep their original revision/time",
+    "Final deployed image and backup/key custody require operator acceptance",
+    "Hashes identify bytes and do not authenticate authors"
+  ]
+}

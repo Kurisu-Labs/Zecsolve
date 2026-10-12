@@ -34,3 +34,5 @@ def test_isolated_demo_uses_real_recovery_and_labels_simulated_credit(root):
         trace["tampered_receipt"] == "INVALID" and trace["tampered_approval"] == "CREDIT_INELIGIBLE"
     )
     assert trace["schema_removed"] is True
+    assert trace["rejected_invoice_credited_zat"] == 0
+    assert trace["tampered_reason"] == "OUTPUT_RECOVERY_FAILED"

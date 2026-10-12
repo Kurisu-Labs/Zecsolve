@@ -68,7 +68,7 @@ npm run test:browser -- --grep 'simulated approval'
 
 That source is visibly labeled and exists only in test composition. It does not satisfy Person 3's live RPC gate. The local eight-hour expiry scenario advances the browser clock; revocation uses the actual backend.
 
-See [frontend verification and handoff](../../docs/frontend.md). Person 3 owns registering this browser suite in shared CI/release wiring.
+See [frontend verification and handoff](../../docs/frontend.md). Person 3 registered this browser suite in shared CI/release wiring in merged PR #28.
 
 ## Source map
 

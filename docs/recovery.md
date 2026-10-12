@@ -1,6 +1,6 @@
 # M7.2 backend recovery rehearsal
 
-Person 3 owns this rehearsal. The migration/restart/restore foundation merged in PR #19; [PR #24](https://github.com/Kurisu-Labs/zecsolve/pull/24) merged the scoped report/export/replay recovery integration consuming PRs #20–#23. It exercises the current application and PostgreSQL in an isolated deployment. M3.1 live evidence merged in PR #27 and P4 browser evidence in PR #26. Full M7.2 remains open for deployed browser CI integration, operator/team handoffs and the complete release evidence bundle.
+Person 3 owns this rehearsal. The migration/restart/restore foundation merged in PR #19; [PR #24](https://github.com/Kurisu-Labs/zecsolve/pull/24) merged the scoped report/export/replay recovery integration consuming PRs #20–#23. It exercises the current application and PostgreSQL in an isolated deployment. M3.1 live evidence merged in PR #27 and P4 browser evidence in PR #26. Deployed browser CI integration merged in PR #28. The [release bundle](release-bundle.md) assembles the technical results; full M7.2 remains open for target-specific operator controls, reviewed screenshots and team artifacts.
 
 ## Run and inspect
 

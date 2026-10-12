@@ -1,6 +1,6 @@
 # M7.1 backend deployment preparation
 
-This increment supplies a bounded TLS deployment for the current backend and Person 4's built Vue application. M4.2 cookie/Origin/CSRF controls pass through the actual TLS ingress. P4’s actual-backend browser suite merged in PR #26; P3 now wires that suite into the packaged deployment and shared CI. M3.1 live evidence merged in PR #27. Target-specific operator controls and the full release bundle remain separate gates.
+This increment supplies a bounded TLS deployment for the current backend and Person 4's built Vue application. M4.2 cookie/Origin/CSRF controls pass through the actual TLS ingress. P4’s actual-backend browser suite merged in PR #26; P3 wired that suite into the packaged deployment and shared CI in merged PR #28. M3.1 live evidence merged in PR #27. Target-specific operator controls and the full release bundle remain separate gates.
 
 The existing `compose.yaml`, `make api`, and development POC retain their behavior. Use the separate [deployment Compose file](../infra/compose.deployment.yaml) and the `deployment` target in [Dockerfile.api](../infra/Dockerfile.api) for this composition. It runs `python -m zecsolve.deployment`, which applies forward migrations and starts one bounded Uvicorn process. Application/authentication services are reused without introducing another identity or permission model.
 

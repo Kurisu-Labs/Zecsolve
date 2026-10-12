@@ -1,0 +1,30 @@
+{
+  "counts": {
+    "expected": 1,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0
+  },
+  "scenarios": [
+    {
+      "title": "simulated approval retries once and a second invoice cannot reuse its output",
+      "status": "passed"
+    }
+  ],
+  "duration_ms": 4519.590999999999,
+  "started_at": "2026-10-12T15:31:16.438762+00:00",
+  "finished_at": "2026-10-12T15:31:21.570898+00:00",
+  "boundary": "isolated-FastAPI-TLS",
+  "chain_mode": "SIMULATED",
+  "live_confirmation": false,
+  "release_complete": false,
+  "node": "v24.21.0",
+  "playwright": "1.64.0",
+  "browser_channel": "chromium",
+  "api_interval_ms": 0,
+  "browser_certificate_verification": "disabled for generated localhost certificate",
+  "revision": "775ca5d80956a79c836e9cccd209f26025af310a",
+  "working_tree_changes": false,
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.14.8"
+}
