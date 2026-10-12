@@ -8,7 +8,7 @@
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.5 are merged. M5.0 packet contracts and M5.1 replay merged in PRs #21/#22; M5.2 export is implemented and validated. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is merged in PR #19; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
+**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.5 are merged. M5.0–M5.2 merged in PRs #21–#23. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is merged in PR #19; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 **Start here:** [ownership and feature tasks](#3-ownership-and-feature-tasks), [task cards](#task-cards), and [definition of done](#definition-of-done). Milestone requirements below remain the acceptance specification; the board is the current assignment and dependency source of truth.
 
@@ -47,14 +47,14 @@ Build one backend workflow through the real Rust verifier, real PostgreSQL trans
 
 | Implemented foundation | Remaining integration work |
 |---|---|
-| Stored invoice policies, authoritative balances, and historical evaluation snapshots | Preserve these inputs in scoped reports and replay packets |
+| Stored invoice policies, authoritative balances, and historical evaluation snapshots | Validate preservation through deployment recovery |
 | Atomic merchant decisions, invoice locking, output uniqueness, retries, and chained events | Preserve these guarantees when introducing new principals and browser clients |
-| Encrypted optional receipt/raw-tx bundles, customer attribution/consent and persisted real verification | Add selected reviewer disclosure |
+| Encrypted optional receipt/raw-tx bundles, customer attribution/consent and persisted real verification | Validate selected reviewer disclosure after recovery |
 | Offline and trusted RPC observers, refresh history, and later chain-review findings | Validate against an actual trusted node and retain the live approval trace |
-| Merchant credentials, case grants, browser sessions and transaction authorization | Complete scoped reviewer read/export enforcement |
+| Merchant credentials, case grants, browser sessions and transaction authorization | Exercise merged read/export enforcement through deployed recovery |
 | Case create/detail/report/list routes and scoped claim writers | Retain separate detail/report contracts in frontend integration |
 | Readiness tracks the packaged migration head; revisions through `0009` exist | Rehearse forward migration/recovery without rewriting history |
-| Recorded real-verifier, PostgreSQL workflow and grant/session/submission tests | Add scoped disclosure, export/replay, browser, and release acceptance evidence |
+| Recorded real-verifier, PostgreSQL workflow and grant/session/submission tests | Add deployed export/replay recovery, browser, and final release acceptance evidence |
 
 Primary implementation references: [models](../apps/api/src/zecsolve/db/models.py), [rules](../apps/api/src/zecsolve/domain/rules.py), [API assembly](../apps/api/src/zecsolve/main.py), [verifier adapter](../apps/api/src/zecsolve/adapters/verifier.py), and [initial migration](../apps/api/migrations/versions/0001_initial_schema.py).
 
@@ -70,7 +70,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 | M4 | Backend complete; M4.0–M4.5 merged | P4 browser integration/acceptance remains | Remaining P0-01 and P0-06 |
 | M5 | Backend implemented and validated | P4 download/browser integration and full release still require their acceptance gates; live release requires M3.1 | P0-08 |
 | M6 | Person 4 initial frontend partial; remaining integration/acceptance deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
-| M7 | M7.1 backend preparation merged; M7.2 backend recovery in progress | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
+| M7 | M7.1 backend preparation merged; M7.2 backend recovery merged; export/replay recovery validated; PR integration pending | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
 
 ### Ownership and coordination
 
@@ -93,7 +93,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 `Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
 
-M4.0–M4.5 and M5.0/M5.1 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 has implemented scoped reports, packet contracts, replay and export; task validation and integration references are tracked below. Person 3's M7.1 backend preparation is merged and M7.2 backend recovery merged in PR #19; full M7 completion still needs the listed integration gates.
+M4.0–M4.5 and M5.0–M5.2 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 has implemented scoped reports, packet contracts, replay and export; task validation and integration references are tracked below. Person 3's M7.1 backend preparation is merged and M7.2 backend recovery merged in PR #19; full M7 completion still needs the listed integration gates.
 
 Person 4's PR #12 supplies partial frontend implementation. Remaining M6 integration/acceptance is assigned to Person 4 and retains its explicit-resumption gate. Fixtures may unblock dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
 
@@ -112,7 +112,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Done: PR #20 merged |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Done: PR #21 merged |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Done: PR #22 merged |
-| [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Implemented and validated; [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23) tracks integration |
+| [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Done: [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23) merged |
 | [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
 | [M6.1 — Browser access](#m6-1) | Person 4 | `feat/m6-browser-access` | Frontend resumed; M6.0 and M4.2 merged | Deferred |
 | [M6.2 — Merchant workflow](#m6-2) | Person 4 | `feat/m6-merchant-workflow` | Frontend resumed; M6.1 and M4.3 merged | Deferred |
@@ -121,7 +121,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-reviewer-export` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Deferred |
 | [M6.6 — Browser acceptance](#m6-6) | Person 4 | `test/m6-browser-acceptance` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Deferred |
 | [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend and TLS session preparation validated; browser integration pending |
-| [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-release-rehearsal` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | In progress: backend recovery preparation; full release waiting |
+| [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-export-recovery` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | Backend recovery merged in PR #19; export/replay recovery validated; PR integration pending; full release waiting |
 
 ### Task cards
 
@@ -246,7 +246,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M5.2 — Authorized export
 
-- **Owner:** Person 2. **Branch:** `feat/m5-case-export`. **Status:** Implemented and validated; [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23) tracks integration.
+- **Owner:** Person 2. **Branch:** `feat/m5-case-export`. **Status:** Done: [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23) merged.
 - **Prerequisites:** M4.5 and M5.1 merged.
 - **Goal:** Export an authorized, internally consistent packet that the local replay command can consume.
 - **Owned code:** Export snapshot assembler/router, shared projection consumption, and export/replay integration tests.
@@ -363,14 +363,14 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M7.2 — Release rehearsal
 
-- **Owner:** Person 3. **Branch:** `test/m7-release-rehearsal`. **Status:** In progress: backend recovery preparation. Full release remains waiting.
-- **Prerequisites:** M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier.
-- **Goal:** Assemble reproducible release acceptance and recovery evidence.
-- **Owned code:** Release checklist, migration/restart/retry/restore rehearsal, sanitized demo traces, limitations and release documentation. Person 4 supplies browser results and UI screenshots.
+- **Owner:** Person 3. **Branch:** `test/m7-export-recovery` (follows `test/m7-release-rehearsal`, merged in PR #19). **Status:** Export/replay recovery implemented and validated; PR review/merge pending. Full release remains waiting.
+- **Prerequisites:** M4.5/M5.0–M5.2 and the PR #19 recovery harness are merged, enabling export/replay recovery now. M7.1, M3.1, all M4/M5 tasks and M6.6 are required for full completion.
+- **Goal:** Assemble reproducible release acceptance and recovery evidence. The current slice proves authorized reports/exports and offline replay before and after API restart, database restart and encrypted restore.
+- **Owned code:** Release checklist, `scripts/check_recovery.py`, `scripts/recovery_*.py`, their regression checks, sanitized evidence and release documentation. Person 4 supplies browser results and UI screenshots.
 - **Exclusions:** No assumed discovery results, automatic outreach, skipped gate marked passed, production pilot claim, or mutation of historical DEVELOPMENT.md results.
 - **Public interfaces:** Use existing workflow/export/replay/deployment interfaces; collect team-provided discovery/submission evidence and preserve attribution.
-- **Acceptance checks:** Migration, restart/lost-response recovery and encrypted restore pass; all A-01–A-15 rows have attributable evidence and required gates pass. Missing live validation or deferred frontend keeps full release incomplete. Document limits and recovery without losing accepted allocations.
-- **Validation evidence:** [Backend recovery procedure and acceptance matrix](recovery.md) and [Item 15](DEVELOPMENT.md#item-15--m72-backend-recovery-rehearsal) record forward migrations, process/database restarts, lost-response retries, encrypted fresh-database restore and restored invariants: 19 actual-container groups, 211 PostgreSQL tests and six archive tests passed locally. The native subprocess timeout limitation is recorded explicitly. Combined deployment/recovery CI emits a sanitized revision/time/environment report. Final PR integration is pending; live, scoped export/replay, UI and team-supplied release artifacts remain separate gates. All cards also require the common definition of done below.
+- **Acceptance checks:** Migration, restart/lost-response recovery and encrypted restore pass. At every checkpoint, exact permitted bytes/history, balances and authorization survive; merchant packets reproduce with the packaged offline CLI, reviewer packets remain limited, and tampering fails. Restored revocation denies future reads/exports. All A-01–A-15 rows must have attributable evidence and required gates pass for full completion. Missing live validation or deferred frontend keeps full release incomplete. Document limits and recovery without losing accepted allocations.
+- **Validation evidence:** [Backend recovery procedure and acceptance matrix](recovery.md) and [Item 15](DEVELOPMENT.md#item-15--m72-backend-recovery-rehearsal) record forward migrations, process/database restarts, lost-response retries, encrypted fresh-database restore and restored invariants: 19 actual-container groups, 211 PostgreSQL tests and six archive tests passed locally. The native subprocess timeout limitation is recorded explicitly. Combined deployment/recovery CI emits a sanitized revision/time/environment report. PR #19 merged. The current export/replay integration passed 24 container groups and the complete Linux suites, recorded in [Item 20](DEVELOPMENT.md#item-20--m72-exportreplay-recovery-integration); live, UI and team-supplied release artifacts remain separate gates. All cards also require the common definition of done below.
 
 ### Definition of done
 
@@ -614,7 +614,7 @@ Recorded M1/M2 and M3 adapter results are in [DEVELOPMENT.md](DEVELOPMENT.md), i
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** Person 1 has implemented M4.0–M4.2. Person 3 has implemented M4.4 using the shared actor/session contracts, pending PR integration; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, and start M5.0 implementation against the merged M4.0 foundation. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** M4.0–M4.5 and M5.0–M5.2 are merged. Person 3 has validated export/replay recovery on `test/m7-export-recovery`; review/CI/PR integration is the next step; M3.1 still awaits a trusted endpoint. Person 4 owns the remaining M6 integration and browser acceptance, with its explicit-resumption gate retained. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 
