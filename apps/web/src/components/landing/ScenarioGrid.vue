@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { session } from '@/api/store'
+import { demoState } from '@/api/store'
 
-const scenarios = computed(() => session.demo.map((c) => ({ key: c.key, title: c.title, summary: c.summary })))
+const scenarios = computed(() => demoState.demo.map((c) => ({ key: c.key, title: c.title, summary: c.summary })))
 </script>
 
 <template>

@@ -2,7 +2,7 @@
 // live mode calls the FastAPI workflow with the merchant credential.
 
 import { reactive, readonly } from 'vue'
-import { api, idempotencyKey, readCredential, writeCredential } from './client'
+import { api, idempotencyKey } from './client'
 import {
   DEMO_CREDENTIAL,
   FIXTURE,
@@ -33,41 +33,11 @@ export interface CaseListItem {
   updatedAt: string
 }
 
-const KNOWN_CASES_KEY = 'zecsolve.knownCases'
-
-const state = reactive({
-  mode: (readCredential() ? 'live' : 'demo') as Mode,
-  demo: createDemoCases(),
-})
-
-export const session = readonly(state)
-
-export function setLiveCredential(token: string | null): void {
-  writeCredential(token)
-  state.mode = token ? 'live' : 'demo'
-}
-
-export function resetDemo(): void {
-  state.demo = createDemoCases()
-}
-
-function knownLiveCases(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(KNOWN_CASES_KEY) ?? '[]') as string[]
-  } catch {
-    return []
-  }
-}
-
-export function rememberLiveCase(caseId: string): void {
-  const ids = new Set(knownLiveCases())
-  ids.add(caseId)
-  try {
-    localStorage.setItem(KNOWN_CASES_KEY, JSON.stringify([...ids]))
-  } catch {
-    /* ignore */
-  }
-}
+export { session } from './session'
+import { session } from './session'
+const state = reactive({ demo: createDemoCases() })
+export const demoState = readonly(state)
+export function resetDemo(): void { state.demo = createDemoCases() }
 
 function demoCase(caseId: string): DemoCase {
   const found = state.demo.find((c) => c.caseId === caseId || c.key === caseId)
@@ -110,17 +80,13 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const cases = {
   async list(): Promise<CaseListItem[]> {
-    if (state.mode === 'demo') return state.demo.map((c) => summarize(toReport(c), c.title, c.customer))
-    const reports = await Promise.allSettled(knownLiveCases().map((id) => api.report(id)))
-    return reports.flatMap((r) =>
-      r.status === 'fulfilled' ? [summarize(r.value, 'Merchant case', r.value.invoice.invoice_id.slice(0, 8))] : [],
-    )
+    if (session.mode === 'demo') return state.demo.map((c) => summarize(toReport(c), c.title, c.customer))
+    throw new Error('Use the paginated case-list API in live mode.')
   },
 
   async report(caseId: string, verificationId?: string | null): Promise<CaseReport> {
-    if (state.mode === 'demo') return toReport(demoCase(caseId), verificationId)
+    if (session.mode === 'demo') return toReport(demoCase(caseId), verificationId)
     const report = await api.report(caseId, verificationId)
-    rememberLiveCase(report.case.case_id)
     return report
   },
 
@@ -143,7 +109,7 @@ export const cases = {
     caseId: string,
     input: { receiptJson: string | null; rawTxHex: string | null; source: string },
   ): Promise<{ verificationId: string | null; report: VerificationReport }> {
-    if (state.mode === 'live') {
+    if (session.mode === 'live') {
       const stored = await api.submitEvidence(
         caseId,
         {
@@ -202,7 +168,7 @@ export const cases = {
 
   /** Demo mode records a clearly labelled simulated confirmation. */
   async refreshChain(caseId: string, verificationId: string): Promise<void> {
-    if (state.mode === 'live') {
+    if (session.mode === 'live') {
       await api.refreshChain(caseId, verificationId, idempotencyKey())
       return
     }
@@ -223,7 +189,7 @@ export const cases = {
   },
 
   async resolve(caseId: string, request: ResolveRequest): Promise<void> {
-    if (state.mode === 'live') {
+    if (session.mode === 'live') {
       await api.resolve(caseId, request, idempotencyKey())
       return
     }

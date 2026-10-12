@@ -1,80 +1,58 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { api, readCredential } from '@/api/client'
-import { rememberLiveCase, session, setLiveCredential } from '@/api/store'
+import { connect, logout, session, useDemo } from '@/api/session'
+import { homeFor } from '@/api/access'
 
 const router = useRouter()
-const token = ref(readCredential() ?? '')
-const caseId = ref('')
-const status = ref<string | null>(null)
-const error = ref<string | null>(null)
+const token = ref('')
+const error = ref('')
 const busy = ref(false)
-
-async function connect() {
-  busy.value = true
-  error.value = null
-  status.value = null
-  setLiveCredential(token.value.trim() || null)
-  try {
-    const me = await api.whoami()
-    status.value = `Connected as merchant ${me.merchant_id.slice(0, 8)}.`
-  } catch (e) {
-    setLiveCredential(null)
-    error.value = `The API did not accept this credential: ${e instanceof Error ? e.message : String(e)}`
-  } finally {
-    busy.value = false
-  }
+// A pasted link may carry a code in its fragment. Remove it before any exchange.
+const fragment = new URLSearchParams(window.location.hash.slice(1))
+if (fragment.has('code')) {
+  token.value = fragment.get('code') ?? ''
+  window.history.replaceState(null, '', window.location.pathname)
 }
-
-function useDemo() {
-  setLiveCredential(null)
-  token.value = ''
-  status.value = 'Using demo data.'
+async function signIn() {
+  busy.value = true; error.value = ''
+  const code = token.value.trim(); token.value = ''
+  try { await router.replace(homeFor((await connect(code)).access)) }
+  catch (e) { error.value = e instanceof Error ? e.message : 'Sign in failed.' }
+  finally { busy.value = false }
 }
-
-function openCase() {
-  const id = caseId.value.trim()
-  if (!id) return
-  rememberLiveCase(id)
-  void router.push(`/cases/${id}`)
+async function leave(demo = false) {
+  busy.value = true; error.value = ''
+  try { if (demo) { await useDemo(); await router.push('/cases') } else await logout() }
+  catch (e) { error.value = e instanceof Error ? e.message : 'Sign out failed.' }
+  finally { busy.value = false }
 }
 </script>
-
 <template>
   <div class="shell page">
     <h1>Connect</h1>
-    <p class="lede">
-      The app runs on demo data until you add a merchant credential. Credentials are issued by the operator CLI
-      (<code class="mono">python -m zecsolve.auth.cli issue-credential</code>) and stay in this browser only.
-    </p>
-
+    <p class="lede">Enter the private access code supplied to you. Your access determines which case and actions you can see.</p>
     <section class="card">
-      <h2>Data source</h2>
-      <p class="now">Now using <strong>{{ session.mode === 'demo' ? 'demo data' : 'the live API' }}</strong>.</p>
-      <form class="form" @submit.prevent="connect">
-        <label for="token" class="label">Merchant credential</label>
-        <input id="token" v-model="token" class="field mono" type="password" autocomplete="off" placeholder="Paste the bearer credential" />
-        <div class="row">
-          <button type="submit" class="btn btn-primary" :disabled="busy || !token.trim()">{{ busy ? 'Checkingâ€¦' : 'Use live API' }}</button>
-          <button type="button" class="btn btn-quiet" @click="useDemo">Use demo data</button>
-        </div>
+      <template v-if="session.info">
+        <h2>Signed in as {{ session.info.access.role }}</h2>
+        <p>Access expires {{ new Date(session.info.expires_at).toLocaleString() }}.</p>
+        <RouterLink :to="homeFor(session.info.access)" class="btn">Continue to workspace</RouterLink>
+        <button class="btn" :disabled="busy" @click="leave()">Sign out</button>
+      </template>
+      <form v-else class="form" @submit.prevent="signIn">
+        <label for="token" class="label">Access code</label>
+        <input id="token" v-model="token" class="field mono" type="password" autocomplete="off" required />
+        <button class="btn btn-primary" :disabled="busy || !token.trim()">{{ busy ? 'Connecting…' : 'Sign in' }}</button>
       </form>
-      <p v-if="status" class="ok" role="status">{{ status }}</p>
-      <p v-if="error" class="error" role="alert">{{ error }}</p>
+      <p v-if="error || session.error" class="error" role="alert">{{ error || session.error }}</p>
     </section>
-
-    <section v-if="session.mode === 'live'" class="card">
-      <h2>Open a case by id</h2>
-      <p class="muted">The API has no list route yet. Cases you open here are remembered in this browser.</p>
-      <form class="row" @submit.prevent="openCase">
-        <input v-model="caseId" class="field mono grow" placeholder="Case UUID" aria-label="Case id" />
-        <button type="submit" class="btn">Open case</button>
-      </form>
+    <section class="card">
+      <h2>Explore the demo</h2>
+      <p class="lede">Public fixture examples with simulated decisions. No live payment is credited.</p>
+      <button class="btn btn-quiet" :disabled="busy" @click="leave(true)">Use demo data</button>
     </section>
   </div>
 </template>
-
 <style scoped>
 .page { padding: 3rem 0; display: grid; gap: 1.5rem; max-width: 720px; }
 h1 { font-size: var(--step-4); }

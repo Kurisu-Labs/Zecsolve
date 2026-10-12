@@ -2,19 +2,28 @@
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { cases, resetDemo, session, type CaseListItem } from '@/api/store'
+import { api, type Contract } from '@/api/client'
 import MoneyAmount from '@/components/ui/MoneyAmount.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import { caseStateLabel, chainView, formatWhen, receiptView } from '@/lib/status'
 
 const items = ref<CaseListItem[]>([])
+const liveItems = ref<Contract['caseList']['items']>([])
+const cursor = ref<string | null>(null)
+const filter = ref('')
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-async function load() {
+async function load(more = false) {
   loading.value = true
   error.value = null
   try {
-    items.value = await cases.list()
+    if (session.mode === 'demo') items.value = await cases.list()
+    else {
+      const page = await api.list(more ? cursor.value ?? undefined : undefined, filter.value || undefined)
+      liveItems.value = more ? [...liveItems.value, ...page.items] : page.items
+      cursor.value = page.next_cursor ?? null
+    }
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   } finally {
@@ -27,7 +36,7 @@ function reset() {
   void load()
 }
 
-onMounted(load)
+onMounted(() => load())
 </script>
 
 <template>
@@ -43,16 +52,25 @@ onMounted(load)
       <button v-if="session.mode === 'demo'" type="button" class="btn btn-quiet" @click="reset">Reset demo data</button>
     </header>
 
+    <div v-if="session.mode === 'live'" class="head">
+      <RouterLink to="/cases/new" class="btn btn-primary">Create invoice and case</RouterLink>
+      <label>Filter state <select v-model="filter" class="field" :disabled="loading" @change="load()"><option value="">All states</option><option v-for="s in ['OPEN','AWAITING_EVIDENCE','UNDER_REVIEW','RESOLVED','CLOSED_UNRESOLVED']" :key="s">{{ s }}</option></select></label>
+      <button class="btn" :disabled="loading" @click="load()">Refresh</button>
+    </div>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
     <p v-else-if="loading" class="muted">Loading cases…</p>
-    <div v-else-if="items.length === 0" class="empty">
+    <div v-else-if="session.mode === 'demo' ? items.length === 0 : liveItems.length === 0" class="empty">
       <p>No cases yet.</p>
       <p class="muted">
-        The API has no list route yet, so live mode shows cases you have opened in this browser. Open one by id from
-        <RouterLink to="/connect">Connect</RouterLink>.
+        Create an invoice to open your first case.
       </p>
     </div>
 
+    <div v-else-if="session.mode === 'live'" class="table-wrap">
+      <table><caption class="sr-only">Merchant cases</caption><thead><tr><th>Case</th><th>Invoice</th><th>State</th><th>Version</th><th>Created</th></tr></thead>
+      <tbody><tr v-for="item in liveItems" :key="item.case_id"><td><RouterLink :to="`/cases/${item.case_id}`">{{ item.case_id }}</RouterLink></td><td>{{ item.invoice_id }}</td><td>{{ caseStateLabel[item.state] }}</td><td>{{ item.version }}</td><td>{{ formatWhen(item.created_at) }}</td></tr></tbody></table>
+      <button v-if="cursor" class="btn" :disabled="loading" @click="load(true)">Load more cases</button>
+    </div>
     <div v-else class="table-wrap">
       <table>
         <caption class="sr-only">Cases with receipt, chain and balance status</caption>

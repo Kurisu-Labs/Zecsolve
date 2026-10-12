@@ -2,7 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import BrandLogo from './ui/BrandLogo.vue'
-import { session } from '@/api/store'
+import { session } from '@/api/session'
+import { homeFor } from '@/api/access'
 
 const route = useRoute()
 const scrolled = ref(false)
@@ -23,11 +24,11 @@ const onLanding = computed(() => route.name === 'landing')
     <div class="shell row">
       <RouterLink to="/" class="home" aria-label="zecsolve home"><BrandLogo /></RouterLink>
       <nav aria-label="Primary">
-        <RouterLink to="/cases" class="nav">Cases</RouterLink>
+        <RouterLink :to="session.info ? homeFor(session.info.access) : session.mode === 'demo' ? '/cases' : '/connect'" class="nav">{{ session.info?.access.role === 'customer' ? 'Submit' : session.info?.access.role === 'reviewer' ? 'Report' : 'Cases' }}</RouterLink>
         <RouterLink to="/how-it-works" class="nav hide-sm">How it works</RouterLink>
         <RouterLink to="/connect" class="mode" :class="session.mode">
           <span class="dot" aria-hidden="true" />
-          {{ session.mode === 'demo' ? 'Demo data' : 'Live API' }}
+          {{ session.mode === 'demo' ? 'Demo data' : session.info ? session.info.access.role : 'Sign in' }}
         </RouterLink>
       </nav>
     </div>
