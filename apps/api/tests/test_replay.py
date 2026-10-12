@@ -131,9 +131,10 @@ def test_resealed_balance_assertion_still_requires_correct_arithmetic(root, adap
     assert any(check.code == "HISTORICAL_ARITHMETIC_MISMATCH" for check in result.checks)
 
 
-def test_original_omission_is_not_a_missing_input_substitution(root, adapter):
+@pytest.mark.parametrize("field", ["receipt", "raw_transaction_hex"])
+def test_original_omission_is_not_a_missing_input_substitution(root, adapter, field):
     raw = raw_fixture(root, "scoped")
-    raw["payload"]["evidence"][0]["receipt"] = component(None, omitted=True).model_dump()
+    raw["payload"]["evidence"][0][field] = component(None, omitted=True).model_dump()
     result = replay_packet(reseal(raw), adapter)
     assert result.status == "LIMITED"
     assert any(check.code == "ORIGINAL_INPUTS_WITHHELD" for check in result.checks)

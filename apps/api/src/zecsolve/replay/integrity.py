@@ -24,10 +24,11 @@ def validate_history(payload):
                 require(
                     hashlib.sha256(component.text().encode("utf-8")).hexdigest() == component.sha256
                 )
-        require(
-            decoded_transaction_hash(item.raw_transaction_hex.text())
-            == item.decoded_transaction_sha256
-        )
+        if item.raw_transaction_hex.availability != "OMITTED":
+            require(
+                decoded_transaction_hash(item.raw_transaction_hex.text())
+                == item.decoded_transaction_sha256
+            )
     for metadata in report.evidence or []:
         item = evidence.get(metadata.evidence_id)
         if item is None:

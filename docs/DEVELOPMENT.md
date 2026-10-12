@@ -459,3 +459,10 @@ mutation is performed. Existing historical formats/hashes remain unchanged.
 See [replay usage and limits](packets.md#offline-replay-m51) and
 [recorded examples](../fixtures/packets/replay-results.json). M5.2 authorized
 snapshot export is the next local task; full remote integration remains pending.
+
+M5.1 final review after access restoration added a raw-transaction omission
+regression: a scoped packet may retain the selected verification's decoded hash
+while withholding the raw bytes, so replay reports missing input rather than a
+false integrity mismatch. Both receipt and raw-byte omissions now remain LIMITED.
+All 33 focused packet/replay checks pass; no full-history packet permits omitted
+inputs. This correction is part of PR #22 before merge.
