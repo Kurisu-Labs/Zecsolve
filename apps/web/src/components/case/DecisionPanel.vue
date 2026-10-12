@@ -16,11 +16,11 @@ const selected = computed(() =>
   props.report.verifications.find((v) => v.verification_id === props.report.selected_verification_id),
 )
 const observation = computed(() => latestObservation(props.report))
-const closed = computed(() => props.report.case.state === 'RESOLVED' || props.report.case.state === 'CLOSED_UNRESOLVED')
-const eligible = computed(() => approvalReady(props.report, session.mode))
-const canRefreshChain = computed(
-  () => selected.value?.result.receipt_state === 'VALID',
+const closed = computed(
+  () => props.report.case.state === 'RESOLVED' || props.report.case.state === 'CLOSED_UNRESOLVED',
 )
+const eligible = computed(() => approvalReady(props.report, session.mode))
+const canRefreshChain = computed(() => selected.value?.result.receipt_state === 'VALID')
 
 const action = ref<ResolveAction>(eligible.value ? 'APPROVE_OUTPUT' : 'REQUEST_EVIDENCE')
 const reason = ref('')
@@ -28,7 +28,12 @@ const confirming = ref(false)
 const busy = ref<'chain' | 'decide' | null>(null)
 const error = ref<string | null>(null)
 
-watch(() => props.report.case.version, () => { confirming.value = false })
+watch(
+  () => props.report.case.version,
+  () => {
+    confirming.value = false
+  },
+)
 
 watch(eligible, (now) => {
   if (!now && action.value === 'APPROVE_OUTPUT') action.value = 'REQUEST_EVIDENCE'
@@ -38,16 +43,21 @@ function disabledReason(a: ResolveAction): string | null {
   if (a === 'APPROVE_OUTPUT' && !eligible.value) {
     if (props.report.chain_review?.length) return 'An approved payment needs chain review.'
     if (!selected.value || selected.value.result.receipt_state !== 'VALID') return 'Needs a recovered output.'
-    if (props.report.balances.findings.includes('DUPLICATE_CLAIM')) return 'This output already settled another invoice.'
-    if (props.report.balances.findings.includes('ALREADY_ALLOCATED')) return 'Already credited to this invoice.'
+    if (props.report.balances.findings.includes('DUPLICATE_CLAIM'))
+      return 'This output already settled another invoice.'
+    if (props.report.balances.findings.includes('ALREADY_ALLOCATED'))
+      return 'Already credited to this invoice.'
     if (observation.value?.state !== 'CONFIRMED') return 'Waits for a trusted chain confirmation.'
     return 'Findings block credit.'
   }
-  if ((a === 'APPROVE_OUTPUT' || a === 'REJECT_EVIDENCE') && !selected.value) return 'Needs a verification attempt.'
+  if ((a === 'APPROVE_OUTPUT' || a === 'REJECT_EVIDENCE') && !selected.value)
+    return 'Needs a verification attempt.'
   return null
 }
 
-const canSubmit = computed(() => !closed.value && reason.value.trim().length >= 4 && !disabledReason(action.value))
+const canSubmit = computed(
+  () => !closed.value && reason.value.trim().length >= 4 && !disabledReason(action.value),
+)
 
 async function refreshChain() {
   if (!selected.value) return
@@ -73,7 +83,13 @@ async function decide() {
     emit('changed', `${actionView[action.value].done}.`)
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
-    if (e instanceof ApiError && e.status === 409) { confirming.value = false; emit('changed', 'The case changed or this decision is not eligible. Review the refreshed case before another decision.') }
+    if (e instanceof ApiError && e.status === 409) {
+      confirming.value = false
+      emit(
+        'changed',
+        'The case changed or this decision is not eligible. Review the refreshed case before another decision.',
+      )
+    }
   } finally {
     busy.value = null
   }
@@ -85,26 +101,36 @@ async function decide() {
     <h2 id="decision-title" class="title">Decision</h2>
 
     <p v-if="closed" class="closed">
-      This case is {{ report.case.state === 'RESOLVED' ? 'resolved' : 'closed' }}. Decisions are append-only; open a new
-      case to revisit it.
+      This case is {{ report.case.state === 'RESOLVED' ? 'resolved' : 'closed' }}. Decisions are append-only;
+      open a new case to revisit it.
     </p>
 
-      <div v-if="canRefreshChain" class="chain">
-        <p>
-          Check the latest chain status. The server obtains a fresh observation and applies invoice policy before approving credit.
-        </p>
-        <button type="button" class="btn" :disabled="busy !== null" @click="refreshChain">
-          {{ busy === 'chain' ? 'Checking chain…' : 'Check chain now' }}
-        </button>
-        <p v-if="session.mode === 'demo'" class="demo-note">Demo mode records a simulated confirmation, labelled as such.</p>
-      </div>
+    <div v-if="canRefreshChain" class="chain">
+      <p>
+        Check the latest chain status. The server obtains a fresh observation and applies invoice policy
+        before approving credit.
+      </p>
+      <button type="button" class="btn" :disabled="busy !== null" @click="refreshChain">
+        {{ busy === 'chain' ? 'Checking chain…' : 'Check chain now' }}
+      </button>
+      <p v-if="session.mode === 'demo'" class="demo-note">
+        Demo mode records a simulated confirmation, labelled as such.
+      </p>
+    </div>
 
     <template v-if="!closed">
-      <p v-if="session.mode === 'live'">Approval requests are evaluated by the server; a recovered candidate is not approved credit.</p>
+      <p v-if="session.mode === 'live'">
+        Approval requests are evaluated by the server; a recovered candidate is not approved credit.
+      </p>
       <form class="form" @submit.prevent="confirming = true">
         <fieldset :disabled="busy !== null">
           <legend class="legend">Action</legend>
-          <label v-for="a in actions" :key="a" class="option" :class="{ off: !!disabledReason(a), on: action === a }">
+          <label
+            v-for="a in actions"
+            :key="a"
+            class="option"
+            :class="{ off: !!disabledReason(a), on: action === a }"
+          >
             <input v-model="action" type="radio" name="action" :value="a" :disabled="!!disabledReason(a)" />
             <span class="option-text">
               <span class="option-label">{{ actionView[a].label }}</span>
@@ -135,22 +161,28 @@ async function decide() {
           <p>
             <strong>{{ actionView[action].label }}</strong>
             <template v-if="action === 'APPROVE_OUTPUT'">
-              credits <strong class="mono">{{ formatZat(report.balances.candidate_zat) }} zat</strong> to this invoice.
+              credits <strong class="mono">{{ formatZat(report.balances.candidate_zat) }} zat</strong> to this
+              invoice.
             </template>
             <template v-else> records your reason and changes no balance.</template>
-            Recorded against case version {{ report.case.version }}; if the case changes first, nothing is saved.
+            Recorded against case version {{ report.case.version }}; if the case changes first, nothing is
+            saved.
           </p>
           <div class="actions">
             <button type="button" class="btn btn-primary" :disabled="busy !== null" @click="decide">
               {{ busy === 'decide' ? 'Recording…' : 'Record decision' }}
             </button>
-            <button type="button" class="btn btn-quiet" :disabled="busy !== null" @click="confirming = false">Back</button>
+            <button type="button" class="btn btn-quiet" :disabled="busy !== null" @click="confirming = false">
+              Back
+            </button>
           </div>
         </div>
       </form>
     </template>
 
-    <p v-if="observation" class="version">Latest observation: {{ observation.state }} · {{ observation.source }}</p>
+    <p v-if="observation" class="version">
+      Latest observation: {{ observation.state }} · {{ observation.source }}
+    </p>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
   </section>
 </template>
@@ -164,37 +196,116 @@ async function decide() {
   display: grid;
   gap: 1rem;
 }
-.title { font-size: var(--step-1); }
-.closed { color: var(--color-mute); }
+.title {
+  font-size: var(--step-1);
+}
+.closed {
+  color: var(--color-mute);
+}
 .chain {
-  display: grid; gap: 0.75rem; justify-items: start;
-  padding: 1rem; border-radius: var(--radius-md); border: 1px dashed var(--color-unknown);
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-unknown);
   font-size: var(--step--1);
 }
-.demo-note { color: var(--color-faint); }
-.form { display: grid; gap: 1rem; }
-fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
-.legend { display: block; color: var(--color-mute); font-size: var(--step--1); margin-bottom: 0.35rem; }
+.demo-note {
+  color: var(--color-faint);
+}
+.form {
+  display: grid;
+  gap: 1rem;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.legend {
+  display: block;
+  color: var(--color-mute);
+  font-size: var(--step--1);
+  margin-bottom: 0.35rem;
+}
 .option {
-  display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.7rem 0.8rem;
-  border-radius: var(--radius-md); border: 1px solid var(--color-line); cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.8rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
 }
-.option:hover { border-color: var(--color-line-strong); }
-.option.on { border-color: var(--color-zec); background: color-mix(in oklab, var(--color-zec) 6%, transparent); }
-.option.off { cursor: not-allowed; opacity: 0.55; }
-.option input { margin-top: 0.25rem; accent-color: var(--color-zec); }
-.option-text { display: grid; gap: 0.1rem; }
-.option-label { font-weight: 550; }
-.option-help { color: var(--color-mute); font-size: var(--step--1); }
-.reason textarea { resize: vertical; min-height: 5.5rem; }
-.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
-.version { color: var(--color-faint); font-size: var(--step--1); }
+.option:hover {
+  border-color: var(--color-line-strong);
+}
+.option.on {
+  border-color: var(--color-zec);
+  background: color-mix(in oklab, var(--color-zec) 6%, transparent);
+}
+.option.off {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.option input {
+  margin-top: 0.25rem;
+  accent-color: var(--color-zec);
+}
+.option-text {
+  display: grid;
+  gap: 0.1rem;
+}
+.option-label {
+  font-weight: 550;
+}
+.option-help {
+  color: var(--color-mute);
+  font-size: var(--step--1);
+}
+.reason textarea {
+  resize: vertical;
+  min-height: 5.5rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.version {
+  color: var(--color-faint);
+  font-size: var(--step--1);
+}
 .confirm {
-  display: grid; gap: 0.9rem; padding: 1rem; border-radius: var(--radius-md);
-  border: 1px solid var(--color-zec); animation: rise var(--dur-base) var(--ease-enter);
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-zec);
+  animation: rise var(--dur-base) var(--ease-enter);
 }
-.confirm p { font-size: var(--step--1); }
-.error { color: var(--color-fail); font-size: var(--step--1); }
-@keyframes rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.confirm p {
+  font-size: var(--step--1);
+}
+.error {
+  color: var(--color-fail);
+  font-size: var(--step--1);
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 </style>

@@ -4,4 +4,6 @@ import SubmissionForm from '@/components/SubmissionForm.vue'
 import DemoSubmissionPage from './DemoSubmissionPage.vue'
 defineProps<{ id: string }>()
 </script>
-<template><DemoSubmissionPage v-if="session.mode === 'demo'" :id="id" /><SubmissionForm v-else :key="id" :id="id" /></template>
+<template>
+  <DemoSubmissionPage v-if="session.mode === 'demo'" :id="id" /><SubmissionForm v-else :key="id" :id="id" />
+</template>

@@ -17,6 +17,9 @@ export function mayVisit(access: Access, page: string, caseId?: string): boolean
 }
 
 export function csrfToken(cookie: string): string | null {
-  const value = cookie.split(';').map(c => c.trim()).find(c => c.startsWith('__Host-zecsolve_csrf='))
+  const value = cookie
+    .split(';')
+    .map((c) => c.trim())
+    .find((c) => c.startsWith('__Host-zecsolve_csrf='))
   return value ? decodeURIComponent(value.slice(value.indexOf('=') + 1)) : null
 }

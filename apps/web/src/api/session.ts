@@ -3,7 +3,12 @@ import { reactive, readonly } from 'vue'
 import { api, ApiError } from './client'
 import type { SessionInfo } from './access'
 
-const state = reactive({ mode: 'live' as 'live' | 'demo', info: null as SessionInfo | null, ready: false, error: '' })
+const state = reactive({
+  mode: 'live' as 'live' | 'demo',
+  info: null as SessionInfo | null,
+  ready: false,
+  error: '',
+})
 export const session = readonly(state)
 let restore: Promise<void> | null = null
 let expiry: ReturnType<typeof setTimeout> | undefined
@@ -25,19 +30,35 @@ export function expireSession() {
 
 export async function restoreSession() {
   if (state.ready) return
-  if (!restore) restore = (async () => {
-    try { assign(await api.session()) }
-    catch (e) {
-      assign(null)
-      if (!(e instanceof ApiError && e.status === 401)) state.error = 'Unable to restore access. Try signing in again.'
-    }
-  })().finally(() => { restore = null })
+  if (!restore)
+    restore = (async () => {
+      try {
+        assign(await api.session())
+        state.mode = 'live'
+      } catch (e) {
+        assign(null)
+        try {
+          if (sessionStorage.getItem('zecsolve.demo') === 'selected') state.mode = 'demo'
+        } catch {
+          /* storage disabled */
+        }
+        if (!(e instanceof ApiError && e.status === 401))
+          state.error = 'Unable to restore access. Try signing in again.'
+      }
+    })().finally(() => {
+      restore = null
+    })
   await restore
 }
 
 export async function connect(code: string) {
   const info = await api.connect(code)
   state.mode = 'live'
+  try {
+    sessionStorage.removeItem('zecsolve.demo')
+  } catch {
+    /* storage disabled */
+  }
   state.error = ''
   assign(info)
   return info
@@ -45,19 +66,37 @@ export async function connect(code: string) {
 
 export async function logout() {
   if (state.info) {
-    try { await api.logout() }
-    catch (e) { if (!(e instanceof ApiError && e.status === 401)) throw e }
+    try {
+      await api.logout()
+    } catch (e) {
+      if (!(e instanceof ApiError && e.status === 401)) throw e
+    }
   }
   assign(null)
   state.mode = 'live'
+  try {
+    sessionStorage.removeItem('zecsolve.demo')
+  } catch {
+    /* storage disabled */
+  }
   state.error = ''
 }
 
 export async function useDemo() {
   await logout()
   state.mode = 'demo'
+  try {
+    sessionStorage.setItem('zecsolve.demo', 'selected')
+  } catch {
+    /* storage disabled */
+  }
 }
 
 // Remove credentials stored by the previous bearer-based frontend; never reuse them.
-try { localStorage.removeItem('zecsolve.merchantCredential'); localStorage.removeItem('zecsolve.knownCases') } catch { /* storage disabled */ }
+try {
+  localStorage.removeItem('zecsolve.merchantCredential')
+  localStorage.removeItem('zecsolve.knownCases')
+} catch {
+  /* storage disabled */
+}
 window.addEventListener('zecsolve:unauthorized', expireSession)

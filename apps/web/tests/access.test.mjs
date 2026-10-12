@@ -7,7 +7,8 @@ import { parseZec } from '../src/lib/money.ts'
 test('scoped roles cannot navigate to merchant or foreign-case pages', () => {
   for (const role of ['customer', 'reviewer']) {
     const access = { role, case_id: 'own' }
-    for (const page of ['cases', 'case', 'grants', 'new-case', 'report']) assert.equal(mayVisit(access, page, 'own'), false)
+    for (const page of ['cases', 'case', 'grants', 'new-case', 'report'])
+      assert.equal(mayVisit(access, page, 'own'), false)
     assert.equal(mayVisit(access, role === 'customer' ? 'submit' : 'review', 'foreign'), false)
     assert.equal(mayVisit(access, role === 'customer' ? 'submit' : 'review', 'own'), true)
     assert.equal(homeFor(access), role === 'customer' ? '/submit/own' : '/review/own')

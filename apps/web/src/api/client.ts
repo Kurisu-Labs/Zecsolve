@@ -27,7 +27,10 @@ export function idempotencyKey(): string {
   return crypto.randomUUID()
 }
 
-export async function request<T>(path: string, init: RequestInit & { idempotencyKey?: string } = {}): Promise<T> {
+export async function request<T>(
+  path: string,
+  init: RequestInit & { idempotencyKey?: string } = {},
+): Promise<T> {
   const headers = new Headers(init.headers)
   headers.set('Accept', 'application/json')
   if (init.body) headers.set('Content-Type', 'application/json')
@@ -45,7 +48,8 @@ export async function request<T>(path: string, init: RequestInit & { idempotency
   if (retry) headers.set('Idempotency-Key', pendingKey(retry, init.idempotencyKey!))
   const response = await fetch(path, { ...init, headers, credentials: 'same-origin', cache: 'no-store' })
   if (!response.ok) {
-    if (response.status === 401 && path !== '/api/session') window.dispatchEvent(new Event('zecsolve:unauthorized'))
+    if (response.status === 401 && path !== '/api/session')
+      window.dispatchEvent(new Event('zecsolve:unauthorized'))
     // Do not echo validation bodies: they can contain submitted secrets or evidence.
     const messages: Record<number, string> = {
       400: 'A secure HTTPS connection is required.',
@@ -68,7 +72,8 @@ export async function request<T>(path: string, init: RequestInit & { idempotency
 
 export const api = {
   session: () => request<SessionInfo>('/api/session'),
-  connect: (code: string) => request<SessionInfo>('/api/session', { method: 'POST', body: JSON.stringify({ code }) }),
+  connect: (code: string) =>
+    request<SessionInfo>('/api/session', { method: 'POST', body: JSON.stringify({ code }) }),
   logout: () => request<void>('/api/session', { method: 'DELETE' }),
   list: (cursor?: string, state?: string) => {
     const query = new URLSearchParams({ limit: '25' })
@@ -76,15 +81,47 @@ export const api = {
     if (state) query.set('state', state)
     return request<Contract['caseList']>(`/api/cases?${query}`)
   },
-  invoice: (body: Contract['invoiceCreateRequest'], key: string) => request<Contract['invoiceSnapshot']>('/api/invoices', { method: 'POST', body: JSON.stringify(body), idempotencyKey: key }),
-  openCase: (invoice_id: string, key: string) => request<Contract['caseOpened']>('/api/cases', { method: 'POST', body: JSON.stringify({ invoice_id }), idempotencyKey: key }),
-  claim: (id: string, body: Contract['claimSubmitRequest'], key: string) => request<Contract['submissionAcknowledgement']>(`/api/cases/${encodeURIComponent(id)}/claims`, { method: 'POST', body: JSON.stringify(body), idempotencyKey: key }),
-  evidence: (id: string, body: Contract['evidenceSubmitRequestV2'], key: string) => request<Contract['submissionAcknowledgement']>(`/api/cases/${encodeURIComponent(id)}/evidence`, { method: 'POST', body: JSON.stringify(body), idempotencyKey: key }),
+  invoice: (body: Contract['invoiceCreateRequest'], key: string) =>
+    request<Contract['invoiceSnapshot']>('/api/invoices', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      idempotencyKey: key,
+    }),
+  openCase: (invoice_id: string, key: string) =>
+    request<Contract['caseOpened']>('/api/cases', {
+      method: 'POST',
+      body: JSON.stringify({ invoice_id }),
+      idempotencyKey: key,
+    }),
+  claim: (id: string, body: Contract['claimSubmitRequest'], key: string) =>
+    request<Contract['submissionAcknowledgement']>(`/api/cases/${encodeURIComponent(id)}/claims`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      idempotencyKey: key,
+    }),
+  evidence: (id: string, body: Contract['evidenceSubmitRequestV2'], key: string) =>
+    request<Contract['submissionAcknowledgement']>(`/api/cases/${encodeURIComponent(id)}/evidence`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      idempotencyKey: key,
+    }),
   grants: (id: string) => request<Contract['grantList']>(`/api/cases/${encodeURIComponent(id)}/grants`),
-  grant: (id: string, body: Contract['grantCreateRequest'], key: string) => request<Contract['grantCreated']>(`/api/cases/${encodeURIComponent(id)}/grants`, { method: 'POST', body: JSON.stringify(body), idempotencyKey: key }),
-  revoke: (id: string, grant: string) => request<unknown>(`/api/cases/${encodeURIComponent(id)}/grants/${encodeURIComponent(grant)}`, { method: 'DELETE' }),
-  reviewerReport: (id: string) => request<Contract['reviewerReport']>(`/api/cases/${encodeURIComponent(id)}/report`),
-  content: (id: string, evidence: string) => request<Contract['evidenceContent']>(`/api/cases/${encodeURIComponent(id)}/evidence/${encodeURIComponent(evidence)}/content`),
+  grant: (id: string, body: Contract['grantCreateRequest'], key: string) =>
+    request<Contract['grantCreated']>(`/api/cases/${encodeURIComponent(id)}/grants`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      idempotencyKey: key,
+    }),
+  revoke: (id: string, grant: string) =>
+    request<unknown>(`/api/cases/${encodeURIComponent(id)}/grants/${encodeURIComponent(grant)}`, {
+      method: 'DELETE',
+    }),
+  reviewerReport: (id: string) =>
+    request<Contract['reviewerReport']>(`/api/cases/${encodeURIComponent(id)}/report`),
+  content: (id: string, evidence: string) =>
+    request<Contract['evidenceContent']>(
+      `/api/cases/${encodeURIComponent(id)}/evidence/${encodeURIComponent(evidence)}/content`,
+    ),
   async whoami(): Promise<{ merchant_id: string; credential_id: string }> {
     return request('/api/auth/me')
   },
