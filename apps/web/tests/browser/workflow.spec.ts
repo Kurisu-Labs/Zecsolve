@@ -25,10 +25,13 @@ async function paceAPI(context: BrowserContext) {
     await route.fallback()
   })
 }
-test.beforeEach(async ({ context }) => { await paceAPI(context) })
+test.beforeEach(async ({ context }) => {
+  await paceAPI(context)
+})
 
 async function login(page: Page, code: string) {
   await page.goto('/connect')
+  await expect(page.getByRole('heading', { level: 1, name: 'Connect', exact: true })).toBeVisible()
   if (await page.getByRole('button', { name: 'Use another access code' }).isVisible())
     await page.getByRole('button', { name: 'Use another access code' }).click()
   await page.getByLabel('Access code', { exact: true }).fill(code)
@@ -36,6 +39,7 @@ async function login(page: Page, code: string) {
   await expect(page).not.toHaveURL(/\/connect$/)
 }
 async function checkAccessibility(page: Page) {
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(page.locator('.route-enter-active, .route-leave-active')).toHaveCount(0)
   const result = await new AxeBuilder({ page }).analyze()
   expect(result.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) }))).toEqual([])

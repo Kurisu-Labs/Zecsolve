@@ -10,7 +10,7 @@ changes are needed.
 
 | Command / CI job | Actual execution | Limits |
 |---|---|---|
-| `uv run --locked python scripts/check_deployment.py --recovery --browser` / `container-smoke` | Eight offline Chromium scenarios through the packaged Vue build, nginx TLS ingress, real API, PostgreSQL and Rust verifier, after the four recovery/export checkpoints | Public fixture and synthetic application data; production offline observer, zero live credit. Browser certificate verification is disabled for the generated localhost certificate; the Python deployment checks independently verify certificate trust and hostname. |
+| `uv run --locked python scripts/check_deployment.py --recovery --browser` / `container-smoke` | Eight offline Chromium scenarios through the packaged Vue build, nginx TLS ingress, real API, PostgreSQL and Rust verifier, followed by the four recovery/export checkpoints | Public fixture and synthetic application data; production offline observer, zero live credit. Browser certificate verification is disabled for the generated localhost certificate; the Python deployment checks independently verify certificate trust and hostname. |
 | `uv run --locked python scripts/browser_acceptance.py --simulated-chain` / `browser-simulated` | One approval/lost-response retry/cross-invoice conflict scenario using P4's isolated HTTPS test composition and the real backend/verifier | Explicit `SIMULATED` observer and test-only authority. This composition never enters the deployment image or proves live inclusion. |
 
 The default suite covers merchant/customer/reviewer sessions, consent, restricted
@@ -27,6 +27,9 @@ contexts, including automated fixture setup. Requests still use the ordinary
 network and server; production's 5-request/second ingress limit stays unchanged
 and its rejection behavior is separately tested by the deployment harness.
 All contexts use the generated deployment origin rather than a fixed port.
+Browser scenarios run before the recovery harness seeds a simulated allocation:
+the output uniqueness constraint is global, so a different merchant alone would
+not isolate that fixture. No allocation is removed or constraint bypassed.
 
 ## Reproduce
 

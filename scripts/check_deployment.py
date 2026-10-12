@@ -312,28 +312,29 @@ print(json.dumps(result))
         logs = run(compose + ["logs", "--no-color", "api", "ingress"])
         assert all(secret not in logs for secret in [marker, password, key, *session_secrets])
         passed("container logs exclude request codes, authorization and configured secrets")
-        recovery = None
-        if options.recovery:
-            from check_recovery import rehearse
-
-            recovery = rehearse(ROOT, directory, compose, run, request, origin, passed)
         browser = None
         if options.browser:
             from browser_acceptance import run_suite
 
-            # Separate merchant: recovery scenarios must not alter browser listing counts.
+            # Run before recovery seeds a globally allocated public fixture output.
+            # Offline browser scenarios require that output to remain unallocated.
             browser_merchant = json.loads(run(operator_command))
             state = directory / "browser-state.json"
             state.write_text(
                 json.dumps({"merchant_code": browser_merchant["token"], "simulated": False})
             )
             state.chmod(0o600)
-            time.sleep(3)  # Drain prior recovery requests from the real ingress bucket.
+            time.sleep(3)  # Drain preceding checks from the real ingress bucket.
             browser = run_suite(directory / "browser", state, origin, ingress=True)
             passed("eight real-browser scenarios through packaged frontend and nginx TLS ingress")
             logs = run(compose + ["logs", "--no-color", "api", "ingress"])
             assert browser_merchant["token"] not in logs
             passed("browser merchant access code is absent from deployment logs")
+        recovery = None
+        if options.recovery:
+            from check_recovery import rehearse
+
+            recovery = rehearse(ROOT, directory, compose, run, request, origin, passed)
         report = {
             "checks": results,
             "scope": "M7.1 deployment controls with optional M7.2 recovery/browser acceptance",
