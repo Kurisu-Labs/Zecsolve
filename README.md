@@ -1,8 +1,8 @@
 # zecsolve
 
-**Person 4 frontend integration (October 12):** The user resumed frontend work and authorized local implementation while GitHub authentication was unavailable. M6 integration and actual-backend browser evidence are available on `feat/m6-frontend-integration`; see [frontend handoff](docs/frontend.md). PR #26 is published; review, CI and merge remain pending.
+**Person 4 frontend integration (October 12):** M6 integration and actual-backend browser evidence merged in [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); see [frontend handoff](docs/frontend.md). P3 is integrating browser CI and the deployed release rehearsal on `test/m7-browser-release-integration`.
 
-**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status; review/CI/merge still govern completion.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
 
 Resolve shielded-payment exceptions with scoped evidence and explainable merchant decisions.
 
@@ -10,7 +10,7 @@ The October 10 foundation runs real Glasspane output recovery against a bundled 
 
 Start with [TEAM_GUIDE.md](TEAM_GUIDE.md) for the codebase tour and next tasks. Original product documents are preserved in [instructions/](instructions/).
 
-For assignments, use the [four-person feature board](docs/IMPLEMENTATION_PLAN.md#feature-board) and [task cards](docs/IMPLEMENTATION_PLAN.md#task-cards): Person 1 owns access/auth/schema, Person 2 reports/export/replay, Person 3 submission backend/live validation/release, and **Person 4 all frontend work**. Each task names its branch, prerequisites, code boundary and completion checks. The initial frontend is partially implemented in PR #12; task cards still govern remaining integration and acceptance. Listed branches do not establish completion.
+For assignments, use the [four-person feature board](docs/IMPLEMENTATION_PLAN.md#feature-board) and [task cards](docs/IMPLEMENTATION_PLAN.md#task-cards): Person 1 owns access/auth/schema, Person 2 reports/export/replay, Person 3 submission backend/live validation/release, and **Person 4 all frontend work**. Each task names its branch, prerequisites, code boundary and completion checks. PR #26 completes the resumed frontend implementation and records browser acceptance; P3 now owns shared CI/deployment integration and final release evidence. Listed branches do not establish completion.
 
 Before taking a task, read [CONTRIBUTING.md](CONTRIBUTING.md): check active work, publish your task branch before implementation, push progress there, and open a PR when ready.
 
@@ -87,7 +87,7 @@ The backend image builds Rust in a separate stage, runs Python as an unprivilege
 
 The separate [M7.1 deployment composition](docs/deployment.md) serves the built Vue app and API through TLS, with ingress limits, private API/database ports, non-root resource limits, and secret-safe runtime logs. Its production entry point disables the public POC and documentation routes. Run `python3 scripts/check_deployment.py` with Docker/Compose and OpenSSL for an isolated actual-container rehearsal.
 
-This completes the backend preparation slice only. M4.2 session cookies, Origin/CSRF, logout and revocation are validated through TLS; Person 4 retains frontend/browser acceptance. Live validation and full release/restore acceptance remain separate gates.
+P4’s frontend/browser evidence merged in PR #26 and M3.1 live validation in PR #27. P3’s [browser CI/release integration](docs/browser-ci.md) runs the eight offline browser scenarios through this deployment with `--recovery --browser`, plus a separate simulated approval case. Operator deployment and the final release evidence bundle remain open.
 
 ## Provision merchant identity
 
@@ -157,7 +157,7 @@ Implemented: pinned verifier integration; fixture provenance; bounded subprocess
 
 The trusted read-only Zebra adapter, idempotent refresh route, and later reorganization review are implemented. [Live endpoint validation](docs/chain.md#recorded-live-run) passed against the operator-selected QuickNode public demo endpoint using the existing receipt and a synthetic invoice; its evidence merged in PR #27.
 
-Current milestone status: **M1/M2 backend complete; M3 live validation recorded and evidence merged in PR #27; M4.0–M4.5 and M5.0–M5.2 merged; M6 locally implemented and browser-validated by Person 4, PR #26 published; review/CI/merge pending; M7 release incomplete.** P2 scoped reports, packet contracts, replay and export merged in PRs #20–#23. M7.1 backend deployment preparation merged in PR #17 and M7.2 backend recovery in PR #19. Person 3's [recovery integration](docs/recovery.md) merged in PR #24, covering deployed scoped reports, exports and offline replay. The [release evidence index](docs/release-evidence.md) links acceptance scenarios, retained CI evidence, offline demo commands and remaining owners. P4 review/CI/merge and final release evidence remain outstanding. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
+Current milestone status: **M1/M2 backend complete; M3 live validation recorded and evidence merged in PR #27; M4.0–M4.5 and M5.0–M5.2 merged; M6 implementation and recorded browser acceptance merged in PR #26; P3 browser CI/deployment integration in progress; M7 release incomplete.** P2 scoped reports, packet contracts, replay and export merged in PRs #20–#23. M7.1 backend deployment preparation merged in PR #17 and M7.2 backend recovery in PR #19. Person 3's [recovery integration](docs/recovery.md) merged in PR #24, covering deployed scoped reports, exports and offline replay. The [release evidence index](docs/release-evidence.md) links acceptance scenarios, retained CI evidence, offline demo commands and remaining owners. The browser CI integration PR and final operator/team/release evidence remain outstanding. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
 
 The deployed app blocks credit approval while offline; a server-configured trusted RPC source enables the policy-gated path. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed. Assigning or merging a feature does not close the separate live-validation or full-release gates.
 

@@ -328,9 +328,9 @@ def rehearse(root, directory, compose, run, request, origin, passed):
             "checkpoints": exports.checkpoints,
             "restored_reviewer_revocation": "PASS",
         },
-        "remaining_gates": [
-            "M3.1 live validation",
-            "M6 browser acceptance",
-            "full M7 release evidence",
+        "outside_recovery_scope": [
+            "live RPC confirmation: use separately recorded M3.1 evidence",
+            "browser acceptance: use the outer browser result or separate M6 evidence",
+            "operator controls and assembled full M7 release evidence",
         ],
     }

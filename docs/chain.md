@@ -1,6 +1,6 @@
 # Trusted chain observations
 
-M3 adds an optional read-only Zebra RPC adapter. **M3.1 live validation passed on October 12, 2026**, using the operator-selected QuickNode public demo endpoint and the existing public historical receipt. The [recorded run](#recorded-live-run) includes a fresh RPC-backed merchant approval and retry; review, CI and PR merge still govern task completion. Unit/database RPC tests continue to use explicitly synthetic HTTP responses and do not themselves establish live inclusion. No deployed-node or full-release acceptance is claimed.
+M3 adds an optional read-only Zebra RPC adapter. **M3.1 live validation passed on October 12, 2026**, using the operator-selected QuickNode public demo endpoint and the existing public historical receipt. The [recorded run](#recorded-live-run) includes a fresh RPC-backed merchant approval and retry; the evidence merged in PR #27. Unit/database RPC tests continue to use explicitly synthetic HTTP responses and do not themselves establish live inclusion. No deployed-node or full-release acceptance is claimed.
 
 ## Configure a trusted source
 
@@ -32,7 +32,7 @@ It checks the containing header's hash, height, and best-chain confirmation coun
 | Bound side-chain transaction/header | `UNCONFIRMED / RPC_SIDE_CHAIN` |
 | Timeout, auth/HTTP failure, lookup error, malformed/inconsistent response, unsynced/stale tip, wrong network or bytes | `UNAVAILABLE` with a diagnostic code; receipt result is unchanged |
 
-Zebra's wire names and optional mempool/side-chain fields were checked against its published [transaction serialization source](https://zebra.zfnd.org/internal/src/zebra_rpc/methods/types/transaction.rs.html) and [RPC response source](https://zebra.zfnd.org/internal/src/zebra_rpc/methods.rs.html), plus the [header response contract](https://zebra.zfnd.org/internal/zebra_rpc/methods/struct.BlockHeaderObject.html). The actual configured node's response format/version still needs integration testing. Nodes missing required fields fail closed.
+Zebra's wire names and optional mempool/side-chain fields were checked against its published [transaction serialization source](https://zebra.zfnd.org/internal/src/zebra_rpc/methods/types/transaction.rs.html) and [RPC response source](https://zebra.zfnd.org/internal/src/zebra_rpc/methods.rs.html), plus the [header response contract](https://zebra.zfnd.org/internal/zebra_rpc/methods/struct.BlockHeaderObject.html). The operator-selected node passed the [recorded M3.1 integration](#recorded-live-run); other configured endpoints still require compatibility validation. Nodes missing required fields fail closed.
 
 `decision-observation-v2` preserves selected integer/string/bool/null provenance: advertised node version/subversion, chain/tip data, transaction binding, and containing-header facts. It excludes raw transaction content and unrelated RPC fields. Observation time is captured before network work, so lookup time counts against the invoice's existing 60-second freshness policy. Older observation-v1 records and decision hashes remain unchanged.
 
@@ -152,4 +152,4 @@ run. Never overwrite a historical run or treat a failed lookup as a live pass.
 This command is deliberately absent from CI: the offline suites and container
 rehearsal must not acquire a dependency on the shared public RPC service.
 
-The M3.1 acceptance run is recorded; review, CI and merge remain required for task completion. Customer/reviewer grants, disclosure consent, browser sessions and authorized replay packets are merged. Person 4 owns frontend acceptance, separately from this API run. See the [release evidence index](release-evidence.md) for current proof and outstanding handoffs.
+The M3.1 acceptance run and evidence merged in PR #27. Customer/reviewer grants, disclosure consent, browser sessions and authorized replay packets are merged. Person 4 owns frontend acceptance, separately from this API run. See the [release evidence index](release-evidence.md) for current proof and outstanding handoffs.

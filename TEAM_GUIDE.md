@@ -1,6 +1,6 @@
 # zecsolve teammate guide
 
-**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status; review/CI/merge still govern completion.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
 
 This guide explains the foundation and backend milestones completed through October 12. Use [README.md](README.md) for runnable setup commands.
 
@@ -23,12 +23,12 @@ The originals were relocated without rewriting their contents. In particular, en
 | Area | Implemented now | Still needed |
 |---|---|---|
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
-| API | Health/readiness, POC verification, owned invoice/case create/read, paginated merchant case listing, encrypted evidence upload/metadata, persisted verification, reports, merchant decisions, customer claims, scoped reviewer reads and authorized export | P4 actual-browser integration |
+| API | Health/readiness, POC verification, owned invoice/case create/read, paginated merchant case listing, encrypted evidence upload/metadata, persisted verification, reports, merchant decisions, customer claims, scoped reviewer reads and authorized export | P3 deployed browser CI and final evidence |
 | Database | Immutable snapshots, one case per invoice, encrypted evidence, verification/evaluation history, chained events, atomic decisions/allocations/retries | Retention/rotation workflows |
 | Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Real-node integration validation; the trusted RPC adapter is implemented and offline remains the default |
-| Access | Merchant credentials, customer/reviewer grants, consent selection, HTTPS browser sessions and authorization rechecks | P4 browser disclosure/acceptance |
-| Frontend | Initial Vue implementation in PR #12; Person 4 owns it | Remaining actual-backend and browser integration |
-| Export | CasePacketV1, authorized snapshot export and offline historical replay | P3 export/replay recovery integration, P4 download flow and final release rehearsal |
+| Access | Merchant credentials, customer/reviewer grants, consent selection, HTTPS browser sessions and authorization rechecks | Repeat P4’s merged disclosure scenarios through deployment CI |
+| Frontend | P4 implementation and recorded browser acceptance merged in PR #26 | P3 shared browser CI/release integration |
+| Export | CasePacketV1, authorized snapshot export and offline historical replay | Recovery and P4 download flow merged; final release evidence |
 
 The POC runs without PostgreSQL; readiness requires a migrated database, verifier executable, and configured evidence encryption key. Database tests use public fixtures or synthetic rows. They prove the implemented workflow/database behavior; simulated RPC responses do not establish live chain inclusion.
 
@@ -134,9 +134,9 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 | Person 1 — access | M4.0–M4.2 access foundation, grants and sessions merged | Own shared auth/models/migrations; consumers reuse the same authorization context |
 | Person 2 — reports/export | M4.5/M5 backend merged in PRs #20–#23 | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
 | Person 3 — workflow/integration/release | Listing, submissions and deployment/recovery/export integration merged, including PR #24; live QuickNode fixture/approval evidence merged in PR #27 | Own submission services and deployment; consume access contracts and Person 4's built app |
-| Person 4 — all frontend | Local M6 integration and browser evidence complete; PR #26 published; review/CI/merge pending | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
+| Person 4 — all frontend | M6 integration and recorded browser evidence merged in PR #26 | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
-These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. Person 4's M6 scope was explicitly resumed on October 12 and is locally integrated/browser-validated; PR #26 is published; review/CI/merge remain pending. See [frontend evidence](docs/frontend.md). No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
+These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. Person 4's M6 scope was resumed on October 12 and merged with recorded browser evidence in PR #26. P3 owns the browser CI/deployment integration on `test/m7-browser-release-integration`. See [frontend evidence](docs/frontend.md). No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
 
 Person 3 maintains the [release evidence index](docs/release-evidence.md): recorded A-01–A-15 scenarios, sanitized CI recovery results, offline demo steps and operator/P4/team handoffs. Full M7 remains incomplete until its required gates pass.
 
@@ -152,7 +152,7 @@ Commit source and lockfiles, not `.env`, `.venv`, `.cache`, `target`, or real cu
 
 Read [docs/chain.md](docs/chain.md) before configuring a node. The adapter is composed only from server settings; request bodies cannot supply URLs or trust assertions. New approvals always refresh; a merchant can also refresh an already resolved case with `POST /api/cases/{id}/chain-observations`. Keep the existing observation-v1 snapshot format intact: observation-v2 adds sanitized RPC provenance without changing older decision hashes.
 
-The operator selected QuickNode’s public demo endpoint for M3.1. The [live historical-fixture observation and merchant approval trace](docs/chain.md#recorded-live-run) passed with Zebra 6.4.2 on October 12; evidence merged in PR #27; final release association remains required. No new payment was sent. The initial frontend is recorded in PR #12. M4/M5 backend now supplies merchant listing, grants, sessions, claims, scoped reports and replay packets. Browser acceptance and full release validation remain separate gates.
+The operator selected QuickNode’s public demo endpoint for M3.1. The [live historical-fixture observation and merchant approval trace](docs/chain.md#recorded-live-run) passed with Zebra 6.4.2 on October 12; evidence merged in PR #27; final release association remains required. No new payment was sent. The initial frontend is recorded in PR #12. M4/M5 backend now supplies merchant listing, grants, sessions, claims, scoped reports and replay packets. P4 browser evidence merged in PR #26; P3 is integrating [browser CI and deployed acceptance](docs/browser-ci.md). Full release remains gated on the evidence index.
 
 ## P2 report/export/replay handoff
 
@@ -168,5 +168,5 @@ The operator selected QuickNode’s public demo endpoint for M3.1. The [live his
 Start with [scoped report fields](docs/scoped-reports.md) and [packet/export/replay
 usage](docs/packets.md). Public/synthetic fixtures and recorded CLI outcomes are
 in `fixtures/packets/`. Do not use packet-provided strings as HTML, executable
-paths or URLs to fetch. Live validation is still pending; no frontend work was
-included in this P2 implementation.
+paths or URLs to fetch. This P2 implementation preceded the live validation now
+merged in PR #27 and the frontend integration now merged in PR #26.

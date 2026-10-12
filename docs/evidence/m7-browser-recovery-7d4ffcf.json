@@ -1,0 +1,255 @@
+{
+  "checks": [
+    "trusted TLS certificate and migrated/encrypted/verifier readiness",
+    "HTTP redirects to the configured HTTPS hostname",
+    "actual frontend build, assets, SPA routes and API share one origin",
+    "public POC and documentation routes are disabled",
+    "TLS session cookies, restoration, Origin/CSRF, logout and parent revocation",
+    "ingress rejects oversized fixed-length and chunked bodies",
+    "API rate limit cannot be bypassed with forwarded client headers",
+    "non-root containers enforce memory/CPU/PID limits and private API binding",
+    "readiness fails during database outage and recovers after restart",
+    "container logs exclude request codes, authorization and configured secrets",
+    "eight real-browser scenarios through packaged frontend and nginx TLS ingress",
+    "browser merchant access code is absent from deployment logs",
+    "populated 0008 to packaged-head forward migration preserves legacy rows and allocation",
+    "public fixture verifies; offline approval denied; simulated allocation seeded",
+    "before_restart: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "after_api_restart: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "API crash preserves sessions and claim/evidence/approval retries without new rows",
+    "after_database_restart: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "database restart preserves balances, exact evidence, consent, audit and retry records",
+    "encrypted full-database archive rejects wrong backup key and tampering before restore",
+    "after_encrypted_restore: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "fresh-database restore preserves every application row, decryption and retry outcome",
+    "restored constraints/triggers reject invalid writes; missing/wrong evidence keys fail",
+    "restored reviewer revocation prevents new reports, evidence reads and exports",
+    "restored grant revocation blocks even a previously accepted customer retry",
+    "recovery logs exclude credentials, cookies, claims and database secrets"
+  ],
+  "scope": "M7.1 deployment controls with optional M7.2 recovery/browser acceptance",
+  "live_confirmation": false,
+  "release_complete": false,
+  "at": "2026-10-12T14:45:31.074549+00:00",
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.14.8",
+  "docker": "28.0.4",
+  "revision": "7d4ffcf49a4b9348be4c2034b1a2614f2ec6fa9e",
+  "working_tree_changes": false,
+  "browser": {
+    "counts": {
+      "expected": 8,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "scenarios": [
+      {
+        "title": "three roles complete the real HTTPS submission and merchant review flow",
+        "status": "passed"
+      },
+      {
+        "title": "mobile login, invalid access and explicitly selected demo",
+        "status": "passed"
+      },
+      {
+        "title": "merchant sees tampered and missing evidence without credit",
+        "status": "passed"
+      },
+      {
+        "title": "stale merchant decisions refresh for explicit review and noncredit decisions retry safely",
+        "status": "passed"
+      },
+      {
+        "title": "lost grant creation responses expose no replacement secret",
+        "status": "passed"
+      },
+      {
+        "title": "keyboard and accessibility checks cover login, invoice and scoped submission on mobile",
+        "status": "passed"
+      },
+      {
+        "title": "case listing paginates and filters the server summaries",
+        "status": "passed"
+      },
+      {
+        "title": "local expiry returns to login and missing CSRF can recover with a new session",
+        "status": "passed"
+      }
+    ],
+    "duration_ms": 68568.594,
+    "started_at": "2026-10-12T14:42:26.771594+00:00",
+    "finished_at": "2026-10-12T14:43:35.849717+00:00",
+    "boundary": "packaged-nginx-TLS",
+    "chain_mode": "OFFLINE",
+    "live_confirmation": false,
+    "release_complete": false,
+    "node": "v24.21.0",
+    "playwright": "1.64.0",
+    "browser_channel": "chromium",
+    "api_interval_ms": 300,
+    "browser_certificate_verification": "disabled for generated localhost certificate"
+  },
+  "recovery": {
+    "scope": "M7.2 backend and export/replay recovery integration",
+    "migration": {
+      "from_revision": "0008",
+      "to_revision": "0009",
+      "preserved_tables": [
+        "cases",
+        "claims",
+        "evidence",
+        "evidence_contents",
+        "invoices",
+        "merchants",
+        "output_allocations",
+        "resolutions",
+        "verifications"
+      ],
+      "legacy_allocation_zat": 100000,
+      "source_kind": "SYNTHETIC",
+      "schema_removed": true
+    },
+    "source_kind": "PUBLIC_FIXTURE_AND_SIMULATED_ACCOUNTING",
+    "live_confirmation": false,
+    "release_complete": false,
+    "archive_sha256": "d7800504a6021cd053cf8e240dfaa74778572b14a1975c3db74a85c0a66d61bf",
+    "restored_rows_sha256": "daa92907e59e77a9fea6edae0a289ae527018247c8f1851ce47df737b6348577",
+    "counts": {
+      "access_submission_requests": 9,
+      "browser_sessions": 19,
+      "case_creation_requests": 35,
+      "case_events": 53,
+      "case_grants": 10,
+      "case_resolution_requests": 3,
+      "case_verification_requests": 5,
+      "cases": 35,
+      "chain_observations": 7,
+      "claims": 3,
+      "decision_evaluations": 3,
+      "evidence": 7,
+      "evidence_consents": 6,
+      "evidence_contents": 7,
+      "evidence_submission_requests": 1,
+      "grant_creation_requests": 10,
+      "grant_evidence": 5,
+      "invoice_creation_requests": 35,
+      "invoice_policies": 35,
+      "invoices": 35,
+      "merchant_credentials": 3,
+      "merchants": 3,
+      "observation_requests": 0,
+      "output_allocations": 1,
+      "resolutions": 3,
+      "verification_evaluations": 5,
+      "verifications": 5
+    },
+    "export_replay": {
+      "network": "none",
+      "checkpoints": [
+        {
+          "stage": "before_restart",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "c9e45876cc52291bbeb12546b22b13c73916ba27e015292116459a55d211eba1",
+              "history_sha256": "fc5457ca32815f6405cd237ffd4b846328f95f9a14f776ed76b96f6cdcd5d261",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "9889a3607fb551366779dc613b969ad8822c98502ef0fec8a2d18508b10244cb",
+              "history_sha256": "43168ce62698e2227a449266b6bbb95776646e1fd26b15057db6c38a7db20836",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "08fb0b4c7b078e0ff636dedfc7b1c085c06ecf39941f43bfb471b21e7d16f1c2",
+              "history_sha256": "da11244434e5861129abef9a3a92e7567698aa5b147b8478646e98ea8fa8f91b",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        },
+        {
+          "stage": "after_api_restart",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "602511b261143104e8cf099ded07005ae397ee333066e780c213c972a19bc02b",
+              "history_sha256": "fc5457ca32815f6405cd237ffd4b846328f95f9a14f776ed76b96f6cdcd5d261",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "cacb03ee04cf35a33f8d6c88d08a5c0ce78febfc9a3d8bd67983de48a4358c01",
+              "history_sha256": "43168ce62698e2227a449266b6bbb95776646e1fd26b15057db6c38a7db20836",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "5dfa96e16faad17993eacffa3a76b8b95c70cd78192560fe562ba4f47ccd89ba",
+              "history_sha256": "da11244434e5861129abef9a3a92e7567698aa5b147b8478646e98ea8fa8f91b",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        },
+        {
+          "stage": "after_database_restart",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "7adf9b9c5d939a373d9295588e11fb3410df5bfe7c4897946b6e7f2f4dbb1958",
+              "history_sha256": "fc5457ca32815f6405cd237ffd4b846328f95f9a14f776ed76b96f6cdcd5d261",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "db05426f70214045b79a6306648e316552081690df0d6a01394d5035de8065a3",
+              "history_sha256": "43168ce62698e2227a449266b6bbb95776646e1fd26b15057db6c38a7db20836",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "d88e14fea3208830b7d6192c682ca61c786caee93e038868b35d9c51e0b15bd5",
+              "history_sha256": "da11244434e5861129abef9a3a92e7567698aa5b147b8478646e98ea8fa8f91b",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        },
+        {
+          "stage": "after_encrypted_restore",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "991c045635c98bb3d89c740bedec3e0a09a102ccc7eae3e7dac6103bffa8b8a0",
+              "history_sha256": "fc5457ca32815f6405cd237ffd4b846328f95f9a14f776ed76b96f6cdcd5d261",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "2a233a7054e0b92ff6f3d78d73c9556e1074e1e089d08859afed8dede4802007",
+              "history_sha256": "43168ce62698e2227a449266b6bbb95776646e1fd26b15057db6c38a7db20836",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "c8bb2f6c7101f67cd8108ad39ff45b1ba72c08c219a8520560c8e81d3c4d0996",
+              "history_sha256": "da11244434e5861129abef9a3a92e7567698aa5b147b8478646e98ea8fa8f91b",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        }
+      ],
+      "restored_reviewer_revocation": "PASS"
+    },
+    "remaining_gates": [
+      "M3.1 live validation",
+      "M6 browser acceptance",
+      "full M7 release evidence"
+    ]
+  }
+}
