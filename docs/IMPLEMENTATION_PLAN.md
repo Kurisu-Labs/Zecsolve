@@ -111,7 +111,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Done: PR #18 merged |
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Done: PR #20 merged |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Implemented locally; GitHub suspension blocks push/CI/PR |
-| [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
+| [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Implemented locally on M5.0; GitHub integration blocked |
 | [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Waiting |
 | [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
 | [M6.1 — Browser access](#m6-1) | Person 4 | `feat/m6-browser-access` | Frontend resumed; M6.0 and M4.2 merged | Deferred |
@@ -233,14 +233,14 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M5.1 — Replay command
 
-- **Owner:** Person 2. **Branch:** `feat/m5-replay-case`. **Status:** Waiting.
+- **Owner:** Person 2. **Branch:** `feat/m5-replay-case`. **Status:** Implemented locally on the validated M5.0 branch; prerequisite remote merge/CI blocked by GitHub account suspension.
 - **Prerequisites:** M5.0 merged.
 - **Goal:** Reproduce a packet locally without treating historical observation claims as fresh chain trust.
 - **Owned code:** Replay library/CLI, historical evaluator dispatch, and replay fixtures/tests.
 - **Exclusions:** No database export, network lookup, arbitrary executable/version installation, UI, or merchant credit mutation.
 - **Public interfaces:** Local `replay-case` command reports cryptographic recovery, historical rules/arithmetic, integrity and unsupported/missing/external context separately.
 - **Acceptance checks:** Real fixture recovery and historical calculations reproduce; one-byte tampering fails integrity; unsupported versions and scoped omissions do not claim full success. Packet content cannot trigger arbitrary fetches or code execution.
-- **Validation evidence:** Pending: valid, tampered, scoped, missing-version and unsupported-version replay command outputs with fixture hashes. All cards also require the common definition of done below.
+- **Validation evidence:** [Replay guide](packets.md#offline-replay-m51) and [recorded CLI outputs](../fixtures/packets/replay-results.json) cover all five outcomes with file hashes; 19 replay tests pass locally. See [Item 18](DEVELOPMENT.md#item-18--offline-replay-m51). All cards also require the common definition of done below.
 
 <a id="m5-2"></a>
 
