@@ -403,3 +403,126 @@ At 2026-10-12T03:29Z, all 15 affected session/reviewer PostgreSQL scenarios pass
 on the corrected working tree. Final lint/format/schema and diff checks passed.
 CI on the first increment reproduced the same obsolete session assertion; the
 final branch includes its scoped-access correction and awaits fresh CI.
+
+M4.5 final revision `f1ae85c` passed all **220 PostgreSQL**, 237 Python and 12 Rust
+tests, lint, frontend CI and both actual-container CI runs. PR #20 merged as
+`410571b`; its branch was removed after ancestry verification.
+
+## Item 17 — packet contract (M5.0)
+
+Person 2, `feat/m5-packet-contract`, based on merged main `410571b`. Published the
+branch before implementation; contract/fixtures committed as `9154f70`. At
+2026-10-12T03:37Z on Linux x86_64/Python 3.14.7/Rust 1.99.0, all **13 new contract
+checks**, **250 Python unit tests**, **12 Rust tests**, and `make lint` passed.
+Schema generation, deterministic fixture regeneration and diff checks passed.
+There are no database or permission mutations in this increment; M4.5's full
+220-test PostgreSQL run is recorded above. Final CI remains required.
+
+The [packet contract](packets.md) defines exact base64 UTF-8 originals, separate
+original/decoded transaction hash bases, unchanged historical records, explicit
+complete/limited scope and external assertion limits. The fixtures include v1
+and v2 submission/events and both decision observation schemas. Simulated
+approval and synthetic unavailable RPC-shaped history are explicitly labeled;
+no live endpoint was queried.
+
+**Publishing block:** GitHub rejected the first implementation push with HTTP
+403, “Your account is suspended.” Read-only PR listing failed with the same
+account suspension. The local commit is intact; the remote branch still points
+to its pre-implementation base. No M5 PR/CI/merge is claimed. Remaining P2 work
+continues on local dependent task branches so implementation and tests remain
+reviewable. Once account access returns, publish and integrate M5.0, M5.1 and
+M5.2 in order through passing CI and merge-commit PRs; do not push to main.
+
+## Item 18 — offline replay (M5.1)
+
+Person 2 continued on local `feat/m5-replay-case`, based on validated M5.0 commit
+`8f02391`; GitHub account suspension prevents publishing or merging prerequisites.
+The core implementation is committed as `0ea6971`. No GitHub retry will be made
+until the user reports restored access. No CI/PR/merge completion is claimed.
+
+On Linux x86_64/Python 3.14.7/Rust 1.99.0 at 2026-10-12T03:45Z, `make lint` passed,
+`make test` passed **12 Rust and 269 Python tests**, including **19 new replay
+scenarios**. All 32 focused packet/replay tests passed. The installed `replay-case`
+entry point also reproduced the current complete fixture. The recorded actual
+CLI examples return valid=0/REPRODUCED, tampered=1/FAILED, scoped=2/LIMITED,
+missing-version=2/LIMITED, unsupported-version=3/UNSUPPORTED with input file hashes.
+
+The engine verifies original components, historical hashes and relationships
+before invoking the real bounded local verifier. Fixed historical dispatch
+reproduces initial rules 0.1.0 and decision rules 0.2.0 using recorded time and
+inputs. It distinguishes self-consistent hashes from recovered output and from
+external invoice/claim/chain/allocation assertions. Missing version fields cannot
+silently inherit the schema's default implementation. Packet data cannot select
+executables, download code or initiate network requests. No database or credit
+mutation is performed. Existing historical formats/hashes remain unchanged.
+
+See [replay usage and limits](packets.md#offline-replay-m51) and
+[recorded examples](../fixtures/packets/replay-results.json). M5.2 authorized
+snapshot export is the next local task; full remote integration remains pending.
+
+GitHub access was restored later in the same session. All three M5 branches were
+published; M5.0 PR #21 passed foundation, web and actual-container checks and
+merged as `fe08aef`. The earlier suspension entries describe that temporary
+interruption, not a current access limitation. M5.1 continues through PR #22.
+
+## Item 19 — authorized snapshot export (M5.2)
+
+Person 2 implementation on `feat/m5-case-export`, initially stacked locally on
+M5.1 `bbdd524` during the GitHub interruption. After access was restored, remote
+branches/PRs showed no overlapping work and all task branches were published.
+The first export increment was committed and pushed as `f71a9b5`; focused
+permission/concurrency tests accompany it. Review and integration continue in
+M5 dependency order with merge commits.
+
+`GET /api/cases/{id}/export` uses the shared authorizer, M4.5 projections and M5.0
+contract. One repeatable-read snapshot includes report state, original ciphertext,
+metadata and balance/allocation inputs. Decryption occurs outside its transaction;
+a fresh authorization check covers credential/grant/session expiry and revocation
+plus the entire consent selection. It does not reread and mix newer report data.
+Merchant packets retain complete original submissions; reviewer packets omit
+private submission/claim links, actor and full audit/allocation context, identify
+omissions and cannot claim full replay. Foreign conflicts remain opaque assertions.
+There are no model, migration, frontend, chain-trust or credit-writer changes.
+
+Recorded at **2026-10-12T03:52:55Z**, Linux x86_64, Python 3.14.7, Rust 1.99.0 and
+isolated native PostgreSQL 18.6 schemas: `make lint` and `make test` passed all
+**12 Rust and 269 Python tests**; `make test-db` passed **234 database tests**.
+The 30 focused export/report/evidence tests passed. Two subsequently added
+missing-versus-empty export/replay scenarios also passed, bringing export coverage
+to **16 scenarios**. Those additions change tests only; final CI will cover all
+236 PostgreSQL tests. The first export test run exposed an incorrect test-helper
+revocation signature; correcting it made the credential revocation case pass.
+The existing Starlette/httpx deprecation warning remains.
+
+The tests prove a concurrently approved case exports either the earlier history
+with zero credit or the later history with 100,000 approved zatoshis; both replay.
+They also cover real v2 claim/consent history, legacy simulated approval, exact
+originals, tampering, five HTTP roles, explicit export permission, case-only
+limited exports, grant/credential/session revocation during decryption, expired
+grants, private linked claims, foreign conflicts, byte limits and negative replay.
+
+[Packet/export/replay usage](packets.md), [scoped report fields](scoped-reports.md),
+README, PRD and TEAM_GUIDE provide the backend handoff. M3.1 still needs a trusted
+live endpoint; P4 frontend/download/browser acceptance and full release gates
+remain separate. Final-head CI and PR merge are required before M5.2 completion.
+
+M5.1 final review after access restoration added a raw-transaction omission
+regression: a scoped packet may retain the selected verification's decoded hash
+while withholding the raw bytes, so replay reports missing input rather than a
+false integrity mismatch. Both receipt and raw-byte omissions now remain LIMITED.
+All 33 focused packet/replay checks pass; no full-history packet permits omitted
+inputs. This correction is part of PR #22 before merge.
+
+M5.1 final revision `cbf8c54` passed foundation, web and actual-container CI and
+merged through PR #22. Its remote branch was removed only after ancestry
+verification. On integrated export revision `03bafe8` (with documentation-only
+working tree updates), the final local run completed by **2026-10-12T04:00:12Z**:
+**12 Rust, 270 Python and 236 PostgreSQL tests passed**, plus lint, schema
+regeneration, deterministic replay-output regeneration, POC and documentation
+link/diff checks. This includes all 16 export and 20 replay scenarios. The only
+merge conflict was two appended validation notes; both records were retained.
+M7.2 backend preparation is also confirmed merged as PR #19, correcting an older
+progress-board label. Export final-head CI remains its integration gate.
+
+M5.2 integration is tracked in [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23),
+with the full final validation results and the reviewed export-only diff.

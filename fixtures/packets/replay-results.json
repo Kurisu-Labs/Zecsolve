@@ -1,0 +1,285 @@
+{
+  "valid": {
+    "exit_code": 0,
+    "output": {
+      "schema_version": "case-replay-v1",
+      "status": "REPRODUCED",
+      "full_replay": true,
+      "packet_file_sha256": "3178cbbb996811037a0ec49228608baeaabdd5d6d9eb15ef1ce733da7f914c35",
+      "checks": [
+        {
+          "category": "integrity",
+          "reference": "packet",
+          "status": "PASS",
+          "code": "PACKET_COMPONENT_AND_HISTORY_HASHES_MATCH"
+        },
+        {
+          "category": "cryptographic_recovery",
+          "reference": "09f771b3-7616-564b-a424-ba237601b11e",
+          "status": "PASS",
+          "code": "OUTPUT_RECOVERY_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "ab58ad89-d5a5-57b6-a4f3-03536c492d65",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "69b02f1d-6a8e-58ed-95d2-8f1e0af90601",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "status": "PASS",
+          "code": "RECORDED_DECISION_TRANSITION_MATCHES"
+        },
+        {
+          "category": "rules",
+          "reference": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "current-balance",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "context",
+          "reference": "observations-and-business-records",
+          "status": "EXTERNAL",
+          "code": "NO_FRESH_CHAIN_OR_AUTHOR_AUTHENTICATION"
+        }
+      ],
+      "external_assertions": [
+        "INVOICE_AND_CLAIMS_ARE_BUSINESS_ASSERTIONS",
+        "OBSERVATIONS_ARE_HISTORICAL_EXTERNAL_ASSERTIONS",
+        "ALLOCATION_AND_SOURCE_AUTHORITY_ARE_EXTERNAL_ASSERTIONS",
+        "HASHES_DO_NOT_AUTHENTICATE_AUTHOR"
+      ]
+    }
+  },
+  "tampered": {
+    "exit_code": 1,
+    "output": {
+      "schema_version": "case-replay-v1",
+      "status": "FAILED",
+      "full_replay": false,
+      "packet_file_sha256": "c15906484d0043b2e7c0530f883a687bfd82b58eeaba45ff8cf791fe088f4d60",
+      "checks": [
+        {
+          "category": "integrity",
+          "reference": "packet",
+          "status": "FAIL",
+          "code": "INVALID_PACKET_OR_HISTORY"
+        }
+      ],
+      "external_assertions": [
+        "INVOICE_AND_CLAIMS_ARE_BUSINESS_ASSERTIONS",
+        "OBSERVATIONS_ARE_HISTORICAL_EXTERNAL_ASSERTIONS",
+        "ALLOCATION_AND_SOURCE_AUTHORITY_ARE_EXTERNAL_ASSERTIONS",
+        "HASHES_DO_NOT_AUTHENTICATE_AUTHOR"
+      ]
+    }
+  },
+  "scoped": {
+    "exit_code": 2,
+    "output": {
+      "schema_version": "case-replay-v1",
+      "status": "LIMITED",
+      "full_replay": false,
+      "packet_file_sha256": "e0362c1dec03662bea868381869e11315a695114bfaf560558bef63eeb18b020",
+      "checks": [
+        {
+          "category": "integrity",
+          "reference": "packet",
+          "status": "PASS",
+          "code": "PACKET_COMPONENT_AND_HISTORY_HASHES_MATCH"
+        },
+        {
+          "category": "context",
+          "reference": "disclosure",
+          "status": "MISSING",
+          "code": "DISCLOSED_SCOPE_OMITS_CONTEXT"
+        },
+        {
+          "category": "context",
+          "reference": "disclosure",
+          "status": "MISSING",
+          "code": "DISCLOSED_SCOPE_OMITS_CONTEXT"
+        },
+        {
+          "category": "context",
+          "reference": "disclosure",
+          "status": "MISSING",
+          "code": "DISCLOSED_SCOPE_OMITS_CONTEXT"
+        },
+        {
+          "category": "cryptographic_recovery",
+          "reference": "09f771b3-7616-564b-a424-ba237601b11e",
+          "status": "PASS",
+          "code": "OUTPUT_RECOVERY_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "historical-context",
+          "status": "MISSING",
+          "code": "SCOPED_REPORT_WITHOUT_COMPLETE_RULE_INPUTS"
+        }
+      ],
+      "external_assertions": [
+        "INVOICE_AND_CLAIMS_ARE_BUSINESS_ASSERTIONS",
+        "OBSERVATIONS_ARE_HISTORICAL_EXTERNAL_ASSERTIONS",
+        "ALLOCATION_AND_SOURCE_AUTHORITY_ARE_EXTERNAL_ASSERTIONS",
+        "HASHES_DO_NOT_AUTHENTICATE_AUTHOR"
+      ]
+    }
+  },
+  "missing-version": {
+    "exit_code": 2,
+    "output": {
+      "schema_version": "case-replay-v1",
+      "status": "LIMITED",
+      "full_replay": false,
+      "packet_file_sha256": "ed75a351bf4c28f9fb33b2f3a04003de527abc8e01e8e11cb45f9d2cedf1b78c",
+      "checks": [
+        {
+          "category": "integrity",
+          "reference": "packet",
+          "status": "PASS",
+          "code": "PACKET_COMPONENT_AND_HISTORY_HASHES_MATCH"
+        },
+        {
+          "category": "context",
+          "reference": "verifier",
+          "status": "MISSING",
+          "code": "VERIFIER_VERSION_METADATA_MISSING"
+        },
+        {
+          "category": "cryptographic_recovery",
+          "reference": "09f771b3-7616-564b-a424-ba237601b11e",
+          "status": "MISSING",
+          "code": "VERIFIER_DECLARATION_MISSING"
+        },
+        {
+          "category": "rules",
+          "reference": "ab58ad89-d5a5-57b6-a4f3-03536c492d65",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "69b02f1d-6a8e-58ed-95d2-8f1e0af90601",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "status": "PASS",
+          "code": "RECORDED_DECISION_TRANSITION_MATCHES"
+        },
+        {
+          "category": "rules",
+          "reference": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "current-balance",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "context",
+          "reference": "observations-and-business-records",
+          "status": "EXTERNAL",
+          "code": "NO_FRESH_CHAIN_OR_AUTHOR_AUTHENTICATION"
+        }
+      ],
+      "external_assertions": [
+        "INVOICE_AND_CLAIMS_ARE_BUSINESS_ASSERTIONS",
+        "OBSERVATIONS_ARE_HISTORICAL_EXTERNAL_ASSERTIONS",
+        "ALLOCATION_AND_SOURCE_AUTHORITY_ARE_EXTERNAL_ASSERTIONS",
+        "HASHES_DO_NOT_AUTHENTICATE_AUTHOR"
+      ]
+    }
+  },
+  "unsupported-version": {
+    "exit_code": 3,
+    "output": {
+      "schema_version": "case-replay-v1",
+      "status": "UNSUPPORTED",
+      "full_replay": false,
+      "packet_file_sha256": "4721dbed21b594a85cc334aee1894e1255e153c4591972372d2dbcc8e2b3b84c",
+      "checks": [
+        {
+          "category": "integrity",
+          "reference": "packet",
+          "status": "PASS",
+          "code": "PACKET_COMPONENT_AND_HISTORY_HASHES_MATCH"
+        },
+        {
+          "category": "context",
+          "reference": "verifier",
+          "status": "UNSUPPORTED",
+          "code": "VERIFIER_IMPLEMENTATION_UNSUPPORTED"
+        },
+        {
+          "category": "cryptographic_recovery",
+          "reference": "09f771b3-7616-564b-a424-ba237601b11e",
+          "status": "MISSING",
+          "code": "VERIFIER_DECLARATION_MISSING"
+        },
+        {
+          "category": "rules",
+          "reference": "ab58ad89-d5a5-57b6-a4f3-03536c492d65",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "69b02f1d-6a8e-58ed-95d2-8f1e0af90601",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "status": "PASS",
+          "code": "RECORDED_DECISION_TRANSITION_MATCHES"
+        },
+        {
+          "category": "rules",
+          "reference": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "rules",
+          "reference": "current-balance",
+          "status": "PASS",
+          "code": "HISTORICAL_ARITHMETIC_REPRODUCED"
+        },
+        {
+          "category": "context",
+          "reference": "observations-and-business-records",
+          "status": "EXTERNAL",
+          "code": "NO_FRESH_CHAIN_OR_AUTHOR_AUTHENTICATION"
+        }
+      ],
+      "external_assertions": [
+        "INVOICE_AND_CLAIMS_ARE_BUSINESS_ASSERTIONS",
+        "OBSERVATIONS_ARE_HISTORICAL_EXTERNAL_ASSERTIONS",
+        "ALLOCATION_AND_SOURCE_AUTHORITY_ARE_EXTERNAL_ASSERTIONS",
+        "HASHES_DO_NOT_AUTHENTICATE_AUTHOR"
+      ]
+    }
+  }
+}

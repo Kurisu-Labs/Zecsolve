@@ -60,9 +60,11 @@ An existing PostgreSQL installation also works: create a dedicated database and 
 | `GET /api/cases/{id}` | Returns current case state/version and its immutable opening event; merchant only |
 | `POST /api/cases/{id}/claims` | Scoped merchant/customer claim with explicit disclosure and consent; minimal acknowledgement + `Idempotency-Key` ([guide](docs/customer-submissions.md)) |
 | `POST /api/cases/{id}/evidence` | Encrypted optional receipt/raw-tx bundle; merchant v1 remains compatible, merchant/customer v2 records consent and returns a minimal acknowledgement; `Idempotency-Key` required |
-| `GET /api/cases/{id}/evidence/{evidence_id}` | Returns owned evidence metadata only; never receipt/raw-tx content or ciphertext |
+| `GET /api/cases/{id}/evidence/{evidence_id}` | Merchant metadata or selected/consented reviewer projection; never ciphertext |
+| `GET /api/cases/{id}/evidence/{evidence_id}/content` | Exact authorized original receipt/raw-tx components; [disclosure contract](docs/scoped-reports.md) |
 | `POST /api/cases/{id}/verify` | Verifies owned encrypted evidence and atomically stores the attempt, offline observation, evaluation, and audit event; requires `Idempotency-Key` |
-| `GET /api/cases/{id}/report` | Returns merchant verification/decision history, current balances, and chain-review flags; optional `verification_id` selects a candidate |
+| `GET /api/cases/{id}/report` | Merchant history/balances or an explicit reviewer projection; optional `verification_id` selects an authorized candidate |
+| `GET /api/cases/{id}/export` | Authorized `CasePacketV1`; reviewers require explicit export permission; [packet/replay guide](docs/packets.md) |
 | `POST /api/cases/{id}/resolve` | Records an authorized merchant decision with reason, reviewed case version, and retry key; production offline approvals remain blocked |
 | `POST /api/cases/{id}/chain-observations` | Refreshes trusted chain evidence for a verification, including resolved cases; merchant + `Idempotency-Key` required |
 | `POST /api/cases/{id}/grants`, `GET /api/cases/{id}/grants`, `DELETE /api/cases/{id}/grants/{grant_id}` | Merchant grant lifecycle; explicit case/disclosure scope, one-time secret and revocation; see [grant guide](docs/grants.md) |
@@ -99,7 +101,7 @@ Creation/issuance returns one JSON object containing the merchant ID, credential
 
 Call `GET /api/auth/me` using `Authorization: Bearer <merchant token>`, or authorize the `MerchantCredential` scheme in `/docs`. The response contains only server-derived merchant and credential IDs. Missing, unknown, expired, or revoked credentials return 401; database unavailability returns a generic 503. This credential is separate from the existing development POC token.
 
-Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification, reports, and [merchant decisions](docs/resolutions.md) are available; case grants and secure browser sessions are available; scoped [customer submissions](docs/customer-submissions.md) are implemented, while scoped reviewer reports remain separate work. Credit approval remains blocked by default; see [trusted RPC configuration](docs/chain.md). Live-node validation is still pending.
+Readiness now compares the database revision with the migration head discovered in `ZECSOLVE_MIGRATIONS_PATH` (default `apps/api/migrations`, relative to the launch directory). Run from the repository root or configure that path explicitly. Persisted verification, reports, and [merchant decisions](docs/resolutions.md) are available; case grants and secure browser sessions are available; scoped [customer submissions](docs/customer-submissions.md) are implemented, with [scoped reviewer reports](docs/scoped-reports.md) and [authorized packet export/replay](docs/packets.md) now implemented. Credit approval remains blocked by default; see [trusted RPC configuration](docs/chain.md). Live-node validation is still pending.
 
 ## Create an invoice
 
@@ -164,3 +166,16 @@ The POC token is a development access gate, not multi-merchant authorization. On
 ## Attribution
 
 Cryptographic recovery reuses [Glasspane](https://github.com/dolepee/glasspane) `gp-core` and `gp-types`, pinned at `f6468e6d08a7adad53bf2991a311358dc84e869b`. Its MIT license is retained in [third_party/glasspane/LICENSE](third_party/glasspane/LICENSE). Original receipt and transaction fixture bytes are recorded with hashes and source paths in [fixtures/manifest.json](fixtures/manifest.json). zecsolve contributes the adapter, workflow contracts, schema, and application foundation; it does not claim authorship of the reused cryptography.
+
+## Replay an authorized packet offline
+
+```sh
+uv run --locked replay-case fixtures/packets/complete-v1.json
+uv run --locked replay-case /path/to/case-packet.json
+```
+
+The command separately checks integrity, real receipt recovery and historical
+rules/arithmetic. Scoped omissions and unsupported/missing versions never claim
+full replay. Fixture approvals are explicitly simulated; replay cannot freshly
+prove chain inclusion or authenticate business assertions. See [packet usage,
+exit codes and limits](docs/packets.md).
