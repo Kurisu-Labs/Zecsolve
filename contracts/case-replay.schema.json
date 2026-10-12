@@ -1,0 +1,97 @@
+{
+  "$defs": {
+    "ReplayCheckV1": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "integrity",
+            "cryptographic_recovery",
+            "rules",
+            "context"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "reference": {
+          "title": "Reference",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "MISSING",
+            "UNSUPPORTED",
+            "EXTERNAL"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "category",
+        "reference",
+        "status",
+        "code"
+      ],
+      "title": "ReplayCheckV1",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "case-replay-v1",
+      "default": "case-replay-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "REPRODUCED",
+        "LIMITED",
+        "UNSUPPORTED",
+        "FAILED"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "full_replay": {
+      "title": "Full Replay",
+      "type": "boolean"
+    },
+    "packet_file_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Packet File Sha256",
+      "type": "string"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/ReplayCheckV1"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "external_assertions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "External Assertions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "status",
+    "full_replay",
+    "packet_file_sha256",
+    "checks",
+    "external_assertions"
+  ],
+  "title": "ReplayResultV1",
+  "type": "object"
+}
