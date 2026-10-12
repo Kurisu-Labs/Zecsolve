@@ -1,0 +1,752 @@
+{
+  "schema_version": "case-packet-v1",
+  "payload": {
+    "disclosure_scope": "MERCHANT",
+    "replay_scope": "FULL_HISTORY",
+    "omissions": [],
+    "assertions": [
+      "INVOICE_AND_CLAIMS_ARE_BUSINESS_ASSERTIONS",
+      "OBSERVATIONS_ARE_HISTORICAL_EXTERNAL_ASSERTIONS",
+      "ALLOCATION_AND_SOURCE_AUTHORITY_ARE_EXTERNAL_ASSERTIONS",
+      "HASHES_DO_NOT_AUTHENTICATE_AUTHOR"
+    ],
+    "report": {
+      "schema_version": "1",
+      "report_scope": "SIMULATED_DECISIONS",
+      "disclosure_scope": "MERCHANT",
+      "generated_at": "2026-10-12T00:00:05Z",
+      "case": {
+        "schema_version": "1",
+        "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+        "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+        "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+        "state": "UNDER_REVIEW",
+        "version": 4,
+        "created_at": "2026-10-12T00:00:00Z"
+      },
+      "invoice": {
+        "schema_version": "1",
+        "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+        "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+        "policy_id": "6b29f07e-528b-5a4b-8318-b7ad16567483",
+        "created_at": "2026-10-12T00:00:00Z",
+        "terms": {
+          "expected_zat": 200000,
+          "network": "mainnet",
+          "pool": "orchard",
+          "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+          "expected_memo": "glasspane first receipt",
+          "expires_at": null,
+          "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+          "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "policy": {
+          "policy_version": "invoice-policy-v1",
+          "rules_version": "0.1.0",
+          "minimum_confirmations": 10,
+          "max_observation_age_seconds": 60,
+          "memo_binding": "exact",
+          "allow_overpayment": false,
+          "unique_receiver_binding": false
+        },
+        "snapshot_hash": "15dd2b942adb9b4585b1325bd000fd34de9e8dd5a5368739f8808a1e24f951c7"
+      },
+      "policy": {
+        "policy_version": "invoice-policy-v1",
+        "rules_version": "0.1.0",
+        "minimum_confirmations": 10,
+        "max_observation_age_seconds": 60,
+        "memo_binding": "exact",
+        "allow_overpayment": false,
+        "unique_receiver_binding": false
+      },
+      "claims": [],
+      "evidence": [
+        {
+          "schema_version": "2",
+          "evidence_id": "cc7caedf-43d4-5e25-8900-45216687177b",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+          "submitted_by": "63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "submitted_at": "2026-10-12T00:00:01Z",
+          "source": "Public Glasspane fixture; synthetic case",
+          "source_kind": "public_fixture",
+          "disclosure_version": "evidence-disclosure-v2",
+          "processing_authorized": true,
+          "share_with_reviewers": true,
+          "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+          "raw_tx_hex_sha256": "a8e89cb90511d6bf54beb26eb73cd980e676301fea9ce3f7464fe79931c72e39",
+          "payload_sha256": "5607193ec4f917c22bdd8468e388d33226dea3c9ec70b0a5ad238bdd40cf46eb",
+          "case_version": 2,
+          "case_state": "OPEN",
+          "event_id": "efe11239-a4fe-5634-a77b-29864b3b158e",
+          "actor_grant_id": null,
+          "consent_id": "bc8daaa4-f6c6-5e2b-a4ce-5d556ee01051",
+          "claim_id": null
+        }
+      ],
+      "verifications": [
+        {
+          "schema_version": "1",
+          "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+          "evidence_id": "cc7caedf-43d4-5e25-8900-45216687177b",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+          "actor_id": "63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "created_at": "2026-10-12T00:00:02Z",
+          "case_version": 3,
+          "case_state": "UNDER_REVIEW",
+          "result": {
+            "schema_version": "1",
+            "verifier": {
+              "name": "zecsolve-verifier",
+              "version": "0.1.0",
+              "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+            },
+            "receipt_state": "VALID",
+            "chain_state": "UNAVAILABLE",
+            "reason_code": "OUTPUT_RECOVERED",
+            "raw_tx_verified": true,
+            "signature_state": "NONE",
+            "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+            "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+            "output": {
+              "network": "mainnet",
+              "pool": "orchard",
+              "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+              "output_index": 1,
+              "amount_zat": 100000,
+              "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+              "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+              "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "observation": {
+            "schema_version": "1",
+            "observation_id": "e8b1864a-9b6a-5572-95b8-4673d7005d28",
+            "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+            "state": "UNAVAILABLE",
+            "source": "offline",
+            "reason_code": "NO_CHAIN_OBSERVER",
+            "observed_at": "2026-10-12T00:00:02Z",
+            "network": "mainnet",
+            "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+            "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+            "confirmations": null,
+            "block_hash": null,
+            "block_height": null
+          },
+          "evaluation": {
+            "schema_version": "1",
+            "evaluation_id": "ab58ad89-d5a5-57b6-a4f3-03536c492d65",
+            "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+            "observation_id": "e8b1864a-9b6a-5572-95b8-4673d7005d28",
+            "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+            "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+            "evaluated_at": "2026-10-12T00:00:02Z",
+            "inputs": {
+              "invoice": {
+                "schema_version": "1",
+                "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+                "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+                "policy_id": "6b29f07e-528b-5a4b-8318-b7ad16567483",
+                "created_at": "2026-10-12T00:00:00Z",
+                "terms": {
+                  "expected_zat": 200000,
+                  "network": "mainnet",
+                  "pool": "orchard",
+                  "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+                  "expected_memo": "glasspane first receipt",
+                  "expires_at": null,
+                  "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+                  "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+                },
+                "policy": {
+                  "policy_version": "invoice-policy-v1",
+                  "rules_version": "0.1.0",
+                  "minimum_confirmations": 10,
+                  "max_observation_age_seconds": 60,
+                  "memo_binding": "exact",
+                  "allow_overpayment": false,
+                  "unique_receiver_binding": false
+                },
+                "snapshot_hash": "15dd2b942adb9b4585b1325bd000fd34de9e8dd5a5368739f8808a1e24f951c7"
+              },
+              "verification": {
+                "schema_version": "1",
+                "verifier": {
+                  "name": "zecsolve-verifier",
+                  "version": "0.1.0",
+                  "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+                },
+                "receipt_state": "VALID",
+                "chain_state": "UNAVAILABLE",
+                "reason_code": "OUTPUT_RECOVERED",
+                "raw_tx_verified": true,
+                "signature_state": "NONE",
+                "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+                "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+                "output": {
+                  "network": "mainnet",
+                  "pool": "orchard",
+                  "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+                  "output_index": 1,
+                  "amount_zat": 100000,
+                  "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+                  "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+                  "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+                }
+              },
+              "approved_allocations": [],
+              "foreign_conflict": false,
+              "chain_state": "UNAVAILABLE"
+            },
+            "result": {
+              "rules_version": "0.1.0",
+              "findings": [
+                "CHAIN_UNVERIFIED",
+                "UNDERPAID"
+              ],
+              "credited_zat": 0,
+              "outstanding_zat": 200000,
+              "excess_zat": 0,
+              "candidate_zat": 100000,
+              "projected_outstanding_zat": 100000,
+              "eligible_for_credit": false
+            },
+            "snapshot_hash": "c4562928b8b62c7b98dc6cf44acf7a9b8692a94fb28382579224f730ac08e62c"
+          },
+          "event_id": "76231c48-25ca-5030-bc91-958b2a8015ea"
+        }
+      ],
+      "chain_observations": [
+        {
+          "schema_version": "1",
+          "observation_id": "e8b1864a-9b6a-5572-95b8-4673d7005d28",
+          "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+          "state": "UNAVAILABLE",
+          "source": "offline",
+          "reason_code": "NO_CHAIN_OBSERVER",
+          "observed_at": "2026-10-12T00:00:02Z",
+          "network": "mainnet",
+          "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+          "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+          "confirmations": null,
+          "block_hash": null,
+          "block_height": null
+        }
+      ],
+      "evaluations": [
+        {
+          "schema_version": "1",
+          "evaluation_id": "ab58ad89-d5a5-57b6-a4f3-03536c492d65",
+          "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+          "observation_id": "e8b1864a-9b6a-5572-95b8-4673d7005d28",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+          "evaluated_at": "2026-10-12T00:00:02Z",
+          "inputs": {
+            "invoice": {
+              "schema_version": "1",
+              "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+              "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+              "policy_id": "6b29f07e-528b-5a4b-8318-b7ad16567483",
+              "created_at": "2026-10-12T00:00:00Z",
+              "terms": {
+                "expected_zat": 200000,
+                "network": "mainnet",
+                "pool": "orchard",
+                "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+                "expected_memo": "glasspane first receipt",
+                "expires_at": null,
+                "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+                "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "policy": {
+                "policy_version": "invoice-policy-v1",
+                "rules_version": "0.1.0",
+                "minimum_confirmations": 10,
+                "max_observation_age_seconds": 60,
+                "memo_binding": "exact",
+                "allow_overpayment": false,
+                "unique_receiver_binding": false
+              },
+              "snapshot_hash": "15dd2b942adb9b4585b1325bd000fd34de9e8dd5a5368739f8808a1e24f951c7"
+            },
+            "verification": {
+              "schema_version": "1",
+              "verifier": {
+                "name": "zecsolve-verifier",
+                "version": "0.1.0",
+                "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+              },
+              "receipt_state": "VALID",
+              "chain_state": "UNAVAILABLE",
+              "reason_code": "OUTPUT_RECOVERED",
+              "raw_tx_verified": true,
+              "signature_state": "NONE",
+              "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+              "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+              "output": {
+                "network": "mainnet",
+                "pool": "orchard",
+                "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+                "output_index": 1,
+                "amount_zat": 100000,
+                "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+                "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+                "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "approved_allocations": [],
+            "foreign_conflict": false,
+            "chain_state": "UNAVAILABLE"
+          },
+          "result": {
+            "rules_version": "0.1.0",
+            "findings": [
+              "CHAIN_UNVERIFIED",
+              "UNDERPAID"
+            ],
+            "credited_zat": 0,
+            "outstanding_zat": 200000,
+            "excess_zat": 0,
+            "candidate_zat": 100000,
+            "projected_outstanding_zat": 100000,
+            "eligible_for_credit": false
+          },
+          "snapshot_hash": "c4562928b8b62c7b98dc6cf44acf7a9b8692a94fb28382579224f730ac08e62c"
+        }
+      ],
+      "selected_verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+      "balances": {
+        "rules_version": "0.1.0",
+        "findings": [
+          "ALREADY_ALLOCATED",
+          "CHAIN_UNVERIFIED",
+          "UNDERPAID"
+        ],
+        "credited_zat": 100000,
+        "outstanding_zat": 100000,
+        "excess_zat": 0,
+        "candidate_zat": 0,
+        "projected_outstanding_zat": 100000,
+        "eligible_for_credit": false
+      },
+      "resolutions": [
+        {
+          "resolution_id": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "outcome": "APPROVE_OUTPUT",
+          "reason": "Synthetic demonstration only",
+          "approved_by": "credential:63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "approved_at": "2026-10-12T00:00:03Z"
+        }
+      ],
+      "events": [
+        {
+          "schema_version": "1",
+          "event_id": "353ec273-83b0-5f25-a2c2-82502be83984",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "sequence": 1,
+          "actor": "credential:63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "action": "CASE_OPENED",
+          "at": "2026-10-12T00:00:00Z",
+          "payload": {
+            "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+            "invoice_snapshot_hash": "15dd2b942adb9b4585b1325bd000fd34de9e8dd5a5368739f8808a1e24f951c7",
+            "policy_id": "6b29f07e-528b-5a4b-8318-b7ad16567483"
+          },
+          "payload_hash": "653a8d970f13468fe6ea94234627a4799a7120f91728f9d027b193d4e2de3ad4",
+          "previous_hash": null,
+          "event_hash": "8c1c3e90133452e6fa6f518c36d481b84b0d544db72b9efd86669b03ef5b8711"
+        },
+        {
+          "schema_version": "2",
+          "event_id": "efe11239-a4fe-5634-a77b-29864b3b158e",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "sequence": 2,
+          "actor": "credential:63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "action": "EVIDENCE_SUBMITTED",
+          "at": "2026-10-12T00:00:01Z",
+          "payload": {
+            "evidence_id": "cc7caedf-43d4-5e25-8900-45216687177b",
+            "payload_sha256": "5607193ec4f917c22bdd8468e388d33226dea3c9ec70b0a5ad238bdd40cf46eb",
+            "consent_id": "bc8daaa4-f6c6-5e2b-a4ce-5d556ee01051",
+            "claim_id": null,
+            "case_version": 2,
+            "case_state": "OPEN"
+          },
+          "payload_hash": "3b47c186251f4bb48f701c6b4cf3a05b2812c919ec99e193b0837d3b3a7559d4",
+          "previous_hash": "8c1c3e90133452e6fa6f518c36d481b84b0d544db72b9efd86669b03ef5b8711",
+          "event_hash": "34f36a55d75be29438290499cda67420f00bcddb21a68230880f03405416d046"
+        },
+        {
+          "schema_version": "1",
+          "event_id": "76231c48-25ca-5030-bc91-958b2a8015ea",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "sequence": 3,
+          "actor": "credential:63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "action": "VERIFICATION_RECORDED",
+          "at": "2026-10-12T00:00:02Z",
+          "payload": {
+            "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+            "evidence_id": "cc7caedf-43d4-5e25-8900-45216687177b",
+            "observation_id": "e8b1864a-9b6a-5572-95b8-4673d7005d28",
+            "evaluation_id": "ab58ad89-d5a5-57b6-a4f3-03536c492d65",
+            "result_sha256": "5dee6fe984b4a0cd3ad26715cbe6321d831e0d1e92080d49bc21ee631f470d00",
+            "evaluation_sha256": "c4562928b8b62c7b98dc6cf44acf7a9b8692a94fb28382579224f730ac08e62c",
+            "case_version": 3,
+            "case_state": "UNDER_REVIEW"
+          },
+          "payload_hash": "74b366995d29157e2e9a4881813091937666bdaee40b980a9242d37fe48d83c3",
+          "previous_hash": "34f36a55d75be29438290499cda67420f00bcddb21a68230880f03405416d046",
+          "event_hash": "5fe627586088f60f55c48ac3a651396e0824d8debb66f9a579d7c046821cc4d2"
+        },
+        {
+          "schema_version": "1",
+          "event_id": "e3f76f96-3a0e-57a3-a3fe-7fb8112bca7e",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "sequence": 4,
+          "actor": "credential:63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "action": "RESOLUTION_RECORDED",
+          "at": "2026-10-12T00:00:03Z",
+          "payload": {
+            "resolution_id": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+            "evaluation_id": "69b02f1d-6a8e-58ed-95d2-8f1e0af90601",
+            "outcome_sha256": "18a05623d7e8d4718f3e3ecb37ac8978090773a1dc3576fdf19c280b9eacb049",
+            "case_version": 4,
+            "case_state": "UNDER_REVIEW"
+          },
+          "payload_hash": "fcb914f25571ed993584bcbd2c76e4563ce20097ed2e2d2aa2d14bbfb62f9afd",
+          "previous_hash": "5fe627586088f60f55c48ac3a651396e0824d8debb66f9a579d7c046821cc4d2",
+          "event_hash": "34db99eb1b6a2659bf4b92374dddfc68ebdd12b7932a17461202cdb7159f7c7d"
+        }
+      ],
+      "chain_review": [],
+      "decision_observations": [
+        {
+          "schema_version": "decision-observation-v1",
+          "observation_id": "2ff77e50-e917-5ba5-8393-7fa35bf09412",
+          "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+          "state": "CONFIRMED",
+          "source_kind": "SIMULATED",
+          "source": "synthetic-packet-fixture",
+          "reason_code": "SIMULATED_CONFIRMATION",
+          "observed_at": "2026-10-12T00:00:03Z",
+          "network": "mainnet",
+          "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+          "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+          "confirmations": 10,
+          "block_hash": "abababababababababababababababababababababababababababababababab",
+          "block_height": 100
+        },
+        {
+          "schema_version": "decision-observation-v2",
+          "observation_id": "ee948080-5536-56e6-acf0-b1e9d4a93a82",
+          "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+          "state": "UNAVAILABLE",
+          "source_kind": "RPC",
+          "source": "synthetic-unavailable-not-live",
+          "reason_code": "RPC_SYNTHETIC_UNAVAILABLE",
+          "observed_at": "2026-10-12T00:00:04Z",
+          "network": "mainnet",
+          "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+          "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+          "confirmations": null,
+          "block_hash": null,
+          "block_height": null,
+          "rpc": {
+            "fixture": "synthetic unavailable provenance shape; no node was queried"
+          }
+        }
+      ],
+      "decision_evaluations": [
+        {
+          "schema_version": "decision-evaluation-v1",
+          "evaluation_id": "69b02f1d-6a8e-58ed-95d2-8f1e0af90601",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+          "evaluated_at": "2026-10-12T00:00:03Z",
+          "invoice": {
+            "schema_version": "1",
+            "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+            "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+            "policy_id": "6b29f07e-528b-5a4b-8318-b7ad16567483",
+            "created_at": "2026-10-12T00:00:00Z",
+            "terms": {
+              "expected_zat": 200000,
+              "network": "mainnet",
+              "pool": "orchard",
+              "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+              "expected_memo": "glasspane first receipt",
+              "expires_at": null,
+              "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+              "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "policy": {
+              "policy_version": "invoice-policy-v1",
+              "rules_version": "0.1.0",
+              "minimum_confirmations": 10,
+              "max_observation_age_seconds": 60,
+              "memo_binding": "exact",
+              "allow_overpayment": false,
+              "unique_receiver_binding": false
+            },
+            "snapshot_hash": "15dd2b942adb9b4585b1325bd000fd34de9e8dd5a5368739f8808a1e24f951c7"
+          },
+          "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+          "verification": {
+            "schema_version": "1",
+            "verifier": {
+              "name": "zecsolve-verifier",
+              "version": "0.1.0",
+              "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+            },
+            "receipt_state": "VALID",
+            "chain_state": "UNAVAILABLE",
+            "reason_code": "OUTPUT_RECOVERED",
+            "raw_tx_verified": true,
+            "signature_state": "NONE",
+            "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+            "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+            "output": {
+              "network": "mainnet",
+              "pool": "orchard",
+              "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+              "output_index": 1,
+              "amount_zat": 100000,
+              "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+              "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+              "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "observation": {
+            "schema_version": "decision-observation-v1",
+            "observation_id": "2ff77e50-e917-5ba5-8393-7fa35bf09412",
+            "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+            "state": "CONFIRMED",
+            "source_kind": "SIMULATED",
+            "source": "synthetic-packet-fixture",
+            "reason_code": "SIMULATED_CONFIRMATION",
+            "observed_at": "2026-10-12T00:00:03Z",
+            "network": "mainnet",
+            "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+            "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+            "confirmations": 10,
+            "block_hash": "abababababababababababababababababababababababababababababababab",
+            "block_height": 100
+          },
+          "source_authorized": true,
+          "approved_allocations": [],
+          "foreign_conflict": false,
+          "result": {
+            "rules_version": "0.2.0",
+            "findings": [
+              "UNDERPAID",
+              "ELIGIBLE_FOR_CREDIT"
+            ],
+            "credited_zat": 0,
+            "outstanding_zat": 200000,
+            "excess_zat": 0,
+            "candidate_zat": 100000,
+            "projected_outstanding_zat": 100000,
+            "eligible_for_credit": true
+          },
+          "snapshot_hash": "2af273c06e3fe82ded8ff847c51ea79c6333bf1f53fb2fb97da53cf8f205e5c8"
+        }
+      ],
+      "decisions": [
+        {
+          "schema_version": "1",
+          "resolution_id": "080e09f1-92e9-5a97-8b8d-21081a98fa76",
+          "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+          "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+          "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+          "actor_id": "63566a56-85cd-5423-85ea-35f7a9b7eedc",
+          "action": "APPROVE_OUTPUT",
+          "reason": "Synthetic demonstration only",
+          "decided_at": "2026-10-12T00:00:03Z",
+          "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+          "output_id": "mainnet:orchard:66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0:1",
+          "allocated_zat": 100000,
+          "case_version": 4,
+          "case_state": "UNDER_REVIEW",
+          "evaluation": {
+            "schema_version": "decision-evaluation-v1",
+            "evaluation_id": "69b02f1d-6a8e-58ed-95d2-8f1e0af90601",
+            "case_id": "17fed402-a103-5f5d-9353-72a587153a6c",
+            "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+            "evaluated_at": "2026-10-12T00:00:03Z",
+            "invoice": {
+              "schema_version": "1",
+              "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+              "merchant_id": "e1c57c48-6aa3-548e-af8b-c9c3776759af",
+              "policy_id": "6b29f07e-528b-5a4b-8318-b7ad16567483",
+              "created_at": "2026-10-12T00:00:00Z",
+              "terms": {
+                "expected_zat": 200000,
+                "network": "mainnet",
+                "pool": "orchard",
+                "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+                "expected_memo": "glasspane first receipt",
+                "expires_at": null,
+                "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+                "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "policy": {
+                "policy_version": "invoice-policy-v1",
+                "rules_version": "0.1.0",
+                "minimum_confirmations": 10,
+                "max_observation_age_seconds": 60,
+                "memo_binding": "exact",
+                "allow_overpayment": false,
+                "unique_receiver_binding": false
+              },
+              "snapshot_hash": "15dd2b942adb9b4585b1325bd000fd34de9e8dd5a5368739f8808a1e24f951c7"
+            },
+            "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+            "verification": {
+              "schema_version": "1",
+              "verifier": {
+                "name": "zecsolve-verifier",
+                "version": "0.1.0",
+                "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+              },
+              "receipt_state": "VALID",
+              "chain_state": "UNAVAILABLE",
+              "reason_code": "OUTPUT_RECOVERED",
+              "raw_tx_verified": true,
+              "signature_state": "NONE",
+              "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+              "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+              "output": {
+                "network": "mainnet",
+                "pool": "orchard",
+                "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+                "output_index": 1,
+                "amount_zat": 100000,
+                "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+                "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+                "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "observation": {
+              "schema_version": "decision-observation-v1",
+              "observation_id": "2ff77e50-e917-5ba5-8393-7fa35bf09412",
+              "verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+              "state": "CONFIRMED",
+              "source_kind": "SIMULATED",
+              "source": "synthetic-packet-fixture",
+              "reason_code": "SIMULATED_CONFIRMATION",
+              "observed_at": "2026-10-12T00:00:03Z",
+              "network": "mainnet",
+              "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+              "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+              "confirmations": 10,
+              "block_hash": "abababababababababababababababababababababababababababababababab",
+              "block_height": 100
+            },
+            "source_authorized": true,
+            "approved_allocations": [],
+            "foreign_conflict": false,
+            "result": {
+              "rules_version": "0.2.0",
+              "findings": [
+                "UNDERPAID",
+                "ELIGIBLE_FOR_CREDIT"
+              ],
+              "credited_zat": 0,
+              "outstanding_zat": 200000,
+              "excess_zat": 0,
+              "candidate_zat": 100000,
+              "projected_outstanding_zat": 100000,
+              "eligible_for_credit": true
+            },
+            "snapshot_hash": "2af273c06e3fe82ded8ff847c51ea79c6333bf1f53fb2fb97da53cf8f205e5c8"
+          },
+          "balances": {
+            "rules_version": "0.1.0",
+            "findings": [
+              "ALREADY_ALLOCATED",
+              "CHAIN_UNVERIFIED",
+              "UNDERPAID"
+            ],
+            "credited_zat": 100000,
+            "outstanding_zat": 100000,
+            "excess_zat": 0,
+            "candidate_zat": 0,
+            "projected_outstanding_zat": 100000,
+            "eligible_for_credit": false
+          },
+          "event_id": "e3f76f96-3a0e-57a3-a3fe-7fb8112bca7e"
+        }
+      ]
+    },
+    "evidence": [
+      {
+        "evidence_id": "cc7caedf-43d4-5e25-8900-45216687177b",
+        "provenance": {
+          "source": "Public Glasspane fixture; synthetic case",
+          "source_kind": "public_fixture",
+          "submitted_at": "2026-10-12T00:00:01Z",
+          "assertion": true
+        },
+        "receipt": {
+          "availability": "PRESENT",
+          "encoding": "base64-utf8",
+          "data": "ewogICJ2ZXJzaW9uIjogIjAiLAogICJuZXR3b3JrIjogIm1haW5uZXQiLAogICJwb29sIjogIm9yY2hhcmQiLAogICJ0eF9pZCI6ICI2NjE2N2NkMzAyMGViMzI5NDQ2ZTg2ZDgwY2NkMDQ5NGJhYTM5NTliZjlhMGU1ODZkYmRjY2QyMDRiNmRjZmQwIiwKICAib3V0cHV0X2luZGV4IjogMSwKICAib2NrIjogInBOVlp3MjJIdmhia0tjWUROVl9ibzZlTWp1a2pjZmF4TURRWU9FRjFta0kiLAogICJsYWJlbCI6ICJnbGFzc3BhbmUgZmlyc3QgcmVjZWlwdCIsCiAgImlzc3VlZF9hdCI6ICIyMDI2LTA1LTMxVDEyOjA3OjMxLjg4ODY5MjI4OFoiCn0=",
+          "sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+          "hash_basis": "original-utf8-bytes"
+        },
+        "raw_transaction_hex": {
+          "availability": "PRESENT",
+          "encoding": "base64-utf8",
+          "data": "MDUwMDAwODAwYTI3YTcyNmYwNGRlYzRkMDAwMDAwMDAwYzRiMzMwMDAwMDAwMDAwMDIxYTU2ZGY0M2FmOWI4NjZhMzBkYThmZjY2OGE4OTRjOWQ1ZjhjZWNlNWM3YzFkOTdlYjFiYWVmZmY3ODdhOGI3ZTYwMjc2OTBiMGYyMTc3ZGM5OGNmYmQwMTE3MDk3NjgwZTQwNDhmNGVjN2Q2MmI1ZjVhOTBmMThjMjFkMGQxODZjZDUyZmI4YTA1ZmU0N2RiYjE0NGJhMTJmY2EyMjcwZWY3YWE3ZmU2Y2RmOGM3MTMwYzZlM2Q0ZmE3ZWJhYmIwMGQ5OTUwZDA1YmVmOTZjODMyMzBmMWMzZGM2NzNkMWI1NzUyYTY4YzAzZWIzZWNmMmVhODk2YzFjYTZlNTI0YzdmZGE4YTk3ZTQ4ZTE5YzBlYmFjYzU5MWZkNzg1ZjdjNzM3YWFjYjg0OGQzZDY4YTlkMTk5NzNmN2NiZWRhOWQzOTRjM2Y3ODVjOGFlYzVmZWRjYjM1Yzg0NGNmNjBkYTI4YjE4MDMzODFhN2UyYWYzZGY4MWM3YjY5OTcwOTY2YWFiN2Y5OTMxNDk3NjQwMDQxNTY5ZjI3OTMwZTQwZTMyMDY4OGIxMzFkZTk0YjZiMTZmYmI1ZjYyZTQzM2RlYjc5MjAxMTJiNmI1YWNkYzM5ZjQ3ODNhMjU0MmU5ODU2OThhYzE4NmJkNzJiODMxYjFlNmU5NzRhZGE5NmQ1MTJlZDY4NzcyYTNmYTFiY2NkOGNjNWRiMjEwYzNhNmVhOWUwNmE1YmI5Mzc1ODkxNTE3MTJlNjdlNGZjYTBmMGQ4YzIwNjU4NDIxN2Q3ZjdhOWRjZDdhODJhMWE5NDFmZTMyYTZiYWExZmZkNjU3OGM5MmZkYzkyYTlmYTIyMDZkMjhkNzA4OWQ4ZTNjMDUwZGQ1OTFlZGIyMjA1YzRmYWZmNGViN2ZjZDE0Zjc1YmM4YjVmYzg3MTZlMTZlMmZlMGUxZmI0NTdhODIxZDJmNTgwYjYzNzgwYzAyNWIzYzgxODg5ODQ0MmNmZGEzMWY3YTcxYjgxMjFkM2EzZWMwYjIwYWI5ZjliZmQ2NzhlN2U0ZDQ0MjJiNDg1ZTM1MzEwMjIwMjY0MjI3NmJjZGJlY2Y2NzdmYjBlODJlOTlmNmI3NzkzZjg2Y2RiYTJkMzk4MmYyMjZiZGQxNjQ1NDg3YzA4ZDk1NWYwOWI5Njg1Mzk4ODBjMGY3NzBkMDdlZmM2ODUwZmM2YTM2MmQ1NTBjZjlkZGUyYWJkNTY3ZjgzNDRhODc5MDQ1ZTM0Y2NkZjRmYmEwZTJjZTM4YjI2MmM4ZWQ1NmI3OWY1ZDM4ZmU0ODcwNjRmNzI0ODgzNDAzNTBkNzAwMTJkOTNmOTgxOTFiYmYwMGM5ZGRiNWJhMzZiNDFkNzBhNDc1N2QxYjIxMjFhYjMyMzgyM2UxYTNkMTI4OGE3YzFkMzMyZWFjODc2NDNlMTdjNzhlYjFiODkxY2FkM2RkYzM2N2FkMTE3NjgyODAyY2FiMzIwNjFkNmQzNGM3MGViMjQzMGRiNzA2ZDBhNDNkZTNhZGYxNDY4OWM5Zjg0MTk5MWZlMWM4MmY2YWU4YzdlYTk0ZjAwM2YwZTI4N2VmMjI5MTliNmFkMzFkZGYyZjIwMDhjYmE3NWQwNmIyNTI4YzUzNTk1MjJkMGU0MDNlMWE0N2I4MjMzMzMxZDgwMWM5Y2QzMDM5ZTJjYjQ0OTQ1YmViY2VkMGQyZmUxOWVkM2E5NjBhMTRjN2ViZmE4ZWNhNWU4OGJhYTRkYWQ0MGIwMmU4YWJkOTRjNDMzM2NlODlkNmYwNWVjODI3NWMwMDg3YjNkMzMzZmI5ZWJlNDUzNWQ4YjRhNTY1YmJlMDcwMDM2ZTVjMmM4MWVjYzM3NmY3Y2U1ZjFlYTg1ZDcwZDg5YTIzMTBiZDNmZmYzNmJhZmQxZjRhM2RlZWI3MTViY2UyNmY0MzM3MTU1ZDA1MTI2M2M4MTFlNTU0Mjg4ZThhYmMwZDMyOWFiMmFhM2ZiOTdkZGMxMGVjY2I0MjA1OGYzMzY0NTg3ODk2ZDAyOWU3YTlkYmVmZDFlNzc5MTU2ZTAyZTgxZjQ0YjU5ZjQ0ZTM1MDQ0M2I4MmYzNjc0YTYxM2VmZDAwODk1MWY2YzU4OWFhYTg5ZjU2NDgzZTExNzRkZTkxMzY4YzM5MjkzODM5ZmRlNDE1ZGJhMGVhMTUzZTQ5YWI5NjA5NzI3OWYwZjZmOWUzZjA4M2Q1YzMzODhhNjA5Yzc4ZGFiNGU3YzYxMmVmZDc4ZTI1YTBhNTRjMzI5YzRiMDczMzZhNTg2NWI5MzIxNTEyODM3OTVjNWRjNjI3MGJkM2ZhYzk1MmRiMGRhNWM5MDdjODNkNGFhNzgyYmE5NTA4Yjc0NzAxNWVkZDhhMzEyMmVlMzgzNDcwMDRmMWY1ODg2NGJiOWFjN2QyY2U0MGY5OGFiYjM1ZDk0ZTg4OWZhMTk0NWQzZmEwODZhNDRkZGFlNzgzNzc5NzVkYmVkMzhmYjdkOTllODgyODIxY2IwZGQxOGJiMDM5MDc5NWIwM2I5OWQ4NDJiZWRhZDMxZWJkNWFhYTE3MjVkZjY3MDMzYzViM2ZkYmQwZjhiZjYzNjc2M2E3NTM2ZDdkN2Q3NWFhZGY3MTMyODI0NmZmMzdhNDY1Y2JkMWI3NDhiMjE1YmJhN2Q4YzZhMTFjZmFhZTIwOGU1NmZlNWNhMDlkMjBiOGZlZTJmNWFmM2ZkYzU3MTQxZTVmN2UyZmJlYjE3NjRmODkxYTkxMjZmMDgzMTQwZjRmNmVkMWIyNjlhYmQxOTU3MGI4NmIyYWJmYzgzYWYzOGY0OGYwZTlhMzhkYjBjOTFhOTRmMTc1ZDI3YjY5ZGVmNjgxMGEyZmJmNWQyMjhmYTUwZGNmYjBhZjM4YTIyZmViNWI3YmRmMTVhN2U0NWE4MzMxNzc4MWFlMGJhZDkwMjM2MTg5OGYwMjJlZDg4MWY4MzI4YTFkYzkzYWY2OTU1MjcyMmQxN2Q5YjkyYmQ2MTNmNTdmNTk3M2M0YTA3OWE5NWU5ZmQ0NmEwOWU2YTQwM2RiZDUzODA0OWJjYzIzZTQ4YzI4MWEyZDA4Zjg4MTdjY2I2MzgyODU2ODY3OTNkMTkxNDBkYzI1MGQ1MmE3ZWE3NmUwZTEyZTZjMWI3YTdkOGNiMWNlOWQ3OWU5NGFhNTRkNzE5ODY5ZWQzMTc5ZTJkYzU2ZGVjOTY2NzA5ODk5MmJmMTgxMmRmMzBjMzgwYjczNDY0MzQ1NGJmOWRlY2ZkMWE2MDk3MjRmNzE3Y2E4Mjc1ZjJkODdlMWE2ZTk5MzgyMzIwM2M5YjA4NmRhNzExMmU1NmViZDU3ZGIwYzI1ZTAxZmVmYmQ4ZGIzOTljNzhhYWZlZjY1MDUyNTExYWNjZTFhNzRlYTYwMWY5YzA3OGIyNjMwOTNjM2MxZWVmMmRkYTQ0NDBhMzljN2E4ZDk2YTQwZTNiZmE1MTcyYmUzM2E2OTNiNTU1OGE4YjdlYzc2NjMwYTI1YmJjYzhiMmM1NGYwYTU5NGY1NTY4YTdmODFmOTM4MWE0MWJmYzQ2ZWUxYWZmYzRiYzRjOGVlYzQwMmQyODg2YjVmZjcxMDE4ZTMxYzViYTEyNWZlMjMzNDU1Mjg0OWFlYjkxNDMxODU3MjUzM2I0OTM1N2ExOWNhNjBlNDJkNWI3NGE5YjI2N2ExZDU0NzgzODZjMzMxMzdhNWY4ZGI4YTU5Y2QyYTM4OGUzOTBkNmQwZjJhMTIyZTRmMWUyMzJkYTk2NGQzYmI4YTJmZTgzYThkNTA0Y2NlZTMwMDZlYTc1NTIxMDJmMjJjMDBiNWVjZGUyODA1MjllNzI3YWZiNmRkNDc0MjU2ZGQ5NWI4OTA3MGJmNWE1OWI0YWFkNDA0ZjUwMGJhNzViMWEyNTE2MDM2OWM5ZmI4ZmJkNmJkNGMwNTc3NGU2ZTViN2VhNjY3MWZlMGZiZmU3NDI0MWM2ZjY0NTlmMDA1ZGY3OGYwZWI1ODQyM2Q4OTBjMzdlOTE0ZTUxNTQzYzYyMmE0YTAzMTYzNGNiM2YwYTQ3NDEzY2NkNGVlMzdjNDA3MTIwZmE1NzVhZDE5MGMzMWEwNzhkMTA3NDBkNzgzN2Q0MGE1MTNlM2I2ZDBlZmU5MTA4NGU3NzI3ZmZlZjMwNGQ5Y2Q4ZDEzZWM5NWNiNTkwYzZkNDdlYjIxZWFhMTVjYzA0NTc3MDQwZGY0YTkzMzY4MGYxOGJlZDY5YWFhZmNiODM0MTY5YjA3MmVjNzJlZThkNzFhZGQ3OTM2YjcxZmMwNjA4ODViMzYxOGM4YTAxMWJiY2Q5ZDQxMjc4NDQ0MDRiNThmOTBjNDA1MmIzMjZkN2JhNjBmMDQxYWRjYjQ0MjllMDMxMDI3MDAwMDAwMDAwMDAwNjYzMzVhYzNmMTRjMmUyNjYxODgzOTQzZTk5YjlmN2ExYzY1NjcwNmNjODA2NDZkZmI5MjIyZTZmM2JkZDkzZGZkNjAxYzI3M2Q3NjA0NjBkMzVhYTE1Yzg2NjZmMmE0Y2Y0OGVjM2Q4ZTM2MTE4N2I3YjZmZGIyZTFkZThlMzVjYjY0OTRhN2VhODk4ZjM2NGU0YjYwNmE2OGM5NGIzNjY1MTA4ZGMxODk5MDI4ZWJhYTAzYzFkODhmZTQ3OTY3NTRjYTFiODQzMDRkN2Y3Y2M1NzAzNDhlNjg5OWIyNGFkMmM5MTI2MTUyYjhmZGRmMzczNGZiMjM5ZDZkYzAxYjg0Y2NhZDNmNmYzM2U2NWE4N2EzY2U2ZjUyYTljMWFlMGFhNTIzYzY3ZTYwNDQ1MTllZTdmYmE5YjVkZGE0MzVhMWMxM2VlMDk2MDIxNDg4MWVkYTVjODVhNGYwYjkxNDkxOTgzNTFkOTlhZDA5NDgwOGIwYjc0NTU4NTE4ZjQ1MTdlMTkyNzFlMmE5ZWY3YTE0ZTU0MjZlZjE0MGYxNTcyZmMwYTBlMzM0ZWNiMTc2ZTdhNGI5MGZhOGVkMjRlNzExZGYxOTM1ZDVmMDRlZmZkMzQyNGE1ZDU0Y2NhYzFmOTU1YWVjMGFhZTg1NTBiN2YxMWI4NjQxM2VjNTAzODRhZThjM2NlMWM5Nzg5ZjEyYTRhNGYzOTUzODYyOTAxY2EwNjg3NjE4NTE4NWRjNDA3ZmU2ZDQ1YTZkYmYzM2I1ZGUzNmE3NzNiODZmZTRkMTljNWZjY2NjNjU0NDQ5ZTVlNmZmOWNhOWIwZDg0ZGYzZjNmZjU2NTBlM2U2M2ZkYWVjODMwMGY0ZDM0ODkxN2E3Y2Y5YjAyMWMzM2YyMGJhMWE5ZGRhZmMzNWQ4MzYyNjhiY2E3ZTI5MjRlNjM0MDdkMjQ2MWZhMjM3ZDI1ZjEzOWVmZjkzOTc4ZjM2Y2U1ODczZDE4YmU1ZTVjOTVmOTBlNmZmNmQ3NjdmNjI1YjI1NDIzMjhiNGZmN2ZlN2E3NzY3YzgzM2UxOWQzZGE3MTY3NjEyMDUwZDYxNjNhZTVmMDc0YmY4ZTcwYWRmZmI4N2JmNzdhYjJkYmQ5MjNjZDdmNDBkYWNkODg2MDFiMDIzNmI2ZDQwYzljOGQ3OGUwMjBiM2EwYjNkMTlkM2E5NzU2NjJkMTM0OGMwOTgwYzUwODIwM2Q4YjA1MjRhMGUwNDA3NzEyNjIxNmVkY2UwNGMyMmI2Nzk0NjdmZWQzYWU3MzJjZmJkZGVlNjY4MmJjY2IxNzNkNTA0NjUwMTQzMWNhZmExZjhjYWVkZWI3YzJhNzcwNjZlNDc3NzYzODI2N2U4NzQzOWM0NTU4ODk1MzUzNGI0ODBjZjFmMGNmZTkyNjdkZGIyOWMyMTVkZTYyNmE0NWEzMjRiYjE4ZDRmYTU2ZDY5YmI0NjkyNjJjMmI4YWVlNDBmOWQ3YzdmZGYyYTFkYzQ3OTNjOGI5ZmUzN2ZkMGE2NDA1ZmU2Y2NlMmYxMjQwNThjNDU4ZTRmMTc4OTNhMDlkODBlZTc5ZDJiN2UyMGIxMzJmMGUzNmY1NGJjNjY0MDA5NTdkZWUyOGRmYTZjYTkxMzA2Y2Q3NmIxOTA3MjZkYzZkOWMyOTQ4Mzc0ZmNlZDAyMTJiYTBjZGMzMmRmZTMwMzhjYmYyYTJiNWU2NTAxYWVlZjgxOWEwMDQwYzg3NDczZDM3NjI3OGIzYWJiYmVmODdmYWMwMTAxOTE2OTY4ZjU1YjU4ZTMyYjEwY2ZhMDA3NzIwZTI4NmFhOTdjMDY5OWVlZDNiNzVhNjJlMDQ3ZTc0ODdjZDRjZDA0ZWJhNTA3NTAxNGZlNjUzNTViNDEwNDE5NWQxY2FjMGY0NjQwOTBhOTFlOTMwN2MwNDg4MjI5MzY5NGJkYmNjYTRmODc3NzEyMzA0N2I1MTVjODIzYTYyZDFlNjE5MmMwMzQzOTU2YTg2NmZlZTUxYTI3ZmYzZmQzMjI4N2M3NTE0YTc5OTY2ZjZhZjhhZGQ5NDdhNmJmMmVmMzM1M2UzZjkwZTZhZjZmMDg2NGEwOWM2NDkyMDcxYzk5YmM4MTRjNzc0NWRhODRkYzQxMDI2ODkwY2QwY2EwNjhjNGFmMTU4YmY3ZWNmYzFmNjU3ZDdmYzJjYTYxYTY1YTc3NzhlNGMyMWVlN2ZkMjM1YTljNmFmZWRjMzQ4YWUzZjFjZjY4NDg0NmFmMDg2MDVkNWUxM2FjNmQ5ODliZDVkY2U4N2U5ZGFjNzFkNDU5YmQ1MDZjMjEwNzMxNDhmYTI0MjM2YmNhZDJhNWY0NjYzYTk0MzA1YjNiZTE0NzA4MmEyZDNmMDU3NzQ0NzI0MDA4NDE2ODVlODhiZDY4MWQ2ZTJkODc3YTg5MzI5Y2MwNzc4OGNlMGE1NzkxYjMyYzAwYzQ3NzQzZWU4NmNhOGJhYmQ1MDA4ZDY3OTFlODgzNmQ5YTAyOTAyNDkwMDJjYTg5OTI2YTE2YTBlYzU1NTA0MzE0NDQ2MTZhZGFjODc2ZmI3NDA0NzhiNTMxYjMwZWYxOTI3ZDE4ZTViYjYzNzA5NTM5ODFjNDllMWI2ZDRiYTY5NTU0MzBlYWY4OTMzMGMwZjkxNmNiM2UwYzNkOWI1YWRlZWYxNjQ3NjNjYTEyNWQ1MTQxYTNlYTc4MzE4NjM4MTIyNDYwMDNjNDBlNGEzMDg4N2ExYmI4YWIwOTU5ZjZjYzhiMDJhMjJmYmMxNDY5ZTgwMzY1YTM4M2IzZmJjMTFiMmY0OWRlY2Y2NjQ3OTNjYjMxNzllOTgwZjBiZDEyYTU4NTdmZWQzMDU3Yjk4ZDNlMWM3OWVjZTQ2ZTIwMjYwYmEwNmM4M2E4ZmZkMjY3NDA5N2NlNmQwYTU4Y2RhZmI2YzE0MDBmZjIwNTk4ZGNlNmQzMjBiZGFlMDExNjRlM2UxZDNkOGY5NTZjNWZjODZlZDk2Mjg5YTFhM2RlMjgxNmYwZmNkMTg1ODg5N2IwOWYwMmE0Yzc4NDhkZjQ5MzNjNGQ4MDZiYzgwZDRmMTBhNzc4ZjkxYzkwODQzMDlhN2IyN2M1NTFhZDUyNDIzYWVhY2VlZGJmYTMzNmYwZGI4MGZhMDRjNzRlMjdkNGY1MDc2YzRlMTcwNmZhYWZlYTk3NjBiZDBmMzJiODZhYzdhNDYwODU1YzZhZDg5NWFjMTkwM2U0YWQ2N2JlOWQ1ZTFhNGU2NzI5MDA1ZmQyYWVlNDQ0MzY4ZmI5MGY2YjMxY2U5MWI4NWYwYWI5MWQ5Mjk3Y2MwZmI4OWRiNWFlOGNlOWI0MDM0MzE5ZWQzMDNmZjA4NTAwZWYyYzIzMjVhZTY4Y2I4MjU4YTJhYjY0NmQ1ZDRkOTE5YTFmYzAxMjA1ZGZlNDI4NjIxMWU1MjVjZDEwNDY2ZjNjOGQyYTFmOTA4OGYzOWZiZjZhNGI0ODQ0NDRkODI2YmI2M2JiNzBiYTllYWUxZjI2MTJmZTZmMjk2YjJhMzRhNWUzNTJlODIzZmRmZTYzMTQ5ODZlYWQ5NTk3ZjI2MDgzNTEzYjc3NTU2NWMyZmYzOGI5OGUxZmFjNThmOThhMDFiNGI5MWFlODNiNTZiMmNlMjMwYjJlZmJhYTU0YzUwNTczNDViYTJmNTRhZGY5MDdhMTYzZGFmNWE4MDk1MzU3YzYzMTNiYWM3OGI1MmRkNWRiZGI0ODBlMTAyMmYxOTYzZTkwZGIxOGZkYjcxZDUwMTRjN2JkZWJjMTQxZmY0NWZiMGE0Yzk2NTIzODhlNWM1OTg1ZGNiZGZkYzYzOGI2ODdhMjNiMGQ3MzhjMWI1ZDNiNzNkZWZlNzZjZjA2NzJjODE0NjE2MjUwYTkyMjVkMTI2MTQ2MWI4OWVlYjlkZTQ4OGZiNWVmM2Q2YWQ3ZTE4NzM3MmNmMDRiNzA2Y2FmMTRhODU2ODRiZTg5ZjViYjg3MzJkNTQ2NGQxMDU0OTRhMmZiZmZkNzM2NmU1ODcyMmM5ZDkyMGVhZmJkZGUxY2VlYzJhMTIxMWJhMDYxMzQ3NDc0MGQ0YzFjNDk4YTBjZTAzYjA0Y2Q2M2M2OWZhYzg0NGM0NTVjMjIwYTA0NDYxZjdhYWVjODI3YTZlNzczOWVjMzBmOGZmZGIyMDkwZDZmZmQwMmM1YWI4MmZjMTQ4NjczN2UyNzgxOWVjZTNlNmJkMzEyNTE1NzdkY2JmZjk3NmM5N2NlNTc2N2EyNzZiMDMxNDFhNDkxZmE2MDE5ODc1NWI5MjNkN2Y1ZWIzZTM5MmIzZjE1NjJlMTM5MDg3ZTg1YzU4Y2Q5NGZjM2U3MGE3YjNjYTk5MTM0MmMyNTAwNjhjNmI5NWQzMWIyMTA2NzVmMDE0ZTY0ZDUzZDk5YzkwMGMwMzRhYzU5MjNmYTI3M2UwZWY2NTBlNjdmYTQ4ZmRmMzQzMzBmOTYxNzEyZmU4YWQzNDUyMDM1ZDk4NmM4ZTU0ZjFlMDY3NWY3ZDcxMmM3ZGE3YjVmYTc4ODgwYWE2N2E1ZjE1YzA0NDBhY2E1YmZkOTczNDg2ZjdhOTQ1OTAwN2IwZTdhNjMyYjVhNjQ3ODkwYzExNWI3NzU1Yjk5ODJlMzIyODZmZTIxYjM4MTk5OWM1MmJlODlkZjAyMTA1YmNlZjJmMjRmZDc1NjllYzI2ZjQ0ZDE2NjI5YTMxNTNmYjc0YmQ2M2M3MzNiODNiYzYzMGYyM2E4ZmU2MzU4Y2MzNmJhYWE0MGVmMmMyNGY4MmI5ZmY3ODQ2MjRiMTUyZDhhZTFmODNlZDczNDkwNzgxNzU4ODNmNzc2MzE4NWQyNDY0Y2RkZDI1YWEwYTk3MjYxZDk5YWNmNmMwMDA5NTAzZDQ1ZWU4ODhiYTk1ZTAyNjQ0YTgxYjVjNmMwYmYyYWZlYmQxZDA4ZTIzNWRkNWU3NWFkMzMzMDE4MzMzOTNlYTgxNTc2YWIzOTk2YWJmNTFjZmQ0MDBlMDcyMGI5YWYyM2U3N2Q1MTVkMmFjZTliZTA2YTM0YmIxMDhlMzU3YmYxOWI0MGUyMjU1NGY5MGU0NzkwOTNiZWI0N2EyYzRjYjAwM2Y0ZGM4ODJhZGQ1MGJiN2JhMTQ5OTFjYjBiYTEwZWYxYTgxZjFmMmYyOTRkZThlYjYxNzRmNDI1ZDVhYjgzYjEyNTZiOTJiMTc2NjcyNjdmMzEzMDdjZTgxZmMyYzZjZjFhNGNmOTg0MDRjMzRiZWExM2U3Mjg0YjkyYzMxM2Q0NDljMmE3ZmQ0NDZlN2FmOTA0MzA2ZGQxMjc5NzI0OTVlMzU3OWU0MjFiNDM2ZmE3NjE2OWQ5YTRjZjg1NTk2NTQ0MTA3NDYyMjc3N2ZmNWY3YzRlYmM5MzMxOWEwMDBkNTEzZTUxNjNmMGQxNzc2MjY4MjA5ZGZmNGI3MzAzYzM0NzNkMzVlZjg2YTQyMTg0N2MyNTIzOWUwM2Q4ODFjOWViZDcyZDY2M2RiNGU1MWFhMjU3ZTZhYzViZTM5ODIyZjViMDY4OGUyMjE3ZGQxMzMxZTlhZmNjMjUwYjM2NGRkMzMzYjQwOGY2MjcwMTc0Y2ZlMGQ3ZjYxOWE2MWYwZmY1NTY1YWYwMDY1NDk3YzczMGYxMTkzZTBiZjVhMjMxMjM0ZDdlYmQ3YWE2MjAyZDQ1MDIwNDg3NTExNDJmZGNjODlmM2ZiMTRhOTdmOGNlODJiYjEzNmQwNTQ3ZWEwOTg2NmVhZDFjMmQ2ZmViNjM0ZmNkN2I4NmUyZjQ1NTUzZjUzM2RjNGNjYTE0YmVlMjM5MzFjMzI3MGQ4MTA5ZTkzNzE1ZjVjN2Y0OGQ3ZmFhMDU5NTRiMzUwYTg3Zjk1NTgwNTRkZWY3NDY2OGM0MTkxNzdkOTZlMTJlYjYxNWQ2Zjg5OGVjYTRjMjcyOWY3OTgwMjNkYzYwZGNlNGFiNjZjYmE5M2UzOTI2NTdlZGNkNWY3M2RhY2YwYmFkZDY0OTg5OTczMmU3YWQ2ZGEyNDIyNjZhMzQ0OWM3MDY5MzY1ZDg5MmM4MWExMTg3YmY2NGY1Y2E5NTU4MmVkN2FjNjZlZDVkMTAxZDQxOGExMGI3OTg5MWM0NTUzODYzYTE1YzY4ZDQxM2UwZjNkZWMxMDNlZjVmODQ1NzE4OTNlZGE3ZmI2ZjM3ZDg1YmM0MDkzZWJkNWE4MTk5MmJhMWYyNWVkMmNiZTFmNjFjOGM5MjkyMGIwM2M4NmMxODhiMDMyNTcxOTNjNTQyY2IzYjA0M2I1MTc0YzBiYzgxZTFmOGE5NzU4ZjY3MzBlZGRiODU1Mjg1ZDUxMmEwMjFkNTk2Y2UyMDhjZjkwNzRlYjMxNGU0M2EwNWZjY2FiZjE3YTQ5ZWMwMTMzNDZmZjIyYWJmM2M4MDU3ODc4MjI5NTlmZjc2YzU2NzJhYzZlMWIyNWYyMTc4YzdjZWFkOGNjZGRiMzVjNWYwMmRhMWJiYTUyMGFhOTQ5YzUyYmMyNmE4OTZmMzVhYWEyNmI4MWUyNWY2YzBiMzRkOWNjMGY5MTU1ODMyMDNmNzM2ZmUwMzMzOTE0M2JhNTJiNmIzMTAyZTVlOTIwMDhhNTI1MDkzYzJmYjc2OWVhNjZlZTc5YTY1ZGNjMjc5OWNiYzQwODk2NzM2MDdlMGNhOGFmMjFhMTFiMjdlMDNjODUyOGVjZTQxNzFiMmU4ZDY1ODhhMGQwODQ2MTcwNmU4NjhiMGU4MzUxMDRkYWI3ZmIyMDcxYWM3MjM1YmY1ZTU3YjBkOWU3N2U4ZWI5YjNkMjdkMWVjOGRiZDAxYmFlMDc1ZTgxMjI4NDU1YjMyNzk3MDZmMTcxMWZjODdmOGZkYTYxM2I0YTg4NDJlN2IzNDcyYjQ5M2VkMDA3ZDUzNjRiMGNkMGU5MTY1ZDdiOTYxYzUxYTIzNmQwOTZjMjFlODM4N2MwMjcyNjRhZjBhZjU0ZmQ0ZWE2Yzc4ZWMwNWRhNWM5ZDIzZTlmNjZhMzg4Y2E0MTMyNzZmYjU4MDkyMThhZDJlOTU1YTQ0ZTJmNzgzMzkwMTQ3MTdkNmI0ZDJlNmE5MmQwYzA3ZmY3ZjE1OWExOTlkMzgyOTNmZDc4NDg5MWE5MGU4NWMyNzRmYWQxZmUwMmUxNDhiMGE4MTU4NDM2OTdmMzU3ZDBhMzgzZThhMmFiNTBiNzg4ZWRlZjQzZGM5MGYyN2YxNDk0ZmI3NDM1ZjMwMWQxOGU3YjIyY2E4OTQ5ZjMyM2M4OWQwNmIxZWI3YWEwN2YyNDViMTgwY2YzMGUwOWUyZWE2NGM5OTAyYzQ4ZjA2MjE0N2QxMTQ3ZTUxNDYxMjg2MmU4OTZjM2I2ZDk1MzI2NDYwNjZkZjZiZDk1ODQ2NTZkYTMxZGRkN2Y5YzY2YmM2MDlkNzIyNzZkYTY5NjIxMTU5OTBlZDJmNmI0OTJkNTcyYTY3Zjk5OTRiNjQ3Njk0MmNhZDQ1ZmQwNDc1YmRhMjFmMDVhMTYwNTE0ZDg5OWE3YTgyZDAzNGFiMTgwYTAxZDNiYmMzNmZlMDU3YWNlNjM4Yzg1M2M5ODRiYTUyNTUwNTBjZjFhYTc3OWY2YzI3ZDA2OTFlNTg2ODEwMzg3ZjA4MDM2NWU0Y2IyNjNjMDU1YThiMThiM2VhZTdlYTBjZjIyZTE1OWUyMmYwM2Y3ODA5ODU0MDQ0NDQ4OTJhZjAwNjMyOWYwNGIwOWQ5N2U0ODIzZTdhYmZjMjhlN2NjNDgyNjg1NWM5YTY5YzQ4NDg2ZTBhMWIwMmFhODAxMzUxMTY0YzRhMDI1ZmMwYmZiMDE0Y2ZlYTBjNmRhYjBkMzRjZDFlMzE1ODgwZGIyMzA0ZWRmOWE1NmY0Y2FiMzkwYzFlNjgyZmUyNmQ2OWZlODQ0NTNjMzdhYjkyZjMxOWZhMDFiODJlODEwNzI5NWU1Mzg0MDlkNGU4M2M5ZjI0OGE3MzQwNzVlYjZmNjQzMmVlZjBkMzE2M2E1ZGZjNTEzYTU4MjlkYmQ0YjQzMDkyYTc4ZjhlMjUyYjIxMGYzZGM5ODQ4YzI3ZDI3YzM3OGJhZGNiYWY4YzUwZDg1Y2JkMjQ2ZDgzMDdmZGI0NGQ2MWE4ZGY2ZDhmMmZjNjc3MWRiNGVmZDY4OWZiNTRjOGE4YWRjMmQyZDI4NjM1NWE3MTdmMDk3ZGU4YjZiMDczNzdhNWJmNjhmN2Q1MjFmZjIxYTU4YzA5ZWMxYmI1MGY1MmU1MTI0YjY1NTAxYzllZjBhODY3MDYwMWRjY2U2ZWRjNzliYmUyOGQ3ZDVhZDkzMTA3ZmRmYjY1ZjRiMzU2ZjhiNTk0NmI3NTk1MjJmNGMyOGYzM2YxNDc3ZTRhYWE2MDdhZTU4OGI4MDA3ODU1M2MwMzgzMTNkMmYyYTY1ZjJmNTRhY2Q3NTEyN2JlOGNmZWNiYzIwY2I2NWUwOGQ5ZGQ2NDc1ZTM1NGZmMjZjZDEyZWY5ZTg0YTA0ZTg0Y2FkNmY4YzU4Y2VlODQ5Y2M1NjM5OWJjMTk0N2ExN2U0Y2VlMmYxNGQ0NDQwMTA5Y2MxYWFlNmVhY2YzZmU3MTA2NWQxMGE0MDU0Zjc1NWM3OWNlZjY3OTczZjcxY2YwNzhjZDIzZWNiMzZhM2UwN2Y5MWNlYWJlYmZhNzZlZDljMjM2YzBjMzM3ZDgwZThjZTI5OGU3Y2U5NWM5MzM5M2MwMGYyOWFlOWRlYWYwNzQwODI0ZjQyOTYxOGFiNzk1OTAzZGI2OTBiZDVlYmE2NzBmMjdkNzE4ZGZlMjg3YTVlOWNmZjFhNDMyNzBjZDNjMmIwOTYwMGJhMWY0YmYzOWZiNmI2ZDhhMDEwNzllOTNiYzVmOWE0ZDk5YTRjNDRmNzY1OTEyOTI4MTcwNDNiYTUzMTNkMzQwMTU2MWIzMjFkYjEzNDU4MjJlYWVmOTc1NjIwYmRhNzljYTNlNzMwNGMyMTNlZjFjYWRmZTZlOTFjNzEwNTE5ODNjOWU5NTM5YzRkYWYzMzFjZGQ1MGM0MzcwYmExNjI0Y2JhZTRmZmRiNzM5YzFkYmNiZDYzYTk5ZjQzMGY5MTdhMDI4OTY5ZDMyNTdmNWQzMTkwODkzODFkY2FmYTgyZGRlYmY2Y2Y2MmM1Nzc4OTZmODljYTA3NWM0MzRjMDUxMWU4ODA5MjQ3ODc2NDI5ZDU5NTIyYTc3ZmU3NzM1ODgzYmYzMDQ4YWM5ZGZlYWFlM2E2ZDFjYTY5YTFmODI1ZWM4NTczNzBlYWRjN2ZjNjgyNjI5NmQ4MzU1N2YyMmQ1NzVjZWY1YmVmZGE4YWVjZmNmOGNhYWFkMGIyM2VhMGNiMTYwYzE1OTA4ZmQ2MzRkMTI4NGJjZGVkNGNhNDdlOTExZGI1NGE5ZDhmYjNlZGYxMWViNjEyNjU3Mzk1OGRmNTc2YWEwYTIxMzgyYjU0NjViMmU5MzQ5YTBkY2M4ZGZlNmQwOTRmYmY3Mzg3NjlhZWY1OTk1ZmFiZTMyOTU0ZTUzZWRmNjA5ZDMxZTAwNDNkYmQ2NWYwYzdkZGM1MmJkMmUzMjk2MTg2NmE4MmY4OTNjYzllZGY3NjkxZWVjZjAyYjZjMWMxMjlhMzAwOGJhYWJmZTgyZjkyOWYyNWNkOWRmMzI2YTI5OWNiNGU3Yjg3YjcxZTExNDJkMGFlOWM2ZTBkYmYxNDM4YmUxYWZkNTgwNDFkYzUyZmU2MTA2ZmVkNTIxZWZhZDI3MWY4MTJkZjI1NmQ0OTVjZjE5YzEyOTJlMmE1N2Q1MGY0MTJjNWYyNjM2NWQwMzZlMjMwNWU2MjAxNGZmMmFjZWRkYjIwZGMzYmZmYjRiZDQyOWU1YTNlZGExNWMyYjgzNTg3Y2VjZDdkNGY1ZjQ4NDEzOTZhYzhkODVhY2QwMGNlZDBkNzE3MTQyMmUzZGQ1MDI3NDI5N2Q3ZTFlYmQ2NTkzZGI5MmYxZGM3ZmQ3NTJmY2ZiZTM2NmNhZmFiNjA0MTRmMzA5OTJmZmRkY2ViZjJlOWY4ODRhZTFlMmEwZTlhOTA4MTQxMzA5NTRiNDBmZDVhM2E4NDFkZjhkMTZiODFiODExZTFjNzFjODdmMzkzZDA3OTZkOTQ5YWY5Y2JiMTE4YjY3OTg4Y2NjNzdjNDk5MGVhNmUzYjZkZTk3MTkxNTVkNjI1ZDNmZGFiMzliMWRiNTYxOTVkOGJmMDI5NTMxMWMwMmY1NWNiOTNjMTU3ZjZlNWU3YWYzNmM1M2Y5NWYyNTRkMGRmZjk2OWUxZTEyMjQxOTQzZWFkMDY3NzljMzEzOTFmMDJjZmU4MjY5NjhjZDNjNTE2NjEyOGM5M2I5ZTZhNTQ1MDEzYmNhYzgwM2ZhNzNmMTRhNWNkOWJiNGRhZmM3OWY4MTNmMmNmOTI3YzU5ZThlMWVlODg3ZGViZmQ3ZTkyMTFkYjg2ZjJkMWJmZjNhZjExODRiNWI5YzQyMmZmZjlmZTE5MDQzMjYzZGRhMTRlYTU3NjU2MTQxOTUwNzQyMTZhMmYzMWI4YTFmZGQ2NzliOWEyOGQ3ODViOWY4YTg1NWIxNWI4MTNkY2I0MjY3MmIyZTZkZmMxY2M4ZDQxM2RiZjZjNDc1NTQxNzAxNTI3MGJiNjI0N2FhN2FlMjIyNjk2ZjQ4Y2YwYzdlM2ExZjA5MTQ2YmIzYmQwMjUyYmY5NTMzZGMzODZiMTY0MmY3NzRhMmM1ZjczM2VhYmI0MWJkNjc2MjcxNzU3NzdjNTUwMjMxMzJjZDM1OTRiZTVjN2RlMTM5OTkzNTBhNTRkYTQ2ZTk1ZTYwNGZiNTcxNDA1Y2I5MmJiYzgzYjZiNmQ5NzQ3NWE4NWZmNzBhZDdkNGE0NDU3ZTVkMmQwY2ZjYzIzNzEzN2JhZGEyYWU1MGMzY2U0YTJhYzIyNjg1NjMzYjczNzJjNGYxMTY1MzVlMTlhZmJhNGJlYzhhMDBhMDAyZjVmM2UxNmFiZTU1ZDY5ZTBlZWZhYjNiZTVhYjFjNTdmMWRlOTgzNDM2YmRkYzVmOTRmOTlmMGUyZDAwNWM0ZDg5MmYxMjEzZDk3ZjZmNjNhZmNjMmQyYzNiYzVlZDQ4N2NmZDk4NzdkYmFhZGIxMWNlYmNkNzc2MWMwNDNmNzU0MWM0MzFmNGQyODM4MjFlY2YxNGU2MDU0MTkxNTlkODhmY2M1MGI5ODljOTliYmY3ZmI2OGNkZWYwMDljNDdhZDI0YmFmMjg0NmMwYWNkY2Y0YmI0MWY5ODNkNDFlNTJhM2JkNTI3YTFiZTlmZjJlN2JmZmE2OWZmNjA1MjFhZTA4YWNkMDkzMDMzZWFiYjZiZjgzNzY1ZWMxMmIxMWMxYjBkMTM0NThkNWNlMzFmNmZkOTE3YTI3YWMyZmE0NDBjMmI2NGVhNzcwOTlmM2I5NTZlMDM1ZGFjNjE0Y2Q0OTJiMzI5ODZkZDBiOGY4ODRlMjU2Njk1MjM2MTBjZmRjNzkxYmQzNjgyZDk3OWRhOWFkNmE0NmE2YzhjNmRhZjA3Y2IzYmZkNmY4MGVhMGUzMTg5ZWM4ZDIzMTA3MjY1MmRiMDBmM2Q5NDE5MTRlNDgxYWU4MDNlM2E4ZWU3NjVlMjIwZDFjMGRkYWM0ZTQ2MzJhZTRmOWE4MDcwMjUyYTIyZDFhODUxYzk3NThjYWE0NTlhOTEyYzZiODM3MTg1MWI3ZjViZGY5ZWExODNhZTA5ZDQ5N2NkZjE0MDc0ZTA2OWI4ODY4ZjllNTA2ZjMzZTI4ZmJmNmY4NzJkODAyZWNhYzFhYWQ3Yzg1Y2YwNGJjMDViMzZjYjYxOTMyYjY0NjdjMjBkMjA2MDQ1Y2Q3YzFiZWYwZmI1ZjA0MTI1Y2ZiMzQxNWE1NjE2MDM5MjViOGQxODBiYTkyYTkxNDFhZTIwMzIwZDVjZWRiNzY3NmYzZjAxNzE1YWU0Mzg3YjVmMjQ0ODEwMGQ0ZjA5ZjBlYWFjZDViMjNhN2QzMDhlNzg3NzgyMDNjMTYzYjA1MDhhMmQ1ZjhmODg1MTNlZWJlODkzZTcxZDYzNjk0ZGI1MDJmYjE1ZmU3YThlZjI1ODMyNDY0NGNlMTgxYWUyNzkwYzczOWRhYTIwY2EyODQwMjA2M2UxZjAxZTM5YzU1YmMyNTJlMjQ1MWVmOGExODNkY2MxYzY3N2Y0ODQzYjFlNjQ3MTI2ZGI2ODIxNDM4ZmIxNDU1MjYyNjVkZWQ3MmZlZjlmZjIyMTYxY2NlMGE5MzM1NTk1ODY0OTBhN2E4YWYwNWE3OWY1YzU3YWFjMjFiYTQ5MTA3MjE5OGJlYmVhZDZmYTBhZjg4Mjc4OTMwOTc2NzcxMmVjMjA2MDQyMjUyZjhmMjVjNjkxZmRkYzExNDlkYzhlOGQ2ZDIwODFhOGJkMzJlNjExOGJiMGUyYWUwYWE1YjdjNjg0NThhMDY3N2NmYTA5ZjE4ZmNhZjQ4Y2UwN2ZkMmI0MThiMDEyYjhhNDZjNTI2NWExMTg2MTVlMWI3NDVmMzVmMjMxMDMyNjVkMmZlZjcyNjljNWNlOWU1NGVjZmMzMTFhOTg2MTI2YjdlODk5MDk2OTZjMjAwN2IxNzRkMjc4ZDQ2NzZiYmNiYmJhZTBiM2E4ZTk0NWRlMGQ3Y2NlYTQzZjYyOTdmMjJhMzFiNjQxZDc4ZGYwNWJjZjk5ODBkZmNiZTQ2YTIzOWFjYWVkODNhYzZlMTVlNGM0MDExZTUxOTNiMjdlNjA4OTI2ZmVkNWZiMzgxMWIyM2I0OGM4NjI1MGMxY2IxNWNlM2UyYjMwMzA4MzFjODNlNWQzNWI4ZWVjMzAyNzFhYTljYjg1YWZiNmFhOTFjMjgyNDhjNjQ5MmFmNWYxNDEzMDM3ZTRlYmI3MGM0NTMxMDQ1ZGQ4ZGFmMmRmNjk5ZWRkNGE1MTNmNzM5ZDgzMmU2ODJhMjZlMDAxOTBjNmZjMWI5OTAxZmU1NTJiNmIzNTBkYzlmYThiMjcxYjNkNzQyN2MyMzFhMDNiMmRkMGFkNDNhM2U4MTlkNjZmNzQ3ZDBhMjkyYjgxNzYxN2M1YjBiMWI5ZjU1NDMzOWNhZDZlYzRkZGM0MDMxNGMyMTMzNGU0ZDk0ZmFlMjRiYzYwYTIzMjkxOGFlYzMyZWZlMzg3MzY5OWU3MWUyZGUwNzIxNDJkNGFhNmVlYzYyZDAwYjdlZjVjZDc0MGUxMDZkYWZiMWVhMTAzZTI4NzlkZDBmM2MyNWRmZGIxZGRmYTAxOTliMGEzYzZiZjA5NjNiMWQxNzQyZjM1ODNlNDMyNjg1YTRlMmM1OGNjMmYyNGIyMmEzOThiMjczZWQzZDBhZjYzYmJiZGRiM2QwMDkyYjEwZDk0ODRlYTc0MDg4NzUwODA3ZTRiZjkyZTE3YmEyZTMxMzQxNGFjYjNjYjEyYzgyNTkwYmM0ZTQxYzE0ZjYyY2E4YWMwMmUxOWQ3Y2U4YzY0YmI0ZGE0Yzc1MGFhODljMjZmZjdiOTg0YzIzMmJlN2Y4ZWM3N2EwMmUzMDNlMDNjNDI1OTRkZWYyZDFlMTZiNmE5N2M4MzliYzg5NjI2N2FjMzJiMzllZWYzMzAxMjRiYzZkOTFhODAyMDM0NTBiNWFmMTI5MDk1YWVjNTU3Zjg1ZTZiZDEyZWJkNzZjMzA5NWE0NTZlNmM2ZDdiMGRiYjRhZTFhOTA3MjI4YTgzMzU5MzNjZTZiNTYyY2FhODRhY2VhMjQ2NTEzNmYzMGQ5NTYyY2E1MTk4ZmQ5ZjVlYjU2YTZhMmNlYzUxNjI1MTA0ZjQwNGI2YmQ4ZTExMjJiMDIzNmIyMTI3YTM1MzNjNzYwZTVkN2VmMDRhMDU0NTUzMDkyYzNjMTNmNTExMzAwZGYwZGZkZTcyY2MwODZhZjU3NGQ1YTgwMDA4ZWYyZWJkZjZmNDM4YWQwODM2NjEzNGQ5N2QwM2ZmNDgxZDgzN2JjYjg3ZWVmODc0OGJiYmZmYTk3MTUzMjZiOGM1ZTA0YzZjNGU0MDllYmJkZjc3ZTMzMjg2YTY4MDhkZTJjMzUzM2M1YjZkNGE0Njc2MTE5MGVlMGM3ZTA1YzY3ZTRjNjllYjc1MzU5NjJhMTFkYTg3OGJiNmFhMDljMzM1ZTA2ZWRmMGU4ZDExZTY3MjI2NDNlYWYwMjkxMzM2ZTE3MjI5YzMwZDU5MGE2MGQ2ZWU0N2Y1NGI1ODQ3NDlmYjExMjg0OGMzY2M5YWNiNjIxMTI3NDFhMjA2ODgxZTg1MDEyNWFlYzYzY2Q5Y2ExYjA1OTcxY2Y4Mzc0YzFjMTIwMmU2YWNkMmY0NzEyZWQ1OGNjYzE1NWZmOTVjMWQyOTBmMzVkNDAxNDI3MDM3ODlkZWQ5MGVhMWNjM2E4MWU5NTMzNGY2MzI4Yjg2ODA4NDYwYzliYWIyNjFlOWI1MDZmM2EyMjQ1ZjZkZjBmYmJlMDY5YmUwMDM3ZTVhYjg5MjgxNDc5ZDcyZWM1MGE2ZmFlYjA0MDA5Yzg3NTc0ZjM0ODgzZGNiNWVjYTUzNDRjNWYwYTdhZGY4NmQ0M2Q0Nzg0Mjk5MmVmNzQ1NGQzZDQyNjU4MGY3YzA0NzQ1ZDJjYWM2OTVmYzk4ODYzNzg3M2RkZmQwMGQ2YzI1ZjZmMGNmZTA0MDliNzE3YWI2OTJmZjA5Y2MzZDI0YjhkMGVhZDA1ZWYyMDRiZjVlMTRhMjMzMjYxZThlYTZmZDRmNWQ2YTMwOTk0MGNmZjMyZWUxZTRkNTliMzY1ZDc1NDUzMmZmZWM3N2ZiZGZjYjI5OTIwMDViYjFjNTY4ZjY4Zjg3ZjFjMDMwMzkxNjViNmVkNjNiOWQ3YTk4ODIwMTZiYmI4ZGE5MDUzMjU5M2QzYTg5NzE3N2IwMzFiM2M1ZDNkMWFmNjNlZjliZTQyY2M4Y2JmNzBhZDBiNTEwNzhkYjc3YWY1NTkyNjUzMGU5NmYxMTRiMDAzMjY1ZTAyYzNmOThmNjEwMDdhZDliNzRhYTc5ZGJiOGMwN2M1NWNmZDdkMDBhZjAwZjBlMjA5NWMxOWYyMTRlM2Q1MzM4NzYxNmI2OTY4MjJkODYyNWY0OGIzOGQwYzIzNWI2NWMzYTQwZDRhMjc1OTk3MGJkZWIzZTZhYzRjMzRhYmFlOTA2ZWU3Y2ZiMDE4MTYyMzBkOTI4ZGM4NDFjNGNhMGVmMjc4ZDVlYmUyMmFkYTcwZDJhYmM3M2U2ZWRhOGM5MGM4MDBiZTBhMjMyNDIyNDVmMzZjM2I2ZmNkYmE1NWNlOTc4MGRlYjU1MmE4OTM2MzdiM2M0ZWU5OGYyODY2OTczMTRkYTI0ZTZmMmI3NTMyYmVhMjkwZjY4ODJmYzVjMWViZDIxNDg1NDEzNTQ4YzVmMTU5M2E0Yjk4M2RhYzNlY2E3NjQ5ZmY3NTA4ZjQ1YWZkOGNjMTc5MDYyZjczNmQwMGNmMTJiN2UzZTA1NzliZDNjN2JmMDJmZmZjNjE2N2IxNDAyYWEyZTkzOGI3ZjhmMmUyZmYwMjAzMmJkOGEzZWExMmQxNGEwMDEyZmQwZDY0YWZmMzMwYjFlNzlmZTM4YzA4Zjc3NDE5MDUyY2MwMjI0YTBkYzA1YTBhZDViMmZhYThkM2ZiZjQ5M2NkYWU2Zjc4MDkzMmQ1NGIzZThhM2Q5MGQ2YTQ1MzIzZmU1NWEyZjU4ZGM5NDBiODI4YzVhMTg1OWM4NGM3NWU1MDk2OTI2MmY0YWNmZGY1N2FjOWEyZjdjYjY3M2IzMDNkNDlkYWVjOWVhYWVlZDMyZTkxNzc4ZTA2Y2E1NGQ4MzA2ZTA0MjY4ZDc1M2FlNDBmMDJlMGM4ZGJmZTY1MmQzYjUyZmVmNWQyOTNhYjY5Zjk3YTliMjliZjcxOWE3ZGU1ZTdhZDlmZDQ0OTUxODAyNDk1OTQ3MTg5MjUwNDFhOGYyNGNmYjU1NDMyNmI0YWQzN2I4MjM2YTNlNGE2NjY2NGJjNTViYzU1YTMzYTBjNmNkNjhiZGMyN2UwZTEzODJhZGYzMGJhYmM2OTQxOTg5MDIyMjFmN2Y3YTM1N2JhZGFmYzBjMzBhZjE0ZTI5ZTQwZmJkMTliNzU2ZjVjM2ZkYTk4ZGQ5MTFkYWZmMzE1ZWM3MGFlNzlkNjM5YzI2MWFmZTY3MzkyODY4YzQ1ZWRkN2JhYmFhYTY1ZTlhZDI2MDhkZWY0MTIxOTIwZGU2NjRiYzhmNTYwNzdlMTY0MTM1MGIwOGFjMTFjNmY4ZGNkNjBmYWI2NTU5Y2RiYzYyZmNkMWQwMDZlNDczNTc4M2I4ZDNiYjA4YmY1OWZhNTNiZmE0YzhhMzgyMDY3OTU0N2E2M2U1NDlhMDRmZDIzM2U3OTg3ZGQ4MjA5ZDc4ZjE5NDM2MWExNDJhMDFkNmQ2YTM1NDdhZTExMzE2MThlYTZkMTc0NmNjMDkzMjVlZTNmMzRhMTBjNjdmYzRjZDQ4OTE4ZTQ2M2VkNzA3NjQ3YzQ5NGQzNjI2YTNiNDg5ZjlkY2I0M2JkZTFkN2Q1YTAwNzg2MWJhYTdlY2U3Mjk3MjFiODUyYzcwZTg4M2NkZGI1N2U0MWVkMmY4M2Y3ZTFkNWY0MzJkZDhhZWM5MGZkMmUyNzYxYTI4ZmFmMzY3ZjljNTQ5MTJlYzg0NWY1N2VjYWE0ZTk1OTlmYjEzMTVlODllMTlkOGUyZmE2ZjJkZDAxOTg1ZTI3OTlhNzM3ZGI0ODFlYmI2Mzc5NTk5YTU5MWFkMjAzMzczZDY4NGFkMTZiMGVhMWVkNjRlOGE0Y2UzYmQ5MzQ4YTVmMmM4M2I2N2EyMTllOTQ4Mjk5OGU3Y2MxYzA4Y2QzMzdmNjBmYTU2NTgwZmU1NDQyZDVkYjM2MDE3OGY0MmMyOWVmM2VhMTRjM2I4NWE5M2RkNjAzMzJhODcxMzVjODExOTliMWYxZWRhNDA0NmYwMmZkNzczMTNmMDk3YjBmMDFkOTNkMWExN2VlNTU0ODI5YTUxODIyNTc2ZGQ4NjQxZTkzOGFkNWFhMWQ3YmZiN2VjZmY3ZGUyNDIzNDQ4ZTYwMGNjNDQwYjEzNWE2YjZiZTNiMWZlNGFjYjNkMTEyNjQyMTFkNDE4Yjg0OTUyMmU5MDU4YjA4MjE0NmI4OWYyMzFjNWRjOWI3NWYwOTljZTliMWUzODI5MzgzYTI5MThhZjlhMDBkMTk3YWY4MjZhZDA3NTA0MDI5Nzg4MzRlNzJhMjk5NzE5OWQ2YTM4MTI5YTZjYjBmYTA3ODI4YmEzZjM3NDQ4YTRjMmQzODA4MzVkMmZmY2MwNDAwYzRiNDQ1OTVlZDY0MzA3ZTc1NTMwZDIzNjc3NzUyM2YzMGY5YjEyYzUzNzAyNDIzZmIyYzBjMjZiYzM1MzJhMWRlODljOGJmZTY3MmViMzQ2Yzc0MWNlMDUzNjFjYmY3M2ZkMWM3NzUxMDMwNWU5YTcxYWM4MzYyOTk5NTI4MTMxNTE1OGU3N2NhNmI3NTYxZjJiZWNlYzFjMWJhYjU5MDU1ZGUzNWQ3YWRiODk0NmEyYmZiNzgyYjA4ZjIwMDE2NmVjMTAyZDk0NTYyMTFhYWRhNDY5MTJmZTZiYWE2MmE0OTk0OWVjNDliZTVhN2NjOTk1NDIyNzlkMzg4OTk5YTM1Yzg0NmM2OTRhNTUzZTlkYzg2NDkzNGRjZmJhOTAxMDkxOTA1NGI5OTIzOWEzZTI0NmNlNTRiNTMzYzljZTA3OTU0MTY5MWIxZjhhYjk1ZjJmODBjMGJlY2U3ZTcyMDA4YjllNDRjMTQ0YjE1ZWE3ZjRiZjhjZWViM2UzYjBmZTgxNjBhYTU1NTMwMWU0Mjc2ZmZmNzJlZWZiOTlmNDc5NmZmNDNkOWI5MGExNWRkYTVjOTMzM2Y1YTY1OWZiMThkMTIwN2IwYTRmNWEzMzM2ODhhNmMyOGUzNWQzNWI3YzY2MjM0ZDU5MzNiMjEwM2Q3ZjE4NDU3MTk5NjAzOThhYzJhNGJiM2I0NDdkNGIwZjI4ZmEzMmZjNDRjMzFmOTVjZjAxYmViMWY0ZDRjOGYxZDBmZTZmNjlkMjY5MTJhNGMyMTI3MjEwY2NiZjAzNDc4MzY4NjlhMDJiZWJiMWRiZDk3ZjZhY2Q3OTkzNjhmNWUwZTU3MjI2YWJmYmRiYjM3NGI2NWI4N2Q4NWY0NDc4ZDZiNWRhMjE1M2RmNGVlY2JkNTM2MzRmY2QyNGQ5NmIwOTY4NTEwZGQ2Njk1OGVmOTEwZWJjMWUyN2I0NTdiYzJiZTI5MTBkOGIyNDRhNDY2NGYxN2Y3YmQ0YzZjN2ZhZGVmNTZjZWRiMzYxZmUzYWY2YTZiNWI5MDg5NTE2OTQ1OWE0YWNjZDIyYjU0MzU3ZjUwZDg1MTlkYTRmNTZlYjIxZjRhZjRjOTI1Yjk0ODdlMzFjNWM4ODNjZDFmMGVhZTllMjIxZTYwYjE1ZGY2MTFhMTZmMzcwZTRhMTY5MTMwNTQ1NTliZTllN2FkZDNjYWZkYjI4NWU2ZWYzOTE2ZmZiMDNiNGQ4ODJiNDY3Zjg3MWI3NWY4NDBhNGFiZTY1MjJhMmFmOTRhMjUwZTM3Y2EzNzZmZDc3N2Q5NjIyMTY1MjcyMzEzOWE3ZWI0ZDNiNzkyN2JmNTY3NzcwZjg1OTdhMTY5MjFiY2RjMDQwNWI0YmU4MzQ2ODI0NjAzZjMwZGFjNjFjMWNlN2RjMWE0NTQxOWE2MGY5ZDMzYWZiZWVjYTFkYTI1ZDg4OTBjNjMzMWQxNGY0NDQ4MzNjODJjZjc5N2EwNWRiOWVlYjYwZDA3NzE0NmFiMDM1ZjQ4YzkxN2RjNTZiOTIzMDQwZjU4NzNlZWFlZDdjNTVjOWMwZTUxMmI3M2ZhY2EzZTMyMDBjMjMyMzYxODJjNWU5MTExM2Q2M2Y4ZTk1NTIwMzY0ZmE2ZmQ5YzNjNTM0ZDc1ZTU4YTNkYWI2ODFkOGRmYzUwNjliNjZhNzQ1MmExOTJmZTBlZGJmMGZiNjBjZjMxZGViMzU5NmU3ZTUyZWU3N2U4OWU2Njg2Nzg0NmI4ODFmYjcxNDhjMzMxMzI3MDdkY2EzYjRiMWEzNGMyYmYwZjM4YmJiZTI2ZDJiZGU1M2I5OTcyZWM1MDczODkwYjQ5MTc3MzhiNzhmZTFlOWZmZDdlNDI5ZWJkNzM5OWI1MWU4ZDk4ODI0ODMzMzdiODk2MGVmZDRhYmMzNjFjNTU1ZjcwMGFkYzMxMzUwMTg0ZTZjYjY0NTI2NDY1MjJiYTg1ZGNiMzUyNTMyMmQ5MTk3OGFjZWIxMDg5OWU4NjM5MTRhYmI1Zjc5YjhkZGRmYmI5YWQ4MjI3MTE5MGU1YzNhYmUwZTI1YjY1MGE1NDRiZTg3NmM5OWYyNzdkOTJjNWMwODk1ZGUyMzg2Yjk1NTAzZTlmZjZjZTJiN2RjYTBiMGFkZGQxZGI5OTg4YmRlODY5MjA4MmQwNGNiYWMxYmRjNTc0OThiYzI5ZGU2NjE1MTk3OGFlZTExZjZmYzhkNTExYWNlNDUzOWNiZGUyMjliODZjZWI1YTQ0NjAwZjdkODg5MGVmY2RlYTk4ZTY5ODFjMmFiNDIyZTIwNTk5YTViNDhmMDQ0MjgyMDIyMTkyOGRhN2MzZWMyMzk4N2VjYmZkZDYzZWE2ZWU5NzIyMjQ5YWY1Njk4ZWIyZTZjNGI5MWExYzNlM2E3M2E1YWE4MzRmMjAyZmJkYTc2ZGI2OTMwNTcwMzQ4NmRiNGYzYWQzYzQ1MWUzZmI1ZWY0OTkyZjAyMWZjYTc2M2NiZjMwODA5Mzk3YjI3OWNmZTQyYmJmMTNkYjFhNzM1OGM2YTYzYzI5NWIzZDg2OTczN2FiYmIyZDBlMmI0OGE5Y2IyNjkyNTMwMDdkMGEzODYwNmE5NWMyOTM0ODA0ZGIxMjdkZTY4Y2Q5NjE1M2MxZDYwZGZmYmQ5Y2JhNDQzNjQ3M2Q2Mzk1OTY5Y2FmNTYxYTQ1MWEyOWFiNjM4OTcwNmQ1ODgwYTU2Mzc4ZDEzMmE4M2ZkMDEw",
+          "sha256": "a8e89cb90511d6bf54beb26eb73cd980e676301fea9ce3f7464fe79931c72e39",
+          "hash_basis": "original-utf8-bytes"
+        },
+        "submission_payload": {
+          "availability": "PRESENT",
+          "encoding": "base64-utf8",
+          "data": "eyJjbGFpbV9pZCI6bnVsbCwiZGlzY2xvc3VyZV92ZXJzaW9uIjoiZXZpZGVuY2UtZGlzY2xvc3VyZS12MiIsInByb2Nlc3NpbmdfYXV0aG9yaXplZCI6dHJ1ZSwicmF3X3R4X2hleCI6IjA1MDAwMDgwMGEyN2E3MjZmMDRkZWM0ZDAwMDAwMDAwMGM0YjMzMDAwMDAwMDAwMDAyMWE1NmRmNDNhZjliODY2YTMwZGE4ZmY2NjhhODk0YzlkNWY4Y2VjZTVjN2MxZDk3ZWIxYmFlZmZmNzg3YThiN2U2MDI3NjkwYjBmMjE3N2RjOThjZmJkMDExNzA5NzY4MGU0MDQ4ZjRlYzdkNjJiNWY1YTkwZjE4YzIxZDBkMTg2Y2Q1MmZiOGEwNWZlNDdkYmIxNDRiYTEyZmNhMjI3MGVmN2FhN2ZlNmNkZjhjNzEzMGM2ZTNkNGZhN2ViYWJiMDBkOTk1MGQwNWJlZjk2YzgzMjMwZjFjM2RjNjczZDFiNTc1MmE2OGMwM2ViM2VjZjJlYTg5NmMxY2E2ZTUyNGM3ZmRhOGE5N2U0OGUxOWMwZWJhY2M1OTFmZDc4NWY3YzczN2FhY2I4NDhkM2Q2OGE5ZDE5OTczZjdjYmVkYTlkMzk0YzNmNzg1YzhhZWM1ZmVkY2IzNWM4NDRjZjYwZGEyOGIxODAzMzgxYTdlMmFmM2RmODFjN2I2OTk3MDk2NmFhYjdmOTkzMTQ5NzY0MDA0MTU2OWYyNzkzMGU0MGUzMjA2ODhiMTMxZGU5NGI2YjE2ZmJiNWY2MmU0MzNkZWI3OTIwMTEyYjZiNWFjZGMzOWY0NzgzYTI1NDJlOTg1Njk4YWMxODZiZDcyYjgzMWIxZTZlOTc0YWRhOTZkNTEyZWQ2ODc3MmEzZmExYmNjZDhjYzVkYjIxMGMzYTZlYTllMDZhNWJiOTM3NTg5MTUxNzEyZTY3ZTRmY2EwZjBkOGMyMDY1ODQyMTdkN2Y3YTlkY2Q3YTgyYTFhOTQxZmUzMmE2YmFhMWZmZDY1NzhjOTJmZGM5MmE5ZmEyMjA2ZDI4ZDcwODlkOGUzYzA1MGRkNTkxZWRiMjIwNWM0ZmFmZjRlYjdmY2QxNGY3NWJjOGI1ZmM4NzE2ZTE2ZTJmZTBlMWZiNDU3YTgyMWQyZjU4MGI2Mzc4MGMwMjViM2M4MTg4OTg0NDJjZmRhMzFmN2E3MWI4MTIxZDNhM2VjMGIyMGFiOWY5YmZkNjc4ZTdlNGQ0NDIyYjQ4NWUzNTMxMDIyMDI2NDIyNzZiY2RiZWNmNjc3ZmIwZTgyZTk5ZjZiNzc5M2Y4NmNkYmEyZDM5ODJmMjI2YmRkMTY0NTQ4N2MwOGQ5NTVmMDliOTY4NTM5ODgwYzBmNzcwZDA3ZWZjNjg1MGZjNmEzNjJkNTUwY2Y5ZGRlMmFiZDU2N2Y4MzQ0YTg3OTA0NWUzNGNjZGY0ZmJhMGUyY2UzOGIyNjJjOGVkNTZiNzlmNWQzOGZlNDg3MDY0ZjcyNDg4MzQwMzUwZDcwMDEyZDkzZjk4MTkxYmJmMDBjOWRkYjViYTM2YjQxZDcwYTQ3NTdkMWIyMTIxYWIzMjM4MjNlMWEzZDEyODhhN2MxZDMzMmVhYzg3NjQzZTE3Yzc4ZWIxYjg5MWNhZDNkZGMzNjdhZDExNzY4MjgwMmNhYjMyMDYxZDZkMzRjNzBlYjI0MzBkYjcwNmQwYTQzZGUzYWRmMTQ2ODljOWY4NDE5OTFmZTFjODJmNmFlOGM3ZWE5NGYwMDNmMGUyODdlZjIyOTE5YjZhZDMxZGRmMmYyMDA4Y2JhNzVkMDZiMjUyOGM1MzU5NTIyZDBlNDAzZTFhNDdiODIzMzMzMWQ4MDFjOWNkMzAzOWUyY2I0NDk0NWJlYmNlZDBkMmZlMTllZDNhOTYwYTE0YzdlYmZhOGVjYTVlODhiYWE0ZGFkNDBiMDJlOGFiZDk0YzQzMzNjZTg5ZDZmMDVlYzgyNzVjMDA4N2IzZDMzM2ZiOWViZTQ1MzVkOGI0YTU2NWJiZTA3MDAzNmU1YzJjODFlY2MzNzZmN2NlNWYxZWE4NWQ3MGQ4OWEyMzEwYmQzZmZmMzZiYWZkMWY0YTNkZWViNzE1YmNlMjZmNDMzNzE1NWQwNTEyNjNjODExZTU1NDI4OGU4YWJjMGQzMjlhYjJhYTNmYjk3ZGRjMTBlY2NiNDIwNThmMzM2NDU4Nzg5NmQwMjllN2E5ZGJlZmQxZTc3OTE1NmUwMmU4MWY0NGI1OWY0NGUzNTA0NDNiODJmMzY3NGE2MTNlZmQwMDg5NTFmNmM1ODlhYWE4OWY1NjQ4M2UxMTc0ZGU5MTM2OGMzOTI5MzgzOWZkZTQxNWRiYTBlYTE1M2U0OWFiOTYwOTcyNzlmMGY2ZjllM2YwODNkNWMzMzg4YTYwOWM3OGRhYjRlN2M2MTJlZmQ3OGUyNWEwYTU0YzMyOWM0YjA3MzM2YTU4NjViOTMyMTUxMjgzNzk1YzVkYzYyNzBiZDNmYWM5NTJkYjBkYTVjOTA3YzgzZDRhYTc4MmJhOTUwOGI3NDcwMTVlZGQ4YTMxMjJlZTM4MzQ3MDA0ZjFmNTg4NjRiYjlhYzdkMmNlNDBmOThhYmIzNWQ5NGU4ODlmYTE5NDVkM2ZhMDg2YTQ0ZGRhZTc4Mzc3OTc1ZGJlZDM4ZmI3ZDk5ZTg4MjgyMWNiMGRkMThiYjAzOTA3OTViMDNiOTlkODQyYmVkYWQzMWViZDVhYWExNzI1ZGY2NzAzM2M1YjNmZGJkMGY4YmY2MzY3NjNhNzUzNmQ3ZDdkNzVhYWRmNzEzMjgyNDZmZjM3YTQ2NWNiZDFiNzQ4YjIxNWJiYTdkOGM2YTExY2ZhYWUyMDhlNTZmZTVjYTA5ZDIwYjhmZWUyZjVhZjNmZGM1NzE0MWU1ZjdlMmZiZWIxNzY0Zjg5MWE5MTI2ZjA4MzE0MGY0ZjZlZDFiMjY5YWJkMTk1NzBiODZiMmFiZmM4M2FmMzhmNDhmMGU5YTM4ZGIwYzkxYTk0ZjE3NWQyN2I2OWRlZjY4MTBhMmZiZjVkMjI4ZmE1MGRjZmIwYWYzOGEyMmZlYjViN2JkZjE1YTdlNDVhODMzMTc3ODFhZTBiYWQ5MDIzNjE4OThmMDIyZWQ4ODFmODMyOGExZGM5M2FmNjk1NTI3MjJkMTdkOWI5MmJkNjEzZjU3ZjU5NzNjNGEwNzlhOTVlOWZkNDZhMDllNmE0MDNkYmQ1MzgwNDliY2MyM2U0OGMyODFhMmQwOGY4ODE3Y2NiNjM4Mjg1Njg2NzkzZDE5MTQwZGMyNTBkNTJhN2VhNzZlMGUxMmU2YzFiN2E3ZDhjYjFjZTlkNzllOTRhYTU0ZDcxOTg2OWVkMzE3OWUyZGM1NmRlYzk2NjcwOTg5OTJiZjE4MTJkZjMwYzM4MGI3MzQ2NDM0NTRiZjlkZWNmZDFhNjA5NzI0ZjcxN2NhODI3NWYyZDg3ZTFhNmU5OTM4MjMyMDNjOWIwODZkYTcxMTJlNTZlYmQ1N2RiMGMyNWUwMWZlZmJkOGRiMzk5Yzc4YWFmZWY2NTA1MjUxMWFjY2UxYTc0ZWE2MDFmOWMwNzhiMjYzMDkzYzNjMWVlZjJkZGE0NDQwYTM5YzdhOGQ5NmE0MGUzYmZhNTE3MmJlMzNhNjkzYjU1NThhOGI3ZWM3NjYzMGEyNWJiY2M4YjJjNTRmMGE1OTRmNTU2OGE3ZjgxZjkzODFhNDFiZmM0NmVlMWFmZmM0YmM0YzhlZWM0MDJkMjg4NmI1ZmY3MTAxOGUzMWM1YmExMjVmZTIzMzQ1NTI4NDlhZWI5MTQzMTg1NzI1MzNiNDkzNTdhMTljYTYwZTQyZDViNzRhOWIyNjdhMWQ1NDc4Mzg2YzMzMTM3YTVmOGRiOGE1OWNkMmEzODhlMzkwZDZkMGYyYTEyMmU0ZjFlMjMyZGE5NjRkM2JiOGEyZmU4M2E4ZDUwNGNjZWUzMDA2ZWE3NTUyMTAyZjIyYzAwYjVlY2RlMjgwNTI5ZTcyN2FmYjZkZDQ3NDI1NmRkOTViODkwNzBiZjVhNTliNGFhZDQwNGY1MDBiYTc1YjFhMjUxNjAzNjljOWZiOGZiZDZiZDRjMDU3NzRlNmU1YjdlYTY2NzFmZTBmYmZlNzQyNDFjNmY2NDU5ZjAwNWRmNzhmMGViNTg0MjNkODkwYzM3ZTkxNGU1MTU0M2M2MjJhNGEwMzE2MzRjYjNmMGE0NzQxM2NjZDRlZTM3YzQwNzEyMGZhNTc1YWQxOTBjMzFhMDc4ZDEwNzQwZDc4MzdkNDBhNTEzZTNiNmQwZWZlOTEwODRlNzcyN2ZmZWYzMDRkOWNkOGQxM2VjOTVjYjU5MGM2ZDQ3ZWIyMWVhYTE1Y2MwNDU3NzA0MGRmNGE5MzM2ODBmMThiZWQ2OWFhYWZjYjgzNDE2OWIwNzJlYzcyZWU4ZDcxYWRkNzkzNmI3MWZjMDYwODg1YjM2MThjOGEwMTFiYmNkOWQ0MTI3ODQ0NDA0YjU4ZjkwYzQwNTJiMzI2ZDdiYTYwZjA0MWFkY2I0NDI5ZTAzMTAyNzAwMDAwMDAwMDAwMDY2MzM1YWMzZjE0YzJlMjY2MTg4Mzk0M2U5OWI5ZjdhMWM2NTY3MDZjYzgwNjQ2ZGZiOTIyMmU2ZjNiZGQ5M2RmZDYwMWMyNzNkNzYwNDYwZDM1YWExNWM4NjY2ZjJhNGNmNDhlYzNkOGUzNjExODdiN2I2ZmRiMmUxZGU4ZTM1Y2I2NDk0YTdlYTg5OGYzNjRlNGI2MDZhNjhjOTRiMzY2NTEwOGRjMTg5OTAyOGViYWEwM2MxZDg4ZmU0Nzk2NzU0Y2ExYjg0MzA0ZDdmN2NjNTcwMzQ4ZTY4OTliMjRhZDJjOTEyNjE1MmI4ZmRkZjM3MzRmYjIzOWQ2ZGMwMWI4NGNjYWQzZjZmMzNlNjVhODdhM2NlNmY1MmE5YzFhZTBhYTUyM2M2N2U2MDQ0NTE5ZWU3ZmJhOWI1ZGRhNDM1YTFjMTNlZTA5NjAyMTQ4ODFlZGE1Yzg1YTRmMGI5MTQ5MTk4MzUxZDk5YWQwOTQ4MDhiMGI3NDU1ODUxOGY0NTE3ZTE5MjcxZTJhOWVmN2ExNGU1NDI2ZWYxNDBmMTU3MmZjMGEwZTMzNGVjYjE3NmU3YTRiOTBmYThlZDI0ZTcxMWRmMTkzNWQ1ZjA0ZWZmZDM0MjRhNWQ1NGNjYWMxZjk1NWFlYzBhYWU4NTUwYjdmMTFiODY0MTNlYzUwMzg0YWU4YzNjZTFjOTc4OWYxMmE0YTRmMzk1Mzg2MjkwMWNhMDY4NzYxODUxODVkYzQwN2ZlNmQ0NWE2ZGJmMzNiNWRlMzZhNzczYjg2ZmU0ZDE5YzVmY2NjYzY1NDQ0OWU1ZTZmZjljYTliMGQ4NGRmM2YzZmY1NjUwZTNlNjNmZGFlYzgzMDBmNGQzNDg5MTdhN2NmOWIwMjFjMzNmMjBiYTFhOWRkYWZjMzVkODM2MjY4YmNhN2UyOTI0ZTYzNDA3ZDI0NjFmYTIzN2QyNWYxMzllZmY5Mzk3OGYzNmNlNTg3M2QxOGJlNWU1Yzk1ZjkwZTZmZjZkNzY3ZjYyNWIyNTQyMzI4YjRmZjdmZTdhNzc2N2M4MzNlMTlkM2RhNzE2NzYxMjA1MGQ2MTYzYWU1ZjA3NGJmOGU3MGFkZmZiODdiZjc3YWIyZGJkOTIzY2Q3ZjQwZGFjZDg4NjAxYjAyMzZiNmQ0MGM5YzhkNzhlMDIwYjNhMGIzZDE5ZDNhOTc1NjYyZDEzNDhjMDk4MGM1MDgyMDNkOGIwNTI0YTBlMDQwNzcxMjYyMTZlZGNlMDRjMjJiNjc5NDY3ZmVkM2FlNzMyY2ZiZGRlZTY2ODJiY2NiMTczZDUwNDY1MDE0MzFjYWZhMWY4Y2FlZGViN2MyYTc3MDY2ZTQ3Nzc2MzgyNjdlODc0MzljNDU1ODg5NTM1MzRiNDgwY2YxZjBjZmU5MjY3ZGRiMjljMjE1ZGU2MjZhNDVhMzI0YmIxOGQ0ZmE1NmQ2OWJiNDY5MjYyYzJiOGFlZTQwZjlkN2M3ZmRmMmExZGM0NzkzYzhiOWZlMzdmZDBhNjQwNWZlNmNjZTJmMTI0MDU4YzQ1OGU0ZjE3ODkzYTA5ZDgwZWU3OWQyYjdlMjBiMTMyZjBlMzZmNTRiYzY2NDAwOTU3ZGVlMjhkZmE2Y2E5MTMwNmNkNzZiMTkwNzI2ZGM2ZDljMjk0ODM3NGZjZWQwMjEyYmEwY2RjMzJkZmUzMDM4Y2JmMmEyYjVlNjUwMWFlZWY4MTlhMDA0MGM4NzQ3M2QzNzYyNzhiM2FiYmJlZjg3ZmFjMDEwMTkxNjk2OGY1NWI1OGUzMmIxMGNmYTAwNzcyMGUyODZhYTk3YzA2OTllZWQzYjc1YTYyZTA0N2U3NDg3Y2Q0Y2QwNGViYTUwNzUwMTRmZTY1MzU1YjQxMDQxOTVkMWNhYzBmNDY0MDkwYTkxZTkzMDdjMDQ4ODIyOTM2OTRiZGJjY2E0Zjg3NzcxMjMwNDdiNTE1YzgyM2E2MmQxZTYxOTJjMDM0Mzk1NmE4NjZmZWU1MWEyN2ZmM2ZkMzIyODdjNzUxNGE3OTk2NmY2YWY4YWRkOTQ3YTZiZjJlZjMzNTNlM2Y5MGU2YWY2ZjA4NjRhMDljNjQ5MjA3MWM5OWJjODE0Yzc3NDVkYTg0ZGM0MTAyNjg5MGNkMGNhMDY4YzRhZjE1OGJmN2VjZmMxZjY1N2Q3ZmMyY2E2MWE2NWE3Nzc4ZTRjMjFlZTdmZDIzNWE5YzZhZmVkYzM0OGFlM2YxY2Y2ODQ4NDZhZjA4NjA1ZDVlMTNhYzZkOTg5YmQ1ZGNlODdlOWRhYzcxZDQ1OWJkNTA2YzIxMDczMTQ4ZmEyNDIzNmJjYWQyYTVmNDY2M2E5NDMwNWIzYmUxNDcwODJhMmQzZjA1Nzc0NDcyNDAwODQxNjg1ZTg4YmQ2ODFkNmUyZDg3N2E4OTMyOWNjMDc3ODhjZTBhNTc5MWIzMmMwMGM0Nzc0M2VlODZjYThiYWJkNTAwOGQ2NzkxZTg4MzZkOWEwMjkwMjQ5MDAyY2E4OTkyNmExNmEwZWM1NTUwNDMxNDQ0NjE2YWRhYzg3NmZiNzQwNDc4YjUzMWIzMGVmMTkyN2QxOGU1YmI2MzcwOTUzOTgxYzQ5ZTFiNmQ0YmE2OTU1NDMwZWFmODkzMzBjMGY5MTZjYjNlMGMzZDliNWFkZWVmMTY0NzYzY2ExMjVkNTE0MWEzZWE3ODMxODYzODEyMjQ2MDAzYzQwZTRhMzA4ODdhMWJiOGFiMDk1OWY2Y2M4YjAyYTIyZmJjMTQ2OWU4MDM2NWEzODNiM2ZiYzExYjJmNDlkZWNmNjY0NzkzY2IzMTc5ZTk4MGYwYmQxMmE1ODU3ZmVkMzA1N2I5OGQzZTFjNzllY2U0NmUyMDI2MGJhMDZjODNhOGZmZDI2NzQwOTdjZTZkMGE1OGNkYWZiNmMxNDAwZmYyMDU5OGRjZTZkMzIwYmRhZTAxMTY0ZTNlMWQzZDhmOTU2YzVmYzg2ZWQ5NjI4OWExYTNkZTI4MTZmMGZjZDE4NTg4OTdiMDlmMDJhNGM3ODQ4ZGY0OTMzYzRkODA2YmM4MGQ0ZjEwYTc3OGY5MWM5MDg0MzA5YTdiMjdjNTUxYWQ1MjQyM2FlYWNlZWRiZmEzMzZmMGRiODBmYTA0Yzc0ZTI3ZDRmNTA3NmM0ZTE3MDZmYWFmZWE5NzYwYmQwZjMyYjg2YWM3YTQ2MDg1NWM2YWQ4OTVhYzE5MDNlNGFkNjdiZTlkNWUxYTRlNjcyOTAwNWZkMmFlZTQ0NDM2OGZiOTBmNmIzMWNlOTFiODVmMGFiOTFkOTI5N2NjMGZiODlkYjVhZThjZTliNDAzNDMxOWVkMzAzZmYwODUwMGVmMmMyMzI1YWU2OGNiODI1OGEyYWI2NDZkNWQ0ZDkxOWExZmMwMTIwNWRmZTQyODYyMTFlNTI1Y2QxMDQ2NmYzYzhkMmExZjkwODhmMzlmYmY2YTRiNDg0NDQ0ZDgyNmJiNjNiYjcwYmE5ZWFlMWYyNjEyZmU2ZjI5NmIyYTM0YTVlMzUyZTgyM2ZkZmU2MzE0OTg2ZWFkOTU5N2YyNjA4MzUxM2I3NzU1NjVjMmZmMzhiOThlMWZhYzU4Zjk4YTAxYjRiOTFhZTgzYjU2YjJjZTIzMGIyZWZiYWE1NGM1MDU3MzQ1YmEyZjU0YWRmOTA3YTE2M2RhZjVhODA5NTM1N2M2MzEzYmFjNzhiNTJkZDVkYmRiNDgwZTEwMjJmMTk2M2U5MGRiMThmZGI3MWQ1MDE0YzdiZGViYzE0MWZmNDVmYjBhNGM5NjUyMzg4ZTVjNTk4NWRjYmRmZGM2MzhiNjg3YTIzYjBkNzM4YzFiNWQzYjczZGVmZTc2Y2YwNjcyYzgxNDYxNjI1MGE5MjI1ZDEyNjE0NjFiODllZWI5ZGU0ODhmYjVlZjNkNmFkN2UxODczNzJjZjA0YjcwNmNhZjE0YTg1Njg0YmU4OWY1YmI4NzMyZDU0NjRkMTA1NDk0YTJmYmZmZDczNjZlNTg3MjJjOWQ5MjBlYWZiZGRlMWNlZWMyYTEyMTFiYTA2MTM0NzQ3NDBkNGMxYzQ5OGEwY2UwM2IwNGNkNjNjNjlmYWM4NDRjNDU1YzIyMGEwNDQ2MWY3YWFlYzgyN2E2ZTc3MzllYzMwZjhmZmRiMjA5MGQ2ZmZkMDJjNWFiODJmYzE0ODY3MzdlMjc4MTllY2UzZTZiZDMxMjUxNTc3ZGNiZmY5NzZjOTdjZTU3NjdhMjc2YjAzMTQxYTQ5MWZhNjAxOTg3NTViOTIzZDdmNWViM2UzOTJiM2YxNTYyZTEzOTA4N2U4NWM1OGNkOTRmYzNlNzBhN2IzY2E5OTEzNDJjMjUwMDY4YzZiOTVkMzFiMjEwNjc1ZjAxNGU2NGQ1M2Q5OWM5MDBjMDM0YWM1OTIzZmEyNzNlMGVmNjUwZTY3ZmE0OGZkZjM0MzMwZjk2MTcxMmZlOGFkMzQ1MjAzNWQ5ODZjOGU1NGYxZTA2NzVmN2Q3MTJjN2RhN2I1ZmE3ODg4MGFhNjdhNWYxNWMwNDQwYWNhNWJmZDk3MzQ4NmY3YTk0NTkwMDdiMGU3YTYzMmI1YTY0Nzg5MGMxMTViNzc1NWI5OTgyZTMyMjg2ZmUyMWIzODE5OTljNTJiZTg5ZGYwMjEwNWJjZWYyZjI0ZmQ3NTY5ZWMyNmY0NGQxNjYyOWEzMTUzZmI3NGJkNjNjNzMzYjgzYmM2MzBmMjNhOGZlNjM1OGNjMzZiYWFhNDBlZjJjMjRmODJiOWZmNzg0NjI0YjE1MmQ4YWUxZjgzZWQ3MzQ5MDc4MTc1ODgzZjc3NjMxODVkMjQ2NGNkZGQyNWFhMGE5NzI2MWQ5OWFjZjZjMDAwOTUwM2Q0NWVlODg4YmE5NWUwMjY0NGE4MWI1YzZjMGJmMmFmZWJkMWQwOGUyMzVkZDVlNzVhZDMzMzAxODMzMzkzZWE4MTU3NmFiMzk5NmFiZjUxY2ZkNDAwZTA3MjBiOWFmMjNlNzdkNTE1ZDJhY2U5YmUwNmEzNGJiMTA4ZTM1N2JmMTliNDBlMjI1NTRmOTBlNDc5MDkzYmViNDdhMmM0Y2IwMDNmNGRjODgyYWRkNTBiYjdiYTE0OTkxY2IwYmExMGVmMWE4MWYxZjJmMjk0ZGU4ZWI2MTc0ZjQyNWQ1YWI4M2IxMjU2YjkyYjE3NjY3MjY3ZjMxMzA3Y2U4MWZjMmM2Y2YxYTRjZjk4NDA0YzM0YmVhMTNlNzI4NGI5MmMzMTNkNDQ5YzJhN2ZkNDQ2ZTdhZjkwNDMwNmRkMTI3OTcyNDk1ZTM1NzllNDIxYjQzNmZhNzYxNjlkOWE0Y2Y4NTU5NjU0NDEwNzQ2MjI3NzdmZjVmN2M0ZWJjOTMzMTlhMDAwZDUxM2U1MTYzZjBkMTc3NjI2ODIwOWRmZjRiNzMwM2MzNDczZDM1ZWY4NmE0MjE4NDdjMjUyMzllMDNkODgxYzllYmQ3MmQ2NjNkYjRlNTFhYTI1N2U2YWM1YmUzOTgyMmY1YjA2ODhlMjIxN2RkMTMzMWU5YWZjYzI1MGIzNjRkZDMzM2I0MDhmNjI3MDE3NGNmZTBkN2Y2MTlhNjFmMGZmNTU2NWFmMDA2NTQ5N2M3MzBmMTE5M2UwYmY1YTIzMTIzNGQ3ZWJkN2FhNjIwMmQ0NTAyMDQ4NzUxMTQyZmRjYzg5ZjNmYjE0YTk3ZjhjZTgyYmIxMzZkMDU0N2VhMDk4NjZlYWQxYzJkNmZlYjYzNGZjZDdiODZlMmY0NTU1M2Y1MzNkYzRjY2ExNGJlZTIzOTMxYzMyNzBkODEwOWU5MzcxNWY1YzdmNDhkN2ZhYTA1OTU0YjM1MGE4N2Y5NTU4MDU0ZGVmNzQ2NjhjNDE5MTc3ZDk2ZTEyZWI2MTVkNmY4OThlY2E0YzI3MjlmNzk4MDIzZGM2MGRjZTRhYjY2Y2JhOTNlMzkyNjU3ZWRjZDVmNzNkYWNmMGJhZGQ2NDk4OTk3MzJlN2FkNmRhMjQyMjY2YTM0NDljNzA2OTM2NWQ4OTJjODFhMTE4N2JmNjRmNWNhOTU1ODJlZDdhYzY2ZWQ1ZDEwMWQ0MThhMTBiNzk4OTFjNDU1Mzg2M2ExNWM2OGQ0MTNlMGYzZGVjMTAzZWY1Zjg0NTcxODkzZWRhN2ZiNmYzN2Q4NWJjNDA5M2ViZDVhODE5OTJiYTFmMjVlZDJjYmUxZjYxYzhjOTI5MjBiMDNjODZjMTg4YjAzMjU3MTkzYzU0MmNiM2IwNDNiNTE3NGMwYmM4MWUxZjhhOTc1OGY2NzMwZWRkYjg1NTI4NWQ1MTJhMDIxZDU5NmNlMjA4Y2Y5MDc0ZWIzMTRlNDNhMDVmY2NhYmYxN2E0OWVjMDEzMzQ2ZmYyMmFiZjNjODA1Nzg3ODIyOTU5ZmY3NmM1NjcyYWM2ZTFiMjVmMjE3OGM3Y2VhZDhjY2RkYjM1YzVmMDJkYTFiYmE1MjBhYTk0OWM1MmJjMjZhODk2ZjM1YWFhMjZiODFlMjVmNmMwYjM0ZDljYzBmOTE1NTgzMjAzZjczNmZlMDMzMzkxNDNiYTUyYjZiMzEwMmU1ZTkyMDA4YTUyNTA5M2MyZmI3NjllYTY2ZWU3OWE2NWRjYzI3OTljYmM0MDg5NjczNjA3ZTBjYThhZjIxYTExYjI3ZTAzYzg1MjhlY2U0MTcxYjJlOGQ2NTg4YTBkMDg0NjE3MDZlODY4YjBlODM1MTA0ZGFiN2ZiMjA3MWFjNzIzNWJmNWU1N2IwZDllNzdlOGViOWIzZDI3ZDFlYzhkYmQwMWJhZTA3NWU4MTIyODQ1NWIzMjc5NzA2ZjE3MTFmYzg3ZjhmZGE2MTNiNGE4ODQyZTdiMzQ3MmI0OTNlZDAwN2Q1MzY0YjBjZDBlOTE2NWQ3Yjk2MWM1MWEyMzZkMDk2YzIxZTgzODdjMDI3MjY0YWYwYWY1NGZkNGVhNmM3OGVjMDVkYTVjOWQyM2U5ZjY2YTM4OGNhNDEzMjc2ZmI1ODA5MjE4YWQyZTk1NWE0NGUyZjc4MzM5MDE0NzE3ZDZiNGQyZTZhOTJkMGMwN2ZmN2YxNTlhMTk5ZDM4MjkzZmQ3ODQ4OTFhOTBlODVjMjc0ZmFkMWZlMDJlMTQ4YjBhODE1ODQzNjk3ZjM1N2QwYTM4M2U4YTJhYjUwYjc4OGVkZWY0M2RjOTBmMjdmMTQ5NGZiNzQzNWYzMDFkMThlN2IyMmNhODk0OWYzMjNjODlkMDZiMWViN2FhMDdmMjQ1YjE4MGNmMzBlMDllMmVhNjRjOTkwMmM0OGYwNjIxNDdkMTE0N2U1MTQ2MTI4NjJlODk2YzNiNmQ5NTMyNjQ2MDY2ZGY2YmQ5NTg0NjU2ZGEzMWRkZDdmOWM2NmJjNjA5ZDcyMjc2ZGE2OTYyMTE1OTkwZWQyZjZiNDkyZDU3MmE2N2Y5OTk0YjY0NzY5NDJjYWQ0NWZkMDQ3NWJkYTIxZjA1YTE2MDUxNGQ4OTlhN2E4MmQwMzRhYjE4MGEwMWQzYmJjMzZmZTA1N2FjZTYzOGM4NTNjOTg0YmE1MjU1MDUwY2YxYWE3NzlmNmMyN2QwNjkxZTU4NjgxMDM4N2YwODAzNjVlNGNiMjYzYzA1NWE4YjE4YjNlYWU3ZWEwY2YyMmUxNTllMjJmMDNmNzgwOTg1NDA0NDQ0ODkyYWYwMDYzMjlmMDRiMDlkOTdlNDgyM2U3YWJmYzI4ZTdjYzQ4MjY4NTVjOWE2OWM0ODQ4NmUwYTFiMDJhYTgwMTM1MTE2NGM0YTAyNWZjMGJmYjAxNGNmZWEwYzZkYWIwZDM0Y2QxZTMxNTg4MGRiMjMwNGVkZjlhNTZmNGNhYjM5MGMxZTY4MmZlMjZkNjlmZTg0NDUzYzM3YWI5MmYzMTlmYTAxYjgyZTgxMDcyOTVlNTM4NDA5ZDRlODNjOWYyNDhhNzM0MDc1ZWI2ZjY0MzJlZWYwZDMxNjNhNWRmYzUxM2E1ODI5ZGJkNGI0MzA5MmE3OGY4ZTI1MmIyMTBmM2RjOTg0OGMyN2QyN2MzNzhiYWRjYmFmOGM1MGQ4NWNiZDI0NmQ4MzA3ZmRiNDRkNjFhOGRmNmQ4ZjJmYzY3NzFkYjRlZmQ2ODlmYjU0YzhhOGFkYzJkMmQyODYzNTVhNzE3ZjA5N2RlOGI2YjA3Mzc3YTViZjY4ZjdkNTIxZmYyMWE1OGMwOWVjMWJiNTBmNTJlNTEyNGI2NTUwMWM5ZWYwYTg2NzA2MDFkY2NlNmVkYzc5YmJlMjhkN2Q1YWQ5MzEwN2ZkZmI2NWY0YjM1NmY4YjU5NDZiNzU5NTIyZjRjMjhmMzNmMTQ3N2U0YWFhNjA3YWU1ODhiODAwNzg1NTNjMDM4MzEzZDJmMmE2NWYyZjU0YWNkNzUxMjdiZThjZmVjYmMyMGNiNjVlMDhkOWRkNjQ3NWUzNTRmZjI2Y2QxMmVmOWU4NGEwNGU4NGNhZDZmOGM1OGNlZTg0OWNjNTYzOTliYzE5NDdhMTdlNGNlZTJmMTRkNDQ0MDEwOWNjMWFhZTZlYWNmM2ZlNzEwNjVkMTBhNDA1NGY3NTVjNzljZWY2Nzk3M2Y3MWNmMDc4Y2QyM2VjYjM2YTNlMDdmOTFjZWFiZWJmYTc2ZWQ5YzIzNmMwYzMzN2Q4MGU4Y2UyOThlN2NlOTVjOTMzOTNjMDBmMjlhZTlkZWFmMDc0MDgyNGY0Mjk2MThhYjc5NTkwM2RiNjkwYmQ1ZWJhNjcwZjI3ZDcxOGRmZTI4N2E1ZTljZmYxYTQzMjcwY2QzYzJiMDk2MDBiYTFmNGJmMzlmYjZiNmQ4YTAxMDc5ZTkzYmM1ZjlhNGQ5OWE0YzQ0Zjc2NTkxMjkyODE3MDQzYmE1MzEzZDM0MDE1NjFiMzIxZGIxMzQ1ODIyZWFlZjk3NTYyMGJkYTc5Y2EzZTczMDRjMjEzZWYxY2FkZmU2ZTkxYzcxMDUxOTgzYzllOTUzOWM0ZGFmMzMxY2RkNTBjNDM3MGJhMTYyNGNiYWU0ZmZkYjczOWMxZGJjYmQ2M2E5OWY0MzBmOTE3YTAyODk2OWQzMjU3ZjVkMzE5MDg5MzgxZGNhZmE4MmRkZWJmNmNmNjJjNTc3ODk2Zjg5Y2EwNzVjNDM0YzA1MTFlODgwOTI0Nzg3NjQyOWQ1OTUyMmE3N2ZlNzczNTg4M2JmMzA0OGFjOWRmZWFhZTNhNmQxY2E2OWExZjgyNWVjODU3MzcwZWFkYzdmYzY4MjYyOTZkODM1NTdmMjJkNTc1Y2VmNWJlZmRhOGFlY2ZjZjhjYWFhZDBiMjNlYTBjYjE2MGMxNTkwOGZkNjM0ZDEyODRiY2RlZDRjYTQ3ZTkxMWRiNTRhOWQ4ZmIzZWRmMTFlYjYxMjY1NzM5NThkZjU3NmFhMGEyMTM4MmI1NDY1YjJlOTM0OWEwZGNjOGRmZTZkMDk0ZmJmNzM4NzY5YWVmNTk5NWZhYmUzMjk1NGU1M2VkZjYwOWQzMWUwMDQzZGJkNjVmMGM3ZGRjNTJiZDJlMzI5NjE4NjZhODJmODkzY2M5ZWRmNzY5MWVlY2YwMmI2YzFjMTI5YTMwMDhiYWFiZmU4MmY5MjlmMjVjZDlkZjMyNmEyOTljYjRlN2I4N2I3MWUxMTQyZDBhZTljNmUwZGJmMTQzOGJlMWFmZDU4MDQxZGM1MmZlNjEwNmZlZDUyMWVmYWQyNzFmODEyZGYyNTZkNDk1Y2YxOWMxMjkyZTJhNTdkNTBmNDEyYzVmMjYzNjVkMDM2ZTIzMDVlNjIwMTRmZjJhY2VkZGIyMGRjM2JmZmI0YmQ0MjllNWEzZWRhMTVjMmI4MzU4N2NlY2Q3ZDRmNWY0ODQxMzk2YWM4ZDg1YWNkMDBjZWQwZDcxNzE0MjJlM2RkNTAyNzQyOTdkN2UxZWJkNjU5M2RiOTJmMWRjN2ZkNzUyZmNmYmUzNjZjYWZhYjYwNDE0ZjMwOTkyZmZkZGNlYmYyZTlmODg0YWUxZTJhMGU5YTkwODE0MTMwOTU0YjQwZmQ1YTNhODQxZGY4ZDE2YjgxYjgxMWUxYzcxYzg3ZjM5M2QwNzk2ZDk0OWFmOWNiYjExOGI2Nzk4OGNjYzc3YzQ5OTBlYTZlM2I2ZGU5NzE5MTU1ZDYyNWQzZmRhYjM5YjFkYjU2MTk1ZDhiZjAyOTUzMTFjMDJmNTVjYjkzYzE1N2Y2ZTVlN2FmMzZjNTNmOTVmMjU0ZDBkZmY5NjllMWUxMjI0MTk0M2VhZDA2Nzc5YzMxMzkxZjAyY2ZlODI2OTY4Y2QzYzUxNjYxMjhjOTNiOWU2YTU0NTAxM2JjYWM4MDNmYTczZjE0YTVjZDliYjRkYWZjNzlmODEzZjJjZjkyN2M1OWU4ZTFlZTg4N2RlYmZkN2U5MjExZGI4NmYyZDFiZmYzYWYxMTg0YjViOWM0MjJmZmY5ZmUxOTA0MzI2M2RkYTE0ZWE1NzY1NjE0MTk1MDc0MjE2YTJmMzFiOGExZmRkNjc5YjlhMjhkNzg1YjlmOGE4NTViMTViODEzZGNiNDI2NzJiMmU2ZGZjMWNjOGQ0MTNkYmY2YzQ3NTU0MTcwMTUyNzBiYjYyNDdhYTdhZTIyMjY5NmY0OGNmMGM3ZTNhMWYwOTE0NmJiM2JkMDI1MmJmOTUzM2RjMzg2YjE2NDJmNzc0YTJjNWY3MzNlYWJiNDFiZDY3NjI3MTc1Nzc3YzU1MDIzMTMyY2QzNTk0YmU1YzdkZTEzOTk5MzUwYTU0ZGE0NmU5NWU2MDRmYjU3MTQwNWNiOTJiYmM4M2I2YjZkOTc0NzVhODVmZjcwYWQ3ZDRhNDQ1N2U1ZDJkMGNmY2MyMzcxMzdiYWRhMmFlNTBjM2NlNGEyYWMyMjY4NTYzM2I3MzcyYzRmMTE2NTM1ZTE5YWZiYTRiZWM4YTAwYTAwMmY1ZjNlMTZhYmU1NWQ2OWUwZWVmYWIzYmU1YWIxYzU3ZjFkZTk4MzQzNmJkZGM1Zjk0Zjk5ZjBlMmQwMDVjNGQ4OTJmMTIxM2Q5N2Y2ZjYzYWZjYzJkMmMzYmM1ZWQ0ODdjZmQ5ODc3ZGJhYWRiMTFjZWJjZDc3NjFjMDQzZjc1NDFjNDMxZjRkMjgzODIxZWNmMTRlNjA1NDE5MTU5ZDg4ZmNjNTBiOTg5Yzk5YmJmN2ZiNjhjZGVmMDA5YzQ3YWQyNGJhZjI4NDZjMGFjZGNmNGJiNDFmOTgzZDQxZTUyYTNiZDUyN2ExYmU5ZmYyZTdiZmZhNjlmZjYwNTIxYWUwOGFjZDA5MzAzM2VhYmI2YmY4Mzc2NWVjMTJiMTFjMWIwZDEzNDU4ZDVjZTMxZjZmZDkxN2EyN2FjMmZhNDQwYzJiNjRlYTc3MDk5ZjNiOTU2ZTAzNWRhYzYxNGNkNDkyYjMyOTg2ZGQwYjhmODg0ZTI1NjY5NTIzNjEwY2ZkYzc5MWJkMzY4MmQ5NzlkYTlhZDZhNDZhNmM4YzZkYWYwN2NiM2JmZDZmODBlYTBlMzE4OWVjOGQyMzEwNzI2NTJkYjAwZjNkOTQxOTE0ZTQ4MWFlODAzZTNhOGVlNzY1ZTIyMGQxYzBkZGFjNGU0NjMyYWU0ZjlhODA3MDI1MmEyMmQxYTg1MWM5NzU4Y2FhNDU5YTkxMmM2YjgzNzE4NTFiN2Y1YmRmOWVhMTgzYWUwOWQ0OTdjZGYxNDA3NGUwNjliODg2OGY5ZTUwNmYzM2UyOGZiZjZmODcyZDgwMmVjYWMxYWFkN2M4NWNmMDRiYzA1YjM2Y2I2MTkzMmI2NDY3YzIwZDIwNjA0NWNkN2MxYmVmMGZiNWYwNDEyNWNmYjM0MTVhNTYxNjAzOTI1YjhkMTgwYmE5MmE5MTQxYWUyMDMyMGQ1Y2VkYjc2NzZmM2YwMTcxNWFlNDM4N2I1ZjI0NDgxMDBkNGYwOWYwZWFhY2Q1YjIzYTdkMzA4ZTc4Nzc4MjAzYzE2M2IwNTA4YTJkNWY4Zjg4NTEzZWViZTg5M2U3MWQ2MzY5NGRiNTAyZmIxNWZlN2E4ZWYyNTgzMjQ2NDRjZTE4MWFlMjc5MGM3MzlkYWEyMGNhMjg0MDIwNjNlMWYwMWUzOWM1NWJjMjUyZTI0NTFlZjhhMTgzZGNjMWM2NzdmNDg0M2IxZTY0NzEyNmRiNjgyMTQzOGZiMTQ1NTI2MjY1ZGVkNzJmZWY5ZmYyMjE2MWNjZTBhOTMzNTU5NTg2NDkwYTdhOGFmMDVhNzlmNWM1N2FhYzIxYmE0OTEwNzIxOThiZWJlYWQ2ZmEwYWY4ODI3ODkzMDk3Njc3MTJlYzIwNjA0MjI1MmY4ZjI1YzY5MWZkZGMxMTQ5ZGM4ZThkNmQyMDgxYThiZDMyZTYxMThiYjBlMmFlMGFhNWI3YzY4NDU4YTA2NzdjZmEwOWYxOGZjYWY0OGNlMDdmZDJiNDE4YjAxMmI4YTQ2YzUyNjVhMTE4NjE1ZTFiNzQ1ZjM1ZjIzMTAzMjY1ZDJmZWY3MjY5YzVjZTllNTRlY2ZjMzExYTk4NjEyNmI3ZTg5OTA5Njk2YzIwMDdiMTc0ZDI3OGQ0Njc2YmJjYmJiYWUwYjNhOGU5NDVkZTBkN2NjZWE0M2Y2Mjk3ZjIyYTMxYjY0MWQ3OGRmMDViY2Y5OTgwZGZjYmU0NmEyMzlhY2FlZDgzYWM2ZTE1ZTRjNDAxMWU1MTkzYjI3ZTYwODkyNmZlZDVmYjM4MTFiMjNiNDhjODYyNTBjMWNiMTVjZTNlMmIzMDMwODMxYzgzZTVkMzViOGVlYzMwMjcxYWE5Y2I4NWFmYjZhYTkxYzI4MjQ4YzY0OTJhZjVmMTQxMzAzN2U0ZWJiNzBjNDUzMTA0NWRkOGRhZjJkZjY5OWVkZDRhNTEzZjczOWQ4MzJlNjgyYTI2ZTAwMTkwYzZmYzFiOTkwMWZlNTUyYjZiMzUwZGM5ZmE4YjI3MWIzZDc0MjdjMjMxYTAzYjJkZDBhZDQzYTNlODE5ZDY2Zjc0N2QwYTI5MmI4MTc2MTdjNWIwYjFiOWY1NTQzMzljYWQ2ZWM0ZGRjNDAzMTRjMjEzMzRlNGQ5NGZhZTI0YmM2MGEyMzI5MThhZWMzMmVmZTM4NzM2OTllNzFlMmRlMDcyMTQyZDRhYTZlZWM2MmQwMGI3ZWY1Y2Q3NDBlMTA2ZGFmYjFlYTEwM2UyODc5ZGQwZjNjMjVkZmRiMWRkZmEwMTk5YjBhM2M2YmYwOTYzYjFkMTc0MmYzNTgzZTQzMjY4NWE0ZTJjNThjYzJmMjRiMjJhMzk4YjI3M2VkM2QwYWY2M2JiYmRkYjNkMDA5MmIxMGQ5NDg0ZWE3NDA4ODc1MDgwN2U0YmY5MmUxN2JhMmUzMTM0MTRhY2IzY2IxMmM4MjU5MGJjNGU0MWMxNGY2MmNhOGFjMDJlMTlkN2NlOGM2NGJiNGRhNGM3NTBhYTg5YzI2ZmY3Yjk4NGMyMzJiZTdmOGVjNzdhMDJlMzAzZTAzYzQyNTk0ZGVmMmQxZTE2YjZhOTdjODM5YmM4OTYyNjdhYzMyYjM5ZWVmMzMwMTI0YmM2ZDkxYTgwMjAzNDUwYjVhZjEyOTA5NWFlYzU1N2Y4NWU2YmQxMmViZDc2YzMwOTVhNDU2ZTZjNmQ3YjBkYmI0YWUxYTkwNzIyOGE4MzM1OTMzY2U2YjU2MmNhYTg0YWNlYTI0NjUxMzZmMzBkOTU2MmNhNTE5OGZkOWY1ZWI1NmE2YTJjZWM1MTYyNTEwNGY0MDRiNmJkOGUxMTIyYjAyMzZiMjEyN2EzNTMzYzc2MGU1ZDdlZjA0YTA1NDU1MzA5MmMzYzEzZjUxMTMwMGRmMGRmZGU3MmNjMDg2YWY1NzRkNWE4MDAwOGVmMmViZGY2ZjQzOGFkMDgzNjYxMzRkOTdkMDNmZjQ4MWQ4MzdiY2I4N2VlZjg3NDhiYmJmZmE5NzE1MzI2YjhjNWUwNGM2YzRlNDA5ZWJiZGY3N2UzMzI4NmE2ODA4ZGUyYzM1MzNjNWI2ZDRhNDY3NjExOTBlZTBjN2UwNWM2N2U0YzY5ZWI3NTM1OTYyYTExZGE4NzhiYjZhYTA5YzMzNWUwNmVkZjBlOGQxMWU2NzIyNjQzZWFmMDI5MTMzNmUxNzIyOWMzMGQ1OTBhNjBkNmVlNDdmNTRiNTg0NzQ5ZmIxMTI4NDhjM2NjOWFjYjYyMTEyNzQxYTIwNjg4MWU4NTAxMjVhZWM2M2NkOWNhMWIwNTk3MWNmODM3NGMxYzEyMDJlNmFjZDJmNDcxMmVkNThjY2MxNTVmZjk1YzFkMjkwZjM1ZDQwMTQyNzAzNzg5ZGVkOTBlYTFjYzNhODFlOTUzMzRmNjMyOGI4NjgwODQ2MGM5YmFiMjYxZTliNTA2ZjNhMjI0NWY2ZGYwZmJiZTA2OWJlMDAzN2U1YWI4OTI4MTQ3OWQ3MmVjNTBhNmZhZWIwNDAwOWM4NzU3NGYzNDg4M2RjYjVlY2E1MzQ0YzVmMGE3YWRmODZkNDNkNDc4NDI5OTJlZjc0NTRkM2Q0MjY1ODBmN2MwNDc0NWQyY2FjNjk1ZmM5ODg2Mzc4NzNkZGZkMDBkNmMyNWY2ZjBjZmUwNDA5YjcxN2FiNjkyZmYwOWNjM2QyNGI4ZDBlYWQwNWVmMjA0YmY1ZTE0YTIzMzI2MWU4ZWE2ZmQ0ZjVkNmEzMDk5NDBjZmYzMmVlMWU0ZDU5YjM2NWQ3NTQ1MzJmZmVjNzdmYmRmY2IyOTkyMDA1YmIxYzU2OGY2OGY4N2YxYzAzMDM5MTY1YjZlZDYzYjlkN2E5ODgyMDE2YmJiOGRhOTA1MzI1OTNkM2E4OTcxNzdiMDMxYjNjNWQzZDFhZjYzZWY5YmU0MmNjOGNiZjcwYWQwYjUxMDc4ZGI3N2FmNTU5MjY1MzBlOTZmMTE0YjAwMzI2NWUwMmMzZjk4ZjYxMDA3YWQ5Yjc0YWE3OWRiYjhjMDdjNTVjZmQ3ZDAwYWYwMGYwZTIwOTVjMTlmMjE0ZTNkNTMzODc2MTZiNjk2ODIyZDg2MjVmNDhiMzhkMGMyMzViNjVjM2E0MGQ0YTI3NTk5NzBiZGViM2U2YWM0YzM0YWJhZTkwNmVlN2NmYjAxODE2MjMwZDkyOGRjODQxYzRjYTBlZjI3OGQ1ZWJlMjJhZGE3MGQyYWJjNzNlNmVkYThjOTBjODAwYmUwYTIzMjQyMjQ1ZjM2YzNiNmZjZGJhNTVjZTk3ODBkZWI1NTJhODkzNjM3YjNjNGVlOThmMjg2Njk3MzE0ZGEyNGU2ZjJiNzUzMmJlYTI5MGY2ODgyZmM1YzFlYmQyMTQ4NTQxMzU0OGM1ZjE1OTNhNGI5ODNkYWMzZWNhNzY0OWZmNzUwOGY0NWFmZDhjYzE3OTA2MmY3MzZkMDBjZjEyYjdlM2UwNTc5YmQzYzdiZjAyZmZmYzYxNjdiMTQwMmFhMmU5MzhiN2Y4ZjJlMmZmMDIwMzJiZDhhM2VhMTJkMTRhMDAxMmZkMGQ2NGFmZjMzMGIxZTc5ZmUzOGMwOGY3NzQxOTA1MmNjMDIyNGEwZGMwNWEwYWQ1YjJmYWE4ZDNmYmY0OTNjZGFlNmY3ODA5MzJkNTRiM2U4YTNkOTBkNmE0NTMyM2ZlNTVhMmY1OGRjOTQwYjgyOGM1YTE4NTljODRjNzVlNTA5NjkyNjJmNGFjZmRmNTdhYzlhMmY3Y2I2NzNiMzAzZDQ5ZGFlYzllYWFlZWQzMmU5MTc3OGUwNmNhNTRkODMwNmUwNDI2OGQ3NTNhZTQwZjAyZTBjOGRiZmU2NTJkM2I1MmZlZjVkMjkzYWI2OWY5N2E5YjI5YmY3MTlhN2RlNWU3YWQ5ZmQ0NDk1MTgwMjQ5NTk0NzE4OTI1MDQxYThmMjRjZmI1NTQzMjZiNGFkMzdiODIzNmEzZTRhNjY2NjRiYzU1YmM1NWEzM2EwYzZjZDY4YmRjMjdlMGUxMzgyYWRmMzBiYWJjNjk0MTk4OTAyMjIxZjdmN2EzNTdiYWRhZmMwYzMwYWYxNGUyOWU0MGZiZDE5Yjc1NmY1YzNmZGE5OGRkOTExZGFmZjMxNWVjNzBhZTc5ZDYzOWMyNjFhZmU2NzM5Mjg2OGM0NWVkZDdiYWJhYWE2NWU5YWQyNjA4ZGVmNDEyMTkyMGRlNjY0YmM4ZjU2MDc3ZTE2NDEzNTBiMDhhYzExYzZmOGRjZDYwZmFiNjU1OWNkYmM2MmZjZDFkMDA2ZTQ3MzU3ODNiOGQzYmIwOGJmNTlmYTUzYmZhNGM4YTM4MjA2Nzk1NDdhNjNlNTQ5YTA0ZmQyMzNlNzk4N2RkODIwOWQ3OGYxOTQzNjFhMTQyYTAxZDZkNmEzNTQ3YWUxMTMxNjE4ZWE2ZDE3NDZjYzA5MzI1ZWUzZjM0YTEwYzY3ZmM0Y2Q0ODkxOGU0NjNlZDcwNzY0N2M0OTRkMzYyNmEzYjQ4OWY5ZGNiNDNiZGUxZDdkNWEwMDc4NjFiYWE3ZWNlNzI5NzIxYjg1MmM3MGU4ODNjZGRiNTdlNDFlZDJmODNmN2UxZDVmNDMyZGQ4YWVjOTBmZDJlMjc2MWEyOGZhZjM2N2Y5YzU0OTEyZWM4NDVmNTdlY2FhNGU5NTk5ZmIxMzE1ZTg5ZTE5ZDhlMmZhNmYyZGQwMTk4NWUyNzk5YTczN2RiNDgxZWJiNjM3OTU5OWE1OTFhZDIwMzM3M2Q2ODRhZDE2YjBlYTFlZDY0ZThhNGNlM2JkOTM0OGE1ZjJjODNiNjdhMjE5ZTk0ODI5OThlN2NjMWMwOGNkMzM3ZjYwZmE1NjU4MGZlNTQ0MmQ1ZGIzNjAxNzhmNDJjMjllZjNlYTE0YzNiODVhOTNkZDYwMzMyYTg3MTM1YzgxMTk5YjFmMWVkYTQwNDZmMDJmZDc3MzEzZjA5N2IwZjAxZDkzZDFhMTdlZTU1NDgyOWE1MTgyMjU3NmRkODY0MWU5MzhhZDVhYTFkN2JmYjdlY2ZmN2RlMjQyMzQ0OGU2MDBjYzQ0MGIxMzVhNmI2YmUzYjFmZTRhY2IzZDExMjY0MjExZDQxOGI4NDk1MjJlOTA1OGIwODIxNDZiODlmMjMxYzVkYzliNzVmMDk5Y2U5YjFlMzgyOTM4M2EyOTE4YWY5YTAwZDE5N2FmODI2YWQwNzUwNDAyOTc4ODM0ZTcyYTI5OTcxOTlkNmEzODEyOWE2Y2IwZmEwNzgyOGJhM2YzNzQ0OGE0YzJkMzgwODM1ZDJmZmNjMDQwMGM0YjQ0NTk1ZWQ2NDMwN2U3NTUzMGQyMzY3Nzc1MjNmMzBmOWIxMmM1MzcwMjQyM2ZiMmMwYzI2YmMzNTMyYTFkZTg5YzhiZmU2NzJlYjM0NmM3NDFjZTA1MzYxY2JmNzNmZDFjNzc1MTAzMDVlOWE3MWFjODM2Mjk5OTUyODEzMTUxNThlNzdjYTZiNzU2MWYyYmVjZWMxYzFiYWI1OTA1NWRlMzVkN2FkYjg5NDZhMmJmYjc4MmIwOGYyMDAxNjZlYzEwMmQ5NDU2MjExYWFkYTQ2OTEyZmU2YmFhNjJhNDk5NDllYzQ5YmU1YTdjYzk5NTQyMjc5ZDM4ODk5OWEzNWM4NDZjNjk0YTU1M2U5ZGM4NjQ5MzRkY2ZiYTkwMTA5MTkwNTRiOTkyMzlhM2UyNDZjZTU0YjUzM2M5Y2UwNzk1NDE2OTFiMWY4YWI5NWYyZjgwYzBiZWNlN2U3MjAwOGI5ZTQ0YzE0NGIxNWVhN2Y0YmY4Y2VlYjNlM2IwZmU4MTYwYWE1NTUzMDFlNDI3NmZmZjcyZWVmYjk5ZjQ3OTZmZjQzZDliOTBhMTVkZGE1YzkzMzNmNWE2NTlmYjE4ZDEyMDdiMGE0ZjVhMzMzNjg4YTZjMjhlMzVkMzViN2M2NjIzNGQ1OTMzYjIxMDNkN2YxODQ1NzE5OTYwMzk4YWMyYTRiYjNiNDQ3ZDRiMGYyOGZhMzJmYzQ0YzMxZjk1Y2YwMWJlYjFmNGQ0YzhmMWQwZmU2ZjY5ZDI2OTEyYTRjMjEyNzIxMGNjYmYwMzQ3ODM2ODY5YTAyYmViYjFkYmQ5N2Y2YWNkNzk5MzY4ZjVlMGU1NzIyNmFiZmJkYmIzNzRiNjViODdkODVmNDQ3OGQ2YjVkYTIxNTNkZjRlZWNiZDUzNjM0ZmNkMjRkOTZiMDk2ODUxMGRkNjY5NThlZjkxMGViYzFlMjdiNDU3YmMyYmUyOTEwZDhiMjQ0YTQ2NjRmMTdmN2JkNGM2YzdmYWRlZjU2Y2VkYjM2MWZlM2FmNmE2YjViOTA4OTUxNjk0NTlhNGFjY2QyMmI1NDM1N2Y1MGQ4NTE5ZGE0ZjU2ZWIyMWY0YWY0YzkyNWI5NDg3ZTMxYzVjODgzY2QxZjBlYWU5ZTIyMWU2MGIxNWRmNjExYTE2ZjM3MGU0YTE2OTEzMDU0NTU5YmU5ZTdhZGQzY2FmZGIyODVlNmVmMzkxNmZmYjAzYjRkODgyYjQ2N2Y4NzFiNzVmODQwYTRhYmU2NTIyYTJhZjk0YTI1MGUzN2NhMzc2ZmQ3NzdkOTYyMjE2NTI3MjMxMzlhN2ViNGQzYjc5MjdiZjU2Nzc3MGY4NTk3YTE2OTIxYmNkYzA0MDViNGJlODM0NjgyNDYwM2YzMGRhYzYxYzFjZTdkYzFhNDU0MTlhNjBmOWQzM2FmYmVlY2ExZGEyNWQ4ODkwYzYzMzFkMTRmNDQ0ODMzYzgyY2Y3OTdhMDVkYjllZWI2MGQwNzcxNDZhYjAzNWY0OGM5MTdkYzU2YjkyMzA0MGY1ODczZWVhZWQ3YzU1YzljMGU1MTJiNzNmYWNhM2UzMjAwYzIzMjM2MTgyYzVlOTExMTNkNjNmOGU5NTUyMDM2NGZhNmZkOWMzYzUzNGQ3NWU1OGEzZGFiNjgxZDhkZmM1MDY5YjY2YTc0NTJhMTkyZmUwZWRiZjBmYjYwY2YzMWRlYjM1OTZlN2U1MmVlNzdlODllNjY4Njc4NDZiODgxZmI3MTQ4YzMzMTMyNzA3ZGNhM2I0YjFhMzRjMmJmMGYzOGJiYmUyNmQyYmRlNTNiOTk3MmVjNTA3Mzg5MGI0OTE3NzM4Yjc4ZmUxZTlmZmQ3ZTQyOWViZDczOTliNTFlOGQ5ODgyNDgzMzM3Yjg5NjBlZmQ0YWJjMzYxYzU1NWY3MDBhZGMzMTM1MDE4NGU2Y2I2NDUyNjQ2NTIyYmE4NWRjYjM1MjUzMjJkOTE5NzhhY2ViMTA4OTllODYzOTE0YWJiNWY3OWI4ZGRkZmJiOWFkODIyNzExOTBlNWMzYWJlMGUyNWI2NTBhNTQ0YmU4NzZjOTlmMjc3ZDkyYzVjMDg5NWRlMjM4NmI5NTUwM2U5ZmY2Y2UyYjdkY2EwYjBhZGRkMWRiOTk4OGJkZTg2OTIwODJkMDRjYmFjMWJkYzU3NDk4YmMyOWRlNjYxNTE5NzhhZWUxMWY2ZmM4ZDUxMWFjZTQ1MzljYmRlMjI5Yjg2Y2ViNWE0NDYwMGY3ZDg4OTBlZmNkZWE5OGU2OTgxYzJhYjQyMmUyMDU5OWE1YjQ4ZjA0NDI4MjAyMjE5MjhkYTdjM2VjMjM5ODdlY2JmZGQ2M2VhNmVlOTcyMjI0OWFmNTY5OGViMmU2YzRiOTFhMWMzZTNhNzNhNWFhODM0ZjIwMmZiZGE3NmRiNjkzMDU3MDM0ODZkYjRmM2FkM2M0NTFlM2ZiNWVmNDk5MmYwMjFmY2E3NjNjYmYzMDgwOTM5N2IyNzljZmU0MmJiZjEzZGIxYTczNThjNmE2M2MyOTViM2Q4Njk3MzdhYmJiMmQwZTJiNDhhOWNiMjY5MjUzMDA3ZDBhMzg2MDZhOTVjMjkzNDgwNGRiMTI3ZGU2OGNkOTYxNTNjMWQ2MGRmZmJkOWNiYTQ0MzY0NzNkNjM5NTk2OWNhZjU2MWE0NTFhMjlhYjYzODk3MDZkNTg4MGE1NjM3OGQxMzJhODNmZDAxMCIsInJlY2VpcHRfanNvbiI6IntcbiAgXCJ2ZXJzaW9uXCI6IFwiMFwiLFxuICBcIm5ldHdvcmtcIjogXCJtYWlubmV0XCIsXG4gIFwicG9vbFwiOiBcIm9yY2hhcmRcIixcbiAgXCJ0eF9pZFwiOiBcIjY2MTY3Y2QzMDIwZWIzMjk0NDZlODZkODBjY2QwNDk0YmFhMzk1OWJmOWEwZTU4NmRiZGNjZDIwNGI2ZGNmZDBcIixcbiAgXCJvdXRwdXRfaW5kZXhcIjogMSxcbiAgXCJvY2tcIjogXCJwTlZadzIySHZoYmtLY1lETlZfYm82ZU1qdWtqY2ZheE1EUVlPRUYxbWtJXCIsXG4gIFwibGFiZWxcIjogXCJnbGFzc3BhbmUgZmlyc3QgcmVjZWlwdFwiLFxuICBcImlzc3VlZF9hdFwiOiBcIjIwMjYtMDUtMzFUMTI6MDc6MzEuODg4NjkyMjg4WlwiXG59Iiwic2hhcmVfd2l0aF9yZXZpZXdlcnMiOnRydWUsInNvdXJjZSI6IlB1YmxpYyBHbGFzc3BhbmUgZml4dHVyZTsgc3ludGhldGljIGNhc2UiLCJzb3VyY2Vfa2luZCI6InB1YmxpY19maXh0dXJlIn0=",
+          "sha256": "5607193ec4f917c22bdd8468e388d33226dea3c9ec70b0a5ad238bdd40cf46eb",
+          "hash_basis": "original-utf8-bytes"
+        },
+        "decoded_transaction_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+        "decoded_transaction_hash_basis": "decoded-transaction-bytes"
+      }
+    ],
+    "balance_context": {
+      "selected_verification_id": "09f771b3-7616-564b-a424-ba237601b11e",
+      "approved_allocations": [
+        {
+          "output_id": "mainnet:orchard:66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0:1",
+          "invoice_id": "f52aaf3b-2afe-5b25-83aa-6c71a0d06cc2",
+          "amount_zat": 100000
+        }
+      ],
+      "foreign_conflict": false,
+      "foreign_conflict_basis": "opaque-external-assertion"
+    },
+    "implementations": {
+      "verifiers": [
+        {
+          "name": "zecsolve-verifier",
+          "version": "0.1.0",
+          "result_schema_version": "1",
+          "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+        }
+      ],
+      "rules": [
+        "0.1.0",
+        "0.2.0"
+      ]
+    }
+  },
+  "integrity": {
+    "algorithm": "SHA-256",
+    "canonicalization": "zecsolve-json-v1",
+    "hash_basis": "canonical-json-payload-excluding-integrity",
+    "payload_sha256": "14a1d9db70ebd5ec99f7f52a0697bd16e0481fb5ca69df7fccffa04f0a9e8342"
+  }
+}

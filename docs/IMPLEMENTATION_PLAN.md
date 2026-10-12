@@ -8,7 +8,7 @@
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.4 are merged; M4.5 scoped reports and M5.0 packet contracts are ready for Person 2. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is implemented and locally validated pending PR integration; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
+**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.4 are merged; M4.5 scoped reports are merged in PR #20; Person 2 is implementing M5.0 packet contracts. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is implemented and locally validated pending PR integration; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 **Start here:** [ownership and feature tasks](#3-ownership-and-feature-tasks), [task cards](#task-cards), and [definition of done](#definition-of-done). Milestone requirements below remain the acceptance specification; the board is the current assignment and dependency source of truth.
 
@@ -67,7 +67,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 | M1 | Backend complete; development Items 01–06 | Authenticated invoice/case/evidence through persisted real verification | P0-01, P0-02, P0-05, merchant portion of P0-06 |
 | M2 | Backend complete; Item 07 uses simulated confirmation | Atomic merchant allocation, initial report, retries/conflicts/rollback | P0-03, P0-04, core P0-07 |
 | M3 | Adapter implemented, Item 08; live gate blocked | M3.1 live node/approval evidence | P0-02, P0-04, P0-05 |
-| M4 | In progress; M4.0–M4.4 merged | M4.5 plus the route-wide role/consent matrix | Remaining P0-01 and P0-06 |
+| M4 | Backend complete; M4.0–M4.5 merged | P4 browser integration/acceptance remains | Remaining P0-01 and P0-06 |
 | M5 | Pending | M5.0–M5.2 authorized export/replay; live release still requires M3.1 | P0-08 |
 | M6 | Person 4 initial frontend partial; remaining integration/acceptance deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
 | M7 | M7.1 backend preparation merged; M7.2 backend recovery in progress | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
@@ -109,8 +109,8 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Done: PR #16 merged |
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Done: PR #13 merged |
 | [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Done: PR #18 merged |
-| [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Implemented and locally validated; CI/PR gate pending |
-| [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Ready |
+| [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Done: PR #20 merged |
+| [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Implemented locally; GitHub suspension blocks push/CI/PR |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
 | [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Waiting |
 | [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
@@ -207,7 +207,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M4.5 — Scoped reports
 
-- **Owner:** Person 2. **Branch:** `feat/m4-scoped-reports`. **Status:** Implemented and locally validated; CI/PR gate pending; M4.2/M4.4 merged.
+- **Owner:** Person 2. **Branch:** `feat/m4-scoped-reports`. **Status:** Done: PR #20 merged; M4.2/M4.4 merged.
 - **Prerequisites:** M4.2 and M4.4 merged.
 - **Goal:** Expose only explicitly selected report fields and consented evidence to reviewers.
 - **Owned code:** Role projections, report service/router integration, authorized evidence-read interfaces, and disclosure tests. Person 1 retains shared auth/model ownership; Person 3 retains evidence submission.
@@ -220,14 +220,14 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M5.0 — Packet contract
 
-- **Owner:** Person 2. **Branch:** `feat/m5-packet-contract`. **Status:** Ready; M4.0 merged.
+- **Owner:** Person 2. **Branch:** `feat/m5-packet-contract`. **Status:** Implemented locally; GitHub suspension blocks push/CI/PR.
 - **Prerequisites:** M4.0 merged.
 - **Goal:** Freeze the common packet format consumed by both exporter and replay.
 - **Owned code:** Packet schemas, integrity/canonicalization contract, public/synthetic complete and scoped fixtures, and schema tests.
 - **Exclusions:** No database exporter, permission implementation, CLI execution, fabricated live evidence, or revision of historical hashes.
 - **Public interfaces:** `CasePacketV1`: exact encoded inputs/hashes, invoice/policy, provenance, observations, verifier/rules versions, evaluation/allocation context, decisions/events, integrity manifest, and explicit disclosure/replay scope.
 - **Acceptance checks:** Complete and limited fixtures validate; original-file and decoded-transaction hashes stay distinct; omitted/redacted inputs and foreign conflicts are explicit. Current and historical supported record formats have contract coverage.
-- **Validation evidence:** Pending: generated packet schema, documented version/hash profile, fixture provenance and schema validation results. All cards also require the common definition of done below.
+- **Validation evidence:** [Packet contract](packets.md), [public/synthetic fixtures](../fixtures/packets/README.md) and [Item 17](DEVELOPMENT.md#item-17--packet-contract-m50) record generated schema/hash profile and 13 passing contract tests. Remote integration is blocked by account suspension. All cards also require the common definition of done below.
 
 <a id="m5-1"></a>
 

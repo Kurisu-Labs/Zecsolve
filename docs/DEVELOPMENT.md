@@ -403,3 +403,32 @@ At 2026-10-12T03:29Z, all 15 affected session/reviewer PostgreSQL scenarios pass
 on the corrected working tree. Final lint/format/schema and diff checks passed.
 CI on the first increment reproduced the same obsolete session assertion; the
 final branch includes its scoped-access correction and awaits fresh CI.
+
+M4.5 final revision `f1ae85c` passed all **220 PostgreSQL**, 237 Python and 12 Rust
+tests, lint, frontend CI and both actual-container CI runs. PR #20 merged as
+`410571b`; its branch was removed after ancestry verification.
+
+## Item 17 — packet contract (M5.0)
+
+Person 2, `feat/m5-packet-contract`, based on merged main `410571b`. Published the
+branch before implementation; contract/fixtures committed as `9154f70`. At
+2026-10-12T03:37Z on Linux x86_64/Python 3.14.7/Rust 1.99.0, all **13 new contract
+checks**, **250 Python unit tests**, **12 Rust tests**, and `make lint` passed.
+Schema generation, deterministic fixture regeneration and diff checks passed.
+There are no database or permission mutations in this increment; M4.5's full
+220-test PostgreSQL run is recorded above. Final CI remains required.
+
+The [packet contract](packets.md) defines exact base64 UTF-8 originals, separate
+original/decoded transaction hash bases, unchanged historical records, explicit
+complete/limited scope and external assertion limits. The fixtures include v1
+and v2 submission/events and both decision observation schemas. Simulated
+approval and synthetic unavailable RPC-shaped history are explicitly labeled;
+no live endpoint was queried.
+
+**Publishing block:** GitHub rejected the first implementation push with HTTP
+403, “Your account is suspended.” Read-only PR listing failed with the same
+account suspension. The local commit is intact; the remote branch still points
+to its pre-implementation base. No M5 PR/CI/merge is claimed. Remaining P2 work
+continues on local dependent task branches so implementation and tests remain
+reviewable. Once account access returns, publish and integrate M5.0, M5.1 and
+M5.2 in order through passing CI and merge-commit PRs; do not push to main.
