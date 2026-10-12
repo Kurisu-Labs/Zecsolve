@@ -20,6 +20,7 @@ from zecsolve.adapters.verifier import VerifierAdapter
 from zecsolve.api.cases import router as case_router
 from zecsolve.api.claims import router as claim_router
 from zecsolve.api.evidence import router as evidence_router
+from zecsolve.api.exports import router as export_router
 from zecsolve.api.grants import router as grant_router
 from zecsolve.api.invoices import router as invoice_router
 from zecsolve.api.observations import router as observation_router
@@ -96,6 +97,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(case_router)
     app.include_router(claim_router)
     app.include_router(evidence_router)
+    app.include_router(export_router)
     app.include_router(verification_router)
     app.include_router(resolution_router)
     app.include_router(observation_router)

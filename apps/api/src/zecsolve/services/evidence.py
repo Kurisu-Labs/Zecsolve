@@ -173,6 +173,24 @@ class EvidenceService:
                 raise WorkflowError(409, "EVIDENCE_CONTENT_UNAVAILABLE")
             sealed = EncryptedEvidence(row.key_id, row.nonce, row.ciphertext)
             authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
+        request = self.decrypt_snapshot(principal, case_id, evidence_id, metadata, sealed)
+        with transaction(self.engine) as session:
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
+            self.metadata(session, principal, case_id, evidence_id)
+            if (
+                session.scalar(
+                    select(EvidenceContent.evidence_id).where(
+                        EvidenceContent.evidence_id == evidence_id
+                    )
+                )
+                is None
+            ):
+                raise WorkflowError(409, "EVIDENCE_CONTENT_UNAVAILABLE")
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
+        return request
+
+    def decrypt_snapshot(self, principal, case_id, evidence_id, metadata, sealed):
+        """Decrypt already-authorized snapshot bytes; caller must reauthorize before disclosure."""
         with self.crypto_slot():
             plaintext = self.cipher.decrypt(
                 sealed, merchant_id=principal.merchant_id, case_id=case_id, evidence_id=evidence_id
@@ -207,19 +225,6 @@ class EvidenceService:
             or getattr(request, "claim_id", None) != getattr(metadata, "claim_id", None)
         ):
             raise WorkflowError(409, "EVIDENCE_INTEGRITY_ERROR")
-        with transaction(self.engine) as session:
-            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
-            self.metadata(session, principal, case_id, evidence_id)
-            if (
-                session.scalar(
-                    select(EvidenceContent.evidence_id).where(
-                        EvidenceContent.evidence_id == evidence_id
-                    )
-                )
-                is None
-            ):
-                raise WorkflowError(409, "EVIDENCE_CONTENT_UNAVAILABLE")
-            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
         return request
 
     def submit(
