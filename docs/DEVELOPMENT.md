@@ -512,3 +512,14 @@ while withholding the raw bytes, so replay reports missing input rather than a
 false integrity mismatch. Both receipt and raw-byte omissions now remain LIMITED.
 All 33 focused packet/replay checks pass; no full-history packet permits omitted
 inputs. This correction is part of PR #22 before merge.
+
+M5.1 final revision `cbf8c54` passed foundation, web and actual-container CI and
+merged through PR #22. Its remote branch was removed only after ancestry
+verification. On integrated export revision `03bafe8` (with documentation-only
+working tree updates), the final local run completed by **2026-10-12T04:00:12Z**:
+**12 Rust, 270 Python and 236 PostgreSQL tests passed**, plus lint, schema
+regeneration, deterministic replay-output regeneration, POC and documentation
+link/diff checks. This includes all 16 export and 20 replay scenarios. The only
+merge conflict was two appended validation notes; both records were retained.
+M7.2 backend preparation is also confirmed merged as PR #19, correcting an older
+progress-board label. Export final-head CI remains its integration gate.

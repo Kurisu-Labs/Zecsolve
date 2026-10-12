@@ -116,7 +116,7 @@ The chosen architecture is a modular monolith: a planned Vue 3/TypeScript/Tailwi
 | Chain observations | Offline default, trusted Zebra adapter, idempotent refresh/provenance and later loss-of-inclusion review | Actual trusted node validation and live merchant approval trace |
 | Frontend | Initial Vue 3/TypeScript/Tailwind implementation from PR #12; all work assigned to Person 4 | Remaining M6 integration and actual-backend acceptance |
 | Export | CasePacketV1, original inputs, historical replay CLI and authorized snapshot export | P4 download integration and full release rehearsal |
-| Delivery | Setup/tests/CI, M7.1 backend TLS/session/limits (PR #17), M7.2 backend migration/restart/encrypted-restore preparation | Recovery PR validation/integration, browser/live/export acceptance, full demo and release evidence |
+| Delivery | Setup/tests/CI, M7.1 backend TLS/session/limits (PR #17), M7.2 backend migration/restart/encrypted-restore preparation (PR #19) | Browser/live/export release acceptance, full demo and release evidence |
 
 This table reflects inspected source and [recorded development results](DEVELOPMENT.md), not a fresh execution of acceptance tests. The merchant approval service is implemented and demonstrated with isolated simulated confirmation; that does not establish live chain inclusion or full release readiness. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map and [assignment board](IMPLEMENTATION_PLAN.md#feature-board) for remaining work.
 

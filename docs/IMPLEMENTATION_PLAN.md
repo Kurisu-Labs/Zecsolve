@@ -8,7 +8,7 @@
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.5 are merged. M5.0 packet contracts merged in PR #21; P2 replay/export implementation is validated and in PR integration. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is implemented and locally validated pending PR integration; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
+**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.5 are merged. M5.0 packet contracts and M5.1 replay merged in PRs #21/#22; M5.2 export is implemented and validated. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is merged in PR #19; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 **Start here:** [ownership and feature tasks](#3-ownership-and-feature-tasks), [task cards](#task-cards), and [definition of done](#definition-of-done). Milestone requirements below remain the acceptance specification; the board is the current assignment and dependency source of truth.
 
@@ -68,7 +68,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 | M2 | Backend complete; Item 07 uses simulated confirmation | Atomic merchant allocation, initial report, retries/conflicts/rollback | P0-03, P0-04, core P0-07 |
 | M3 | Adapter implemented, Item 08; live gate blocked | M3.1 live node/approval evidence | P0-02, P0-04, P0-05 |
 | M4 | Backend complete; M4.0–M4.5 merged | P4 browser integration/acceptance remains | Remaining P0-01 and P0-06 |
-| M5 | Backend implemented; PR integration in progress | M5.0 merged; M5.1/M5.2 final PR/CI gates; live release still requires M3.1 | P0-08 |
+| M5 | Backend implemented and validated | P4 download/browser integration and full release still require their acceptance gates; live release requires M3.1 | P0-08 |
 | M6 | Person 4 initial frontend partial; remaining integration/acceptance deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
 | M7 | M7.1 backend preparation merged; M7.2 backend recovery in progress | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
 
@@ -93,7 +93,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 `Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
 
-M4.0–M4.5 and M5.0 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 has implemented scoped reports, packet contracts, replay and export; remaining PR/CI gates are tracked below. Person 3's M7.1 backend preparation is merged and M7.2 backend recovery is active on `test/m7-release-rehearsal`; full M7 completion still needs the listed integration gates.
+M4.0–M4.5 and M5.0/M5.1 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 has implemented scoped reports, packet contracts, replay and export; task validation and integration references are tracked below. Person 3's M7.1 backend preparation is merged and M7.2 backend recovery merged in PR #19; full M7 completion still needs the listed integration gates.
 
 Person 4's PR #12 supplies partial frontend implementation. Remaining M6 integration/acceptance is assigned to Person 4 and retains its explicit-resumption gate. Fixtures may unblock dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
 
@@ -111,8 +111,8 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Done: PR #18 merged |
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Done: PR #20 merged |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Done: PR #21 merged |
-| [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Implemented and validated; PR #22 integration pending |
-| [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Implemented and validated; final PR/CI gate pending |
+| [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Done: PR #22 merged |
+| [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Implementation complete and validated; see branch PR for integration |
 | [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
 | [M6.1 — Browser access](#m6-1) | Person 4 | `feat/m6-browser-access` | Frontend resumed; M6.0 and M4.2 merged | Deferred |
 | [M6.2 — Merchant workflow](#m6-2) | Person 4 | `feat/m6-merchant-workflow` | Frontend resumed; M6.1 and M4.3 merged | Deferred |
@@ -233,20 +233,20 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M5.1 — Replay command
 
-- **Owner:** Person 2. **Branch:** `feat/m5-replay-case`. **Status:** Implemented and validated; M5.0 merged, PR #22 integration pending.
+- **Owner:** Person 2. **Branch:** `feat/m5-replay-case`. **Status:** Done: PR #22 merged.
 - **Prerequisites:** M5.0 merged.
 - **Goal:** Reproduce a packet locally without treating historical observation claims as fresh chain trust.
 - **Owned code:** Replay library/CLI, historical evaluator dispatch, and replay fixtures/tests.
 - **Exclusions:** No database export, network lookup, arbitrary executable/version installation, UI, or merchant credit mutation.
 - **Public interfaces:** Local `replay-case` command reports cryptographic recovery, historical rules/arithmetic, integrity and unsupported/missing/external context separately.
 - **Acceptance checks:** Real fixture recovery and historical calculations reproduce; one-byte tampering fails integrity; unsupported versions and scoped omissions do not claim full success. Packet content cannot trigger arbitrary fetches or code execution.
-- **Validation evidence:** [Replay guide](packets.md#offline-replay-m51) and [recorded CLI outputs](../fixtures/packets/replay-results.json) cover all five outcomes with file hashes; 19 replay tests pass locally. See [Item 18](DEVELOPMENT.md#item-18--offline-replay-m51). All cards also require the common definition of done below.
+- **Validation evidence:** [Replay guide](packets.md#offline-replay-m51) and [recorded CLI outputs](../fixtures/packets/replay-results.json) cover all five outcomes with file hashes; 20 replay tests pass locally. See [Item 18](DEVELOPMENT.md#item-18--offline-replay-m51). All cards also require the common definition of done below.
 
 <a id="m5-2"></a>
 
 #### M5.2 — Authorized export
 
-- **Owner:** Person 2. **Branch:** `feat/m5-case-export`. **Status:** Implemented and validated; final PR/CI gate pending.
+- **Owner:** Person 2. **Branch:** `feat/m5-case-export`. **Status:** Implementation complete and validated; see branch PR for integration.
 - **Prerequisites:** M4.5 and M5.1 merged.
 - **Goal:** Export an authorized, internally consistent packet that the local replay command can consume.
 - **Owned code:** Export snapshot assembler/router, shared projection consumption, and export/replay integration tests.
