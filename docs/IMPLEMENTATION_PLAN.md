@@ -8,7 +8,7 @@
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.5 are merged. M5.0–M5.2 merged in PRs #21–#23. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery and scoped export/replay integration are merged in PRs #19/#24; full M7 release remains incomplete. The [release evidence index](release-evidence.md) maps acceptance rows to recorded runs and remaining owners. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
+**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh has a [recorded live-node/approval pass](chain.md#recorded-live-run), pending evidence review/CI/merge. M4.0–M4.5 are merged. M5.0–M5.2 merged in PRs #21–#23. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery and scoped export/replay integration are merged in PRs #19/#24; full M7 release remains incomplete. The [release evidence index](release-evidence.md) maps acceptance rows to recorded runs and remaining owners. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 **Start here:** [ownership and feature tasks](#3-ownership-and-feature-tasks), [task cards](#task-cards), and [definition of done](#definition-of-done). Milestone requirements below remain the acceptance specification; the board is the current assignment and dependency source of truth.
 
@@ -66,7 +66,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 |---|---|---|---|
 | M1 | Backend complete; development Items 01–06 | Authenticated invoice/case/evidence through persisted real verification | P0-01, P0-02, P0-05, merchant portion of P0-06 |
 | M2 | Backend complete; Item 07 uses simulated confirmation | Atomic merchant allocation, initial report, retries/conflicts/rollback | P0-03, P0-04, core P0-07 |
-| M3 | Adapter implemented, Item 08; live gate blocked | M3.1 live node/approval evidence | P0-02, P0-04, P0-05 |
+| M3 | Adapter implemented; M3.1 live run passed, evidence PR integration pending | Reviewed/merged live node/approval evidence | P0-02, P0-04, P0-05 |
 | M4 | Backend complete; M4.0–M4.5 merged | P4 browser integration/acceptance remains | Remaining P0-01 and P0-06 |
 | M5 | Backend implemented and validated | P4 download/browser integration and full release still require their acceptance gates; live release requires M3.1 | P0-08 |
 | M6 | Person 4 initial frontend partial; remaining integration/acceptance deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
@@ -103,7 +103,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 | Task | Owner | Branch | Prerequisites | Status |
 |---|---|---|---|---|
-| [M3.1 — Live validation](#m3-1) | Person 3 | `docs/m3-live-validation` | Trusted compatible RPC endpoint supplied by the operator | Externally blocked |
+| [M3.1 — Live validation](#m3-1) | Person 3 | `docs/m3-live-validation` | Operator-selected QuickNode public demo endpoint | Live acceptance passed; evidence review/CI/merge pending |
 | [M4.0 — Access foundation](#m4-0) | Person 1 | `feat/m4-access-foundation` | Existing M1/M2 and M3 implementation on main | Done: PR #14 merged |
 | [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Done: PR #15 merged |
 | [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Done: PR #16 merged |
@@ -129,14 +129,14 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M3.1 — Live validation
 
-- **Owner:** Person 3. **Branch:** `docs/m3-live-validation`. **Status:** Externally blocked.
-- **Prerequisites:** Trusted compatible RPC endpoint supplied by the operator.
+- **Owner:** Person 3. **Branch:** `docs/m3-live-validation`. **Status:** Live acceptance passed; evidence review/CI/merge pending.
+- **Prerequisites:** Met for this run: operator selected QuickNode’s public demo endpoint and the existing public fixture; no new payment required.
 - **Goal:** Close the remaining trusted-chain release gate using the public historical fixture.
-- **Owned code:** `docs/chain.md` validation procedure and sanitized release evidence; coordinate any adapter defect separately.
+- **Owned code:** `docs/chain.md` validation procedure, `scripts/validate_live_chain.py` opt-in reproducibility harness, and sanitized release evidence; coordinate any adapter defect separately.
 - **Exclusions:** No simulated result may satisfy this gate; no new payment, node provisioning, frontend, or unrelated RPC refactor.
 - **Public interfaces:** Exercise the existing refresh and merchant resolve APIs with server-configured RPC settings; preserve observation-v1/v2 compatibility.
 - **Acceptance checks:** Record actual node version/capabilities, bound raw transaction/network/block/confirmation data, freshness and policy eligibility, and a real merchant approval trace.
-- **Validation evidence:** Pending: commands, revision, environment, timestamp, sanitized observation and invoice/case/decision references; never RPC secrets. All cards also require the common definition of done below.
+- **Validation evidence:** [Recorded run](chain.md#recorded-live-run) and [unchanged JSON](evidence/m3-live-f8a594f.json): clean `f8a594f`, October 12 13:23:24–13:23:30 UTC, Zebra 6.4.2, bound live confirmations, fresh eligible merchant approval and identical retries. See Item 22 in DEVELOPMENT.md. No RPC secrets retained. All cards also require the common definition of done below.
 
 <a id="m4-0"></a>
 
@@ -433,7 +433,7 @@ Implement a `ChainObserver.observe(network, txid, expected_raw_tx_sha256)` port.
 
 Use `getrawtransaction` with verbose output for the verified transaction ID; compare the returned decoded transaction hash with the verified raw bytes. Require correct network from `getblockchaininfo`, a current/synced source, and best-chain inclusion before returning a confirmed observation. Use the containing block's `getblockheader` result to verify its height/hash and current best-chain confirmations. Preserve source ID, observed time, transaction binding, block data, and the sanitized relevant response fields. Zebra documents these fields and their mempool/side-chain distinctions in its [transaction response](https://zebra.zfnd.org/internal/zebra_rpc/client/struct.TransactionObject.html), [block-header response](https://zebra.zfnd.org/internal/zebra_rpc/methods/struct.BlockHeaderObject.html), and [chain-info response](https://zebra.zfnd.org/internal/zebra_rpc/methods/struct.GetBlockchainInfoResponse.html).
 
-The adapter must verify the selected node's actual response format during integration rather than treating Rust documentation field names as JSON field names. Record the tested node version and endpoint capabilities. Configuration is a deployment dependency; no endpoint is assumed to exist today.
+The adapter must verify the selected node's actual response format during integration rather than treating Rust documentation field names as JSON field names. Record the tested node version and endpoint capabilities. Configuration remains a deployment dependency. M3.1 records the operator-selected QuickNode public demo source; an ongoing deployment must select and validate its own operating configuration.
 
 - No RPC configuration, timeouts, authentication failures, malformed/missing fields, unsynced source, or ambiguous lookup failure → `UNAVAILABLE`, with a diagnostic reason.
 - A supported response showing mempool or side-chain placement → `UNCONFIRMED`; a “not found” response alone is not a receipt-invalid result.
@@ -611,12 +611,12 @@ Use the [release evidence index](release-evidence.md) for A-01–A-15 run refere
 
 ### External dependencies and boundaries
 
-- **Live RPC:** the operator must supply a trusted compatible endpoint before M3's release gate. Until then, complete the fixture slice and deterministic tests; keep real credit blocked rather than treating availability as confirmation.
+- **Live RPC:** the operator-selected QuickNode public demo endpoint passed the [M3.1 acceptance run](chain.md#recorded-live-run). Evidence review/CI/merge remain required. A deployment must explicitly configure its trusted source; an unavailable lookup continues to block new credit.
 - **Credentials and encryption:** provision access credentials and the evidence key through local operator tooling and deployment secrets. Never place them in the repository or shared reports.
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** M4.0–M4.5 and M5.0–M5.2 are merged. Person 3’s export/replay recovery merged in PR #24. Review/CI/PR integration of `docs/m7-release-evidence` is the current slice; M3.1 still awaits a trusted endpoint. The [remaining handoffs](release-evidence.md#remaining-handoffs-and-release-decision) identify operator/team artifacts for full release. Person 4 owns the remaining M6 integration and browser acceptance, with its explicit-resumption gate retained. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** M4.0–M4.5 and M5.0–M5.2 are merged. Person 3’s export/replay recovery merged in PR #24. The release-evidence consolidation is present in main. Review/CI/PR integration of `docs/m3-live-validation` is the current slice; its real fixture observation and merchant approval trace are recorded. The [remaining handoffs](release-evidence.md#remaining-handoffs-and-release-decision) identify operator/team artifacts for full release. Person 4 owns the remaining M6 integration and browser acceptance, with its explicit-resumption gate retained. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 

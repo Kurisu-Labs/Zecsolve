@@ -133,7 +133,7 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 |---|---|---|
 | Person 1 — access | M4.0–M4.2 access foundation, grants and sessions merged | Own shared auth/models/migrations; consumers reuse the same authorization context |
 | Person 2 — reports/export | M4.5/M5 backend merged in PRs #20–#23 | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
-| Person 3 — workflow/integration/release | Listing, submissions and deployment/recovery/export integration merged, including PR #24; consolidate release evidence while live validation awaits an endpoint | Own submission services and deployment; consume access contracts and Person 4's built app |
+| Person 3 — workflow/integration/release | Listing, submissions and deployment/recovery/export integration merged, including PR #24; live QuickNode fixture/approval evidence recorded, pending review/CI/merge | Own submission services and deployment; consume access contracts and Person 4's built app |
 | Person 4 — all frontend | Complete remaining M6 integration and browser acceptance after resumption | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
 These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. The initial frontend is partial; remaining M6 integration/acceptance retains its explicit-resumption gate. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
@@ -152,7 +152,7 @@ Commit source and lockfiles, not `.env`, `.venv`, `.cache`, `target`, or real cu
 
 Read [docs/chain.md](docs/chain.md) before configuring a node. The adapter is composed only from server settings; request bodies cannot supply URLs or trust assertions. New approvals always refresh; a merchant can also refresh an already resolved case with `POST /api/cases/{id}/chain-observations`. Keep the existing observation-v1 snapshot format intact: observation-v2 adds sanitized RPC provenance without changing older decision hashes.
 
-The user has no RPC endpoint yet. The live historical-fixture observation and merchant-approval trace are **pending**, as is recording the actual node version/capabilities. The initial frontend is recorded in PR #12. M4/M5 backend now supplies merchant listing, grants, sessions, claims, scoped reports and replay packets. Browser acceptance and full release validation remain separate gates.
+The operator selected QuickNode’s public demo endpoint for M3.1. The [live historical-fixture observation and merchant approval trace](docs/chain.md#recorded-live-run) passed with Zebra 6.4.2 on October 12; evidence review/CI/merge remain required. No new payment was sent. The initial frontend is recorded in PR #12. M4/M5 backend now supplies merchant listing, grants, sessions, claims, scoped reports and replay packets. Browser acceptance and full release validation remain separate gates.
 
 ## P2 report/export/replay handoff
 
