@@ -1,6 +1,6 @@
 # Person 4 frontend integration and browser evidence
 
-The user explicitly resumed Person 4's frontend scope on October 12, 2026 and authorized implementation/testing locally when GitHub authentication prevented publishing the task branch. The local branch is `feat/m6-frontend-integration`, based on main through `640b1b1` (PR #23 export merge). Contributor identity beyond the Person 4 slot has not been specified.
+The user explicitly resumed Person 4's frontend scope on October 12, 2026 and authorized implementation/testing locally when GitHub authentication prevented publishing the task branch. The local branch is `feat/m6-frontend-integration`, validated against main through `640b1b1` (PR #23 export merge), then synchronized with `4066ec8` (PR #25 release-evidence merge) before publication. Contributor identity beyond the Person 4 slot has not been specified.
 
 ## Implemented scope
 
