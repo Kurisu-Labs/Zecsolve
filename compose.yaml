@@ -18,7 +18,8 @@ services:
   api:
     build:
       context: .
-      dockerfile: infra/Dockerfile.api
+      dockerfile: Dockerfile.vercel
+      target: development
     environment:
       ZECSOLVE_DATABASE_URL: postgresql+psycopg://zecsolve:zecsolve@db:5432/zecsolve
       ZECSOLVE_VERIFIER_PATH: /usr/local/bin/zecsolve-verifier

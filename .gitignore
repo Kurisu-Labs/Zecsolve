@@ -16,3 +16,4 @@ data/
 coverage.xml
 artifacts/
 .DS_Store
+.vercel/

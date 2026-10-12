@@ -12,6 +12,7 @@ on:
       - 'uv.lock'
       - 'alembic.ini'
       - '.dockerignore'
+      - 'Dockerfile.vercel'
       - 'scripts/check_deployment.py'
       - 'scripts/browser_acceptance.py'
       - 'scripts/check_recovery.py'

@@ -31,5 +31,10 @@ FROM runtime AS deployment
 COPY --from=web /web/dist /app/web
 CMD ["python", "-m", "zecsolve.deployment"]
 
-# Preserve the existing development Compose/default image behavior.
+# Development Compose selects this stage explicitly.
 FROM runtime AS development
+
+# Vercel detects this filename and builds the final stage.
+FROM deployment AS vercel
+ENV ZECSOLVE_VERIFIER_PATH=/usr/local/bin/zecsolve-verifier
+CMD ["python", "-m", "zecsolve.deployment.vercel"]
