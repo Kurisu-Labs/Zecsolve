@@ -1,6 +1,6 @@
 # M7.2 backend recovery rehearsal
 
-Person 3 owns this rehearsal. The migration/restart/restore foundation merged in PR #19; [PR #24](https://github.com/Kurisu-Labs/zecsolve/pull/24) merged the scoped report/export/replay recovery integration consuming PRs #20–#23. It exercises the current application and PostgreSQL in an isolated deployment. Full M7.2 remains open for trusted live validation, Person 4's browser acceptance, and the complete release evidence bundle.
+Person 3 owns this rehearsal. The migration/restart/restore foundation merged in PR #19; [PR #24](https://github.com/Kurisu-Labs/zecsolve/pull/24) merged the scoped report/export/replay recovery integration consuming PRs #20–#23. It exercises the current application and PostgreSQL in an isolated deployment. M3.1 live evidence merged in PR #27 and P4 browser evidence in PR #26. Full M7.2 remains open for deployed browser CI integration, operator/team handoffs and the complete release evidence bundle.
 
 ## Run and inspect
 
@@ -35,7 +35,7 @@ The sanitized `.cache/recovery-result.json` records check names, UTC time, Git r
 
 The migration fixture represents legacy storage preservation; it does not invent missing historical policy, attribution or verification context. The current workflow separately checks real application reads and retries. Simulated accounting evidence never closes M3.1 or proves live payment inclusion.
 
-The offline replay container receives only packet bytes on stdin. It has a read-only root, bounded temporary memory filesystem, no network, no mounted database or credentials, and Docker logging disabled. Packet bytes live only in that temporary filesystem and are removed with the container. The CLI exit/status pairs checked here are `0/REPRODUCED`, `2/LIMITED` and `1/FAILED`; unsupported or missing historical-version behavior remains covered by P2's replay suite. HTTP sessions exercised by this harness are API clients, not P4 browser acceptance.
+The offline replay container receives only packet bytes on stdin. It has a read-only root, bounded temporary memory filesystem, no network, no mounted database or credentials, and Docker logging disabled. Packet bytes live only in that temporary filesystem and are removed with the container. The CLI exit/status pairs checked here are `0/REPRODUCED`, `2/LIMITED` and `1/FAILED`; unsupported or missing historical-version behavior remains covered by P2's replay suite. These recovery checkpoint sessions are HTTP API clients. The combined `--recovery --browser` command first runs P4’s eight offline browser scenarios through the same deployed ingress; see [browser-ci.md](browser-ci.md).
 
 ## Recovery procedure and limits
 
@@ -52,19 +52,19 @@ The [release evidence index](release-evidence.md) expands this matrix into named
 | PRD row | Backend evidence / contribution here | Remaining release evidence |
 |---|---|---|
 | A-01 | Real public-fixture verification in the current rehearsal | Final assembled release trace |
-| A-02 | Existing verifier and resolution safety suites | P4 negative-path browser results |
-| A-03 | Existing invoice-to-report workflow and arithmetic suites | P4 first workflow |
+| A-02 | Existing verifier and resolution safety suites | P4 evidence in PR #26; deployed CI repetition |
+| A-03 | Existing invoice-to-report workflow and arithmetic suites | P4 evidence in PR #26; deployed CI repetition |
 | A-04 | Existing synthetic aggregation/service tests | Final evidence reference |
-| A-05 | Exact approval replay after API crash, DB restart and restore | P4 retry flow |
-| A-06 | Existing approval race/conflict tests; restored output uniqueness checked here | P4 conflict flow and final release trace |
+| A-05 | Exact approval replay after API crash, DB restart and restore | P4 evidence in PR #26; deployed CI repetition |
+| A-06 | Existing approval race/conflict tests; restored output uniqueness checked here | P4 simulated conflict in PR #26; separate CI case and final trace |
 | A-07 | Existing distinct-output database test | Final evidence reference |
-| A-08 | Existing adapter/verification/RPC negative tests | P4 status displays and M3.1 |
-| A-09 | Existing binding/policy/approval safety tests | P4 presentation |
-| A-10 | Production offline approval remains blocked in the rehearsal | M3.1 actual-node observation/approval |
-| A-11 | M4/M5 isolation suites plus deployed reviewer/customer/report-only/revoked permission checks across recovery | P4 browser results |
-| A-12 | Restored customer and reviewer revocation; selected evidence/consent and private-claim checks across recovery | P4 disclosure/access screens |
-| A-13 | Deployed merchant/scoped export, exact inputs/history, offline real-verifier replay and tamper rejection at four recovery checkpoints | P4 authorized export UI and final assembled release trace |
+| A-08 | Existing adapter/verification/RPC negative tests | Merged P4 status evidence and PR #27 live trace; final association |
+| A-09 | Existing binding/policy/approval safety tests | P4 presentation merged in PR #26; final UI evidence |
+| A-10 | Production offline approval remains blocked in the rehearsal | Live trace merged in PR #27; final association |
+| A-11 | M4/M5 isolation suites plus deployed reviewer/customer/report-only/revoked permission checks across recovery | P4 evidence in PR #26; deployed CI repetition |
+| A-12 | Restored customer and reviewer revocation; selected evidence/consent and private-claim checks across recovery | P4 disclosure/access screens merged in PR #26; final UI evidence |
+| A-13 | Deployed merchant/scoped export, exact inputs/history, offline real-verifier replay and tamper rejection at four recovery checkpoints | P4 export UI merged in PR #26; deployed CI and final release trace |
 | A-14 | Existing rollback/stale-version tests; migration/restore preserves immutable rows and accepted allocation | Final assembled evidence; corrections remain outside P0 |
-| A-15 | Actual TLS controls, restart/restore, scoped export privacy and credential/session/claim log canaries | P4 browser evidence, operator controls and final demo |
+| A-15 | Actual TLS controls, restart/restore, scoped export privacy and credential/session/claim log canaries | Deployed browser CI evidence, operator controls and final demo |
 
 P2 owns the merged disclosure/packet/replay implementations; P3 consumes those interfaces in the deployment/recovery harness. P4 supplies actual-backend browser results and screenshots; P3 records them without independently implementing frontend work. [Item 20](DEVELOPMENT.md#item-20--m72-exportreplay-recovery-integration) records this integration's actual validation and limitations.

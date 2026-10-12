@@ -1,6 +1,6 @@
 # Zecsolve — Product Requirements Document
 
-**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration in [frontend.md](frontend.md) supersedes that partial implementation status; review/CI/merge still govern completion.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
 
 **Project:** Zecsolve — a Shielded Payment Exception Engine
 
@@ -18,7 +18,7 @@
 
 **Funding / budget:** Not specified
 
-**Status:** M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh has a [recorded live-node/approval pass](chain.md#recorded-live-run); its evidence merged in PR #27. M4.0–M4.5 and M5.0–M5.2 are merged. Person 4's frontend is locally integrated and browser-validated; PR #26 is published; review/CI/merge remain pending (see [frontend.md](frontend.md)). M7.1 backend preparation and M7.2 backend recovery merged in PRs #17/#19; Person 3’s export/replay [recovery integration](recovery.md) merged in PR #24. The [release evidence index](release-evidence.md) consolidates attributable backend runs and outstanding handoffs. Full release acceptance remains incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains historical results; each current feature still requires review, CI and merge.
+**Status:** M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh has a [recorded live-node/approval pass](chain.md#recorded-live-run); its evidence merged in PR #27. M4.0–M4.5 and M5.0–M5.2 are merged. Person 4's frontend integration and recorded browser acceptance merged in PR #26 (see [frontend.md](frontend.md)). M7.1 backend preparation and M7.2 backend recovery merged in PRs #17/#19; Person 3’s export/replay [recovery integration](recovery.md) merged in PR #24. The [release evidence index](release-evidence.md) consolidates attributable backend runs and outstanding handoffs. Full release acceptance remains incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains historical results; each current feature still requires review, CI and merge.
 
 The cutoff above follows the [official hackathon rules, §5](https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf). The internal sprint is shorter than the full competition period.
 
@@ -104,21 +104,21 @@ The intended journey is **invoice → case → claim/evidence → verification �
 
 ### 6.1 Current implementation and target boundary
 
-The chosen architecture is a modular monolith: a planned Vue 3/TypeScript/Tailwind frontend, a FastAPI application, PostgreSQL, and a local Rust verifier invoked through a bounded adapter. Retain PostgreSQL for the case workflow; the existing constraints and migration already target it. The offline verification POC can run without a database.
+The chosen architecture is a modular monolith: a Vue 3/TypeScript/Tailwind frontend, a FastAPI application, PostgreSQL, and a local Rust verifier invoked through a bounded adapter. Retain PostgreSQL for the case workflow; the existing constraints and migration already target it. The offline verification POC can run without a database.
 
 | Area | Present as of October 12 | Remaining for the target MVP |
 |---|---|---|
 | Verification | Pinned Glasspane integration, historical Orchard/tampered fixtures, persisted real verification | Historical Sapling fixture before claiming equivalent demonstrated coverage |
-| API | Owned invoices/cases/evidence, paginated merchant case listing, persisted verification, reports, atomic merchant resolutions, chain refresh, scoped customer claims/evidence, grants/sessions, health and stateless POC, scoped reviewer reads and export | P4 browser integration and release acceptance |
+| API | Owned invoices/cases/evidence, paginated merchant case listing, persisted verification, reports, atomic merchant resolutions, chain refresh, scoped customer claims/evidence, grants/sessions, health and stateless POC, scoped reviewer reads and export | Deployed browser CI and final release acceptance |
 | Database | Migrations through `0009`, access/session/consent/attribution persistence, immutable snapshots/history, encrypted bundles, atomic retries/allocations/events | Retention/rotation workflows |
-| Rules | Approved aggregation, candidate projection, binding/conflict findings, stored policy/evaluation context and decision-time observation gates; historical context retained in packets | Live evidence PR integration and browser acceptance |
-| Access | Revocable merchant credentials, case grants, HTTPS sessions, explicit submission consent, scoped reviewer reads and authorized export | P4 browser role/disclosure acceptance |
-| Chain observations | Offline default, trusted Zebra adapter, idempotent refresh/provenance and later loss-of-inclusion review | [Live trace recorded](chain.md#recorded-live-run); evidence PR integration and deployed-target acceptance remain |
-| Frontend | Initial Vue 3/TypeScript/Tailwind implementation from PR #12; all work assigned to Person 4 | Remaining M6 integration and actual-backend acceptance |
-| Export | CasePacketV1, original inputs, historical replay CLI and authorized snapshot export | P4 download integration and full release rehearsal |
-| Delivery | Setup/tests/CI, M7.1 backend TLS/session/limits (PR #17), M7.2 migration/restart/encrypted restore (PR #19), scoped export/replay recovery (PR #24), [evidence index](release-evidence.md) | Browser/live acceptance, operator/team handoffs, full demo and final release evidence |
+| Rules | Approved aggregation, candidate projection, binding/conflict findings, stored policy/evaluation context and decision-time observation gates; historical context retained in packets | Final revision association of merged live/browser evidence |
+| Access | Revocable merchant credentials, case grants, HTTPS sessions, explicit submission consent, scoped reviewer reads and authorized export | Repeat merged P4 role/disclosure scenarios through deployment CI |
+| Chain observations | Offline default, trusted Zebra adapter, idempotent refresh/provenance and later loss-of-inclusion review | [Live trace merged in PR #27](chain.md#recorded-live-run); deployed-target configuration/acceptance remain |
+| Frontend | Person 4’s Vue 3/TypeScript/Tailwind integration and recorded actual-backend browser acceptance merged in PR #26 | P3 shared browser CI/deployment integration; final UI evidence bundle |
+| Export | CasePacketV1, original inputs, historical replay CLI and authorized snapshot export | Download integration merged in PR #26; full release evidence |
+| Delivery | Setup/tests/CI, M7.1 backend TLS/session/limits (PR #17), M7.2 migration/restart/encrypted restore (PR #19), scoped export/replay recovery (PR #24), [evidence index](release-evidence.md) | Deployed browser CI integration, operator/team handoffs, full demo and final release evidence |
 
-This table reflects inspected source and [recorded development results](DEVELOPMENT.md), not a fresh execution of acceptance tests. The merchant approval service is implemented and demonstrated with isolated simulated confirmation; that does not establish live chain inclusion or full release readiness. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map and [assignment board](IMPLEMENTATION_PLAN.md#feature-board) for remaining work.
+This table reflects inspected source and [recorded development results](DEVELOPMENT.md), not a fresh execution of acceptance tests. Merchant approval has both separately labeled simulated evidence and the real M3.1 trace merged in PR #27; neither alone establishes full release readiness. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map and [assignment board](IMPLEMENTATION_PLAN.md#feature-board) for remaining work.
 
 ### 6.2 Verification and evidence flow
 
@@ -332,7 +332,7 @@ The user assigned four implementation slots. Actual names, compensation, product
 | Person 3 | Case listing, customer submission backend, live chain validation, deployment and release evidence |
 | Person 4 | All frontend shell/client/types/screens/styles/accessibility/build configuration and browser tests; UI evidence for release |
 
-One feature has one accountable owner and one branch. Shared schema/authentication changes belong to Person 1; disclosure contracts to Person 2; deployment wiring to Person 3; frontend implementation to Person 4. Coordinate shared integration files and merge prerequisites first. M6 remains deferred despite its ownership assignment. Technical release evidence does not authorize outreach, submission on the team's behalf, or invented discovery results.
+One feature has one accountable owner and one branch. Shared schema/authentication changes belong to Person 1; disclosure contracts to Person 2; deployment wiring to Person 3; frontend implementation to Person 4. Coordinate shared integration files and merge prerequisites first. M6 was resumed and its implementation/browser evidence merged in PR #26; P3 owns shared browser CI and deployment integration. Technical release evidence does not authorize outreach, submission on the team's behalf, or invented discovery results.
 
 ## 11. Risks
 

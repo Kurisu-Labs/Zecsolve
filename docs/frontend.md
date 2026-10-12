@@ -4,7 +4,7 @@ The user explicitly resumed Person 4's frontend scope on October 12, 2026 and au
 
 ## Implemented scope
 
-M6.0–M6.5 are implemented locally: generated published-contract types; cookie sessions and CSRF; role-aware navigation; merchant case listing/pagination/filtering and invoice/case creation; evidence verification/selection, chain refresh and explicit decisions; grant creation/list/revocation with consent-aware evidence selection; scoped customer claims/evidence and acknowledgements; selected reviewer reports/original components; authorized full-history/scoped packet downloads and printable merchant/reviewer reports. This preserves the established Vue/Tailwind design and explicitly selected public demo.
+M6.0–M6.5 merged in PR #26: generated published-contract types; cookie sessions and CSRF; role-aware navigation; merchant case listing/pagination/filtering and invoice/case creation; evidence verification/selection, chain refresh and explicit decisions; grant creation/list/revocation with consent-aware evidence selection; scoped customer claims/evidence and acknowledgements; selected reviewer reports/original components; authorized full-history/scoped packet downloads and printable merchant/reviewer reports. This preserves the established Vue/Tailwind design and explicitly selected public demo.
 
 Original files are read as UTF-8 without trimming or line-ending conversion. Preview controls may normalize line endings, so original component downloads use the actual returned strings. Packet receipt components are compared to the source bytes after base64 decoding. Notes/reasons/memos render as text. Reviewer statuses, dates, limits and currency have readable display labels; print uses a light layout with navigation/download controls hidden. Customer routes never follow acknowledgements with merchant reads.
 
@@ -41,8 +41,22 @@ The actual browser scenarios cover:
 
 The reproduction procedure, environment variables and platform limits are in [apps/web/README.md](../apps/web/README.md). Private synthetic credentials, encryption keys, TLS keys and automatic browser artifacts are excluded from the branch and handoff.
 
-## Remaining integration gates
+## Integration and remaining release gates
 
-The local implementation and browser evidence do not mean these commits are merged. The branch was published as [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); review, checks for the current revision and merge remain pending. Person 3 owns registering the browser suite in shared CI/release wiring and validating the built app through deployment ingress. M3.1 live trusted-RPC evidence merged in PR #27; operational key management, retention/deletion and full release evidence remain their separate existing gates.
+[PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26) merged on October 12,
+2026 as `8e8843dce410aaed30e10d960af5de2c857e0edd`, including P4's recorded
+browser evidence above. Its foundation, web and container checks passed; those
+checks did not yet execute Playwright.
 
-No teammates were messaged, and no public deployment or real customer operation was performed. Keep the common review/CI/merge definition of done before recording M6 as merged and release-complete.
+Person 3 owns [browser CI and deployment integration](browser-ci.md) on
+`test/m7-browser-release-integration`: repeat the eight offline scenarios through
+the actual packaged nginx ingress, run the simulated scenario separately, and
+retain sanitized evidence. Both Linux CI compositions passed at `7d4ffcf`;
+see E-07/E-08 in the [release evidence index](release-evidence.md). This consumes
+P4’s suite and does not transfer UI ownership. M3.1 live evidence merged in PR #27. Operator deployment, reviewed UI
+screenshots, retention/deletion for private-customer use and the assembled final
+release evidence remain the separate [release handoffs](release-evidence.md#remaining-handoffs-and-release-decision).
+
+The original local evidence above is preserved as recorded; it is not relabeled
+as a Linux CI or public-deployment run. No public deployment or real customer
+operation is established by this handoff.

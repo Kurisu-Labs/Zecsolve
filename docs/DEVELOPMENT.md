@@ -651,3 +651,89 @@ must pass for the PR. The `f8a594f` branch [CI run](https://github.com/Kurisu-La
 `git diff --check` passed before publication. Full release still requires P4/browser,
 deployed-target/operator and team artifacts. M3.1 acceptance is demonstrated;
 review, CI and merge remain the task-completion gate.
+
+## Item 23 — M7 browser CI and release integration
+
+**Owner:** Person 3. **Branch:** `test/m7-browser-release-integration`.
+Started from clean, updated `main` at `8e8843d` after fetching remote branches and
+checking open PRs. No open PR overlapped; the remaining P4 remote branch had no
+commits outside main. The task branch was pushed before implementation. P4's
+frontend implementation and recorded browser evidence merged in PR #26; M3.1
+live validation merged in PR #27. Items 01–22 are preserved byte-for-byte.
+
+### Integration
+
+`scripts/browser_acceptance.py` runs P4's existing browser scenarios, rejects
+failed/flaky/skipped/empty selections and focused tests, and retains only
+allowlisted results. Raw diagnostics and downloaded packets stay private.
+Shared CI now checks generated frontend types and runs the isolated simulated
+approval/retry/conflict case. The deployment job runs the eight offline browser
+scenarios through the actual built app and nginx TLS ingress, then the existing
+four recovery/export checkpoints. Production auth, schema, chain policy, ingress
+limits and UI behavior are unchanged. Test-only origin/request pacing and
+page-readiness waits let the same P4 suite run through the real deployment.
+
+Implementation was committed/pushed as `6044234`; actual deployment testing found
+and corrected two orchestration issues in `7d4ffcf`:
+
+- Recovery's simulated allocation already owned the globally unique public output,
+  so a later browser run correctly reported zero candidate credit/conflict even
+  with a new merchant. Browser scenarios now run before recovery seeds that
+  allocation; no row, allocation or constraint is bypassed/deleted.
+- Two immediate test checks raced the rendered Connect/page heading through the
+  slower ingress. Assertions now await those visible headings before login-mode
+  selection and axe analysis. No accessibility rule or scenario was disabled.
+
+### Local execution and limits
+
+On macOS 27.0.1 arm64, Python 3.12.14, Node 26.11.0, Playwright 1.64.0 Chromium,
+Rust 1.99.0 and Docker 29.5.2/Colima with PostgreSQL 17:
+
+- `npm test`, `npm run types:check`, `npm run build`: 8 unit tests, generated
+  contract check and Vue/TypeScript production build passed.
+- `make lint`: Rust fmt/Clippy and Python ruff passed. The six new report-boundary
+  tests passed, including rejection of incomplete coverage and omission of raw
+  diagnostics/attachments.
+- `make test`: 12 Rust tests passed; native Python had 276 passes and five existing
+  0.2-second subprocess timeout failures in address/process tests, also seen in
+  earlier local records. These are recorded failures, not a passed local suite;
+  no timeout or production code was weakened. Linux CI below is the full pass.
+- The isolated simulated browser case passed at 14:32:00–14:32:07 UTC. The first
+  combined run failed three browser scenarios for the ordering/readiness issues
+  above. After correction, all eight nginx browser scenarios passed at
+  14:37:58.515183–14:39:00.248720 UTC. The full 26-group deployment/recovery run
+  completed at 14:40:39.297232 UTC. These were working-tree runs; the report records
+  `working_tree_changes=true`. The disposable projects, databases and private
+  diagnostics were removed afterwards.
+
+The browser checks use generated localhost TLS with Playwright's certificate
+verification disabled. Separate deployment HTTP clients validate the certificate
+and hostname using an explicit trust anchor. CI uses public fixture/synthetic
+application data and no live RPC; simulated confirmation remains test-only.
+These checks do not constitute public deployment or full release completion.
+
+
+### Linux CI and retained evidence
+
+Clean implementation revision `7d4ffcf49a4b9348be4c2034b1a2614f2ec6fa9e` passed
+all four branch CI jobs. E-07–E-09 in the [release evidence index](release-evidence.md)
+link their exact jobs and preserve the two sanitized machine reports with verified
+GitHub ZIP digests and retained-file hashes:
+
+- `container-smoke`: all 26 groups, including 8 packaged-nginx browser scenarios
+  and the four recovery/export checkpoints; result at 14:45:31.074549 UTC.
+- `browser-simulated`: 1 explicit simulated approval/retry/conflict scenario,
+  14:39:10.486977–14:39:15.673935 UTC.
+- `foundation`: lint, 12 Rust + 281 non-database Python + 236 PostgreSQL tests and
+  the public-fixture POC passed; the existing Starlette/httpx warning remains.
+- `web`: 8 unit tests, generated contract drift check and production build passed.
+
+The retained reports have `working_tree_changes=false`; no prior failure is
+rewritten as success. The follow-up documentation corrects merged P4/M3 statuses,
+indexes E-06 original P4 evidence and E-07/E-08 Linux repetitions, and keeps final
+operator/team/demo/UI-screenshot requirements explicit. The recovery subreport's
+legacy `remaining_gates` label is clarified as `outside_recovery_scope` in future
+reports; the retained historical bytes remain unchanged. This metadata-only
+change does not alter any recovery assertion. PR review, current CI and merge
+remain required for task completion; no public deployment or full M7 release is
+claimed.

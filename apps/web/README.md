@@ -83,3 +83,14 @@ See [frontend verification and handoff](../../docs/frontend.md). Person 3 owns r
 | `tests/browser/`, `tests/browser_server.py` | Browser-to-API-to-database acceptance |
 
 Keep exact integer-zatoshi arithmetic, distinct evidence layers, keyboard access, labeled errors, responsive layouts and reduced motion. Yellow is the disclosure/approval accent. Keep WebGL and motion libraries lazy. TypeScript casts belong in script sections, not templates.
+
+
+## Shared CI and deployment handoff
+
+P4's integration and recorded browser results merged in PR #26. P3's
+[browser CI runner](../../docs/browser-ci.md) executes this suite through the
+packaged nginx deployment with a generated `ZECSOLVE_BROWSER_URL` and private
+state. `ZECSOLVE_BROWSER_API_INTERVAL_MS=300` schedules automated API requests
+below the unchanged ingress budget. The existing localhost defaults still work.
+The separate simulated job uses the original `--simulated-chain` composition.
+Only sanitized result JSON is uploaded; raw diagnostics/downloads stay private.

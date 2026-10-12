@@ -2,7 +2,7 @@
 
 Migration `0007` adds merchant decisions over the [persisted verification workflow](verification.md). Run `make migrate` to the current head before starting the API. `POST /api/cases/{case_id}/resolve` requires an active merchant credential, an `Idempotency-Key`, a reason, and the case version the merchant reviewed.
 
-The deployed app defaults to an offline observer and default-deny source policy. A server-configured [trusted Zebra observer](chain.md) can authorize fresh RPC observations; **live-node validation is pending**. Noncredit decisions are usable now. The isolated demo below exercises allocation with explicitly simulated confirmations; no public request field or environment toggle enables them in the app.
+The deployed app defaults to an offline observer and default-deny source policy. A server-configured [trusted Zebra observer](chain.md) can authorize fresh RPC observations; **live-node validation and a fresh merchant approval trace merged in PR #27**; see the [recorded run](chain.md#recorded-live-run). Noncredit decisions are usable now. The isolated demo below exercises allocation with explicitly simulated confirmations; no public request field or environment toggle enables them in the app.
 
 ## Request and actions
 
