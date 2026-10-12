@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Page, type BrowserContext } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
@@ -10,6 +10,22 @@ const { merchant_code: merchantCode, simulated } = JSON.parse(fs.readFileSync(st
 const fixture = JSON.parse(fs.readFileSync(path.join(root, 'fixtures/manifest.json'), 'utf8'))
 const receipt = fs.readFileSync(path.join(root, 'fixtures/mainnet/receipt.json'), 'utf8')
 const transaction = fs.readFileSync(path.join(root, 'fixtures/mainnet/transaction.hex'), 'utf8')
+const baseURL = process.env.ZECSOLVE_BROWSER_URL ?? 'https://localhost:8443'
+const apiInterval = Number(process.env.ZECSOLVE_BROWSER_API_INTERVAL_MS ?? 0)
+let nextRequest = 0
+
+// Deployment automation respects the real ingress budget, including setup calls.
+// This only schedules requests; all responses still come from the actual backend.
+async function paceAPI(context: BrowserContext) {
+  if (!apiInterval) return
+  await context.route('**/api/**', async (route) => {
+    const delay = Math.max(0, nextRequest - Date.now())
+    nextRequest = Date.now() + delay + apiInterval
+    await new Promise((resolve) => setTimeout(resolve, delay))
+    await route.fallback()
+  })
+}
+test.beforeEach(async ({ context }) => { await paceAPI(context) })
 
 async function login(page: Page, code: string) {
   await page.goto('/connect')
@@ -100,8 +116,9 @@ test('three roles complete the real HTTPS submission and merchant review flow', 
   const customerCode = await page.getByLabel('Private access code').inputValue()
   const customerContext = await browser.newContext({
     ignoreHTTPSErrors: true,
-    baseURL: 'https://localhost:8443',
+    baseURL,
   })
+  await paceAPI(customerContext)
   const customer = await customerContext.newPage()
   const customerReads: string[] = []
   customer.on('request', (r) => {
@@ -173,8 +190,9 @@ test('three roles complete the real HTTPS submission and merchant review flow', 
   const reviewerCode = await page.getByLabel('Private access code').inputValue()
   const reviewerContext = await browser.newContext({
     ignoreHTTPSErrors: true,
-    baseURL: 'https://localhost:8443',
+    baseURL,
   })
+  await paceAPI(reviewerContext)
   const reviewer = await reviewerContext.newPage()
   await login(reviewer, reviewerCode)
   await expect(reviewer.getByRole('heading', { name: 'Shared case report' })).toBeVisible()

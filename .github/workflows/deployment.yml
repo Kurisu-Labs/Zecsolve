@@ -1,4 +1,4 @@
-name: deployment and recovery preparation
+name: deployment, browser acceptance and recovery
 on:
   push:
     paths:
@@ -13,6 +13,7 @@ on:
       - 'alembic.ini'
       - '.dockerignore'
       - 'scripts/check_deployment.py'
+      - 'scripts/browser_acceptance.py'
       - 'scripts/check_recovery.py'
       - 'scripts/recovery_*.py'
       - 'scripts/rehearse_migration.py'
@@ -30,9 +31,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-      - name: Validate TLS deployment and backend recovery with disposable data
-        run: python scripts/check_deployment.py --recovery
-      - name: Retain sanitized recovery evidence
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Prepare browser tests and real offline packet replay
+        run: |
+          python -m pip install uv==0.12.23
+          rustup toolchain install 1.99.0 --profile minimal
+          make setup
+          npm --prefix apps/web ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+      - name: Validate deployed browser workflows and backend recovery with disposable data
+        run: uv run --locked python scripts/check_deployment.py --recovery --browser
+      - name: Retain sanitized recovery and browser evidence
         uses: actions/upload-artifact@v4
         with:
           name: backend-recovery-evidence

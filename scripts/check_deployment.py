@@ -37,8 +37,13 @@ def main():
     parser.add_argument(
         "--recovery", action="store_true", help="Also rehearse M7.2 backend recovery"
     )
+    parser.add_argument(
+        "--browser", action="store_true", help="Run P4's offline browser suite through nginx"
+    )
     options = parser.parse_args()
     (ROOT / ".cache").mkdir(exist_ok=True)
+    for name in ("deployment-result.json", "recovery-result.json"):
+        (ROOT / ".cache" / name).unlink(missing_ok=True)
     directory = Path(tempfile.mkdtemp(prefix="deployment-", dir=ROOT / ".cache"))
     project = "zecsolve-smoke-" + secrets.token_hex(4)
     http_port, https_port = free_port(), free_port()
@@ -312,9 +317,28 @@ print(json.dumps(result))
             from check_recovery import rehearse
 
             recovery = rehearse(ROOT, directory, compose, run, request, origin, passed)
+        browser = None
+        if options.browser:
+            from browser_acceptance import run_suite
+
+            # Separate merchant: recovery scenarios must not alter browser listing counts.
+            browser_merchant = json.loads(run(operator_command))
+            state = directory / "browser-state.json"
+            state.write_text(
+                json.dumps({"merchant_code": browser_merchant["token"], "simulated": False})
+            )
+            state.chmod(0o600)
+            time.sleep(3)  # Drain prior recovery requests from the real ingress bucket.
+            browser = run_suite(directory / "browser", state, origin, ingress=True)
+            passed("eight real-browser scenarios through packaged frontend and nginx TLS ingress")
+            logs = run(compose + ["logs", "--no-color", "api", "ingress"])
+            assert browser_merchant["token"] not in logs
+            passed("browser merchant access code is absent from deployment logs")
         report = {
             "checks": results,
-            "scope": "M7.1 backend and TLS session preparation; browser acceptance pending",
+            "scope": "M7.1 deployment controls with optional M7.2 recovery/browser acceptance",
+            "live_confirmation": False,
+            "release_complete": False,
             "at": datetime.now(UTC).isoformat(),
             "host": platform.platform(),
             "python": platform.python_version(),
@@ -322,6 +346,8 @@ print(json.dumps(result))
             "revision": run(["git", "rev-parse", "HEAD"]).strip(),
             "working_tree_changes": bool(run(["git", "status", "--porcelain"]).strip()),
         }
+        if browser is not None:
+            report["browser"] = browser
         if recovery is not None:
             report["recovery"] = recovery
             (ROOT / ".cache/recovery-result.json").write_text(json.dumps(report, indent=2) + "\n")
