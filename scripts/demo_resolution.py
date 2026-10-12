@@ -130,6 +130,7 @@ def run_demo(engine):
     )
     invalid = rejected(decisions, second, tampered, "invalid")
     report = CaseReportService(engine).get(principal, case.case_id)
+    rejected_report = CaseReportService(engine).get(principal, second.case_id)
     return dict(
         source_kind="SIMULATED",
         live_confirmation=False,
@@ -143,7 +144,9 @@ def run_demo(engine):
         retry_same_resolution=reused and replay == decision,
         second_invoice=conflict,
         tampered_receipt=tampered.result.receipt_state,
+        tampered_reason=tampered.result.reason_code,
         tampered_approval=invalid,
+        rejected_invoice_credited_zat=rejected_report.balances.credited_zat,
         report_scope=report.report_scope,
         references={
             "invoice_id": str(case.invoice_id),
@@ -175,6 +178,8 @@ def main():
             config.attributes["connection"] = connection
             command.upgrade(config, "head")
         trace = run_demo(engine)
+        with engine.connect() as connection:
+            trace["postgres_version"] = connection.execute(text("SHOW server_version")).scalar_one()
     finally:
         engine.dispose()
         with admin.begin() as connection:

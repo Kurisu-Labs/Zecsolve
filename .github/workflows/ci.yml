@@ -38,6 +38,14 @@ jobs:
       - run: make test
       - run: make test-db
       - run: make poc
+      - name: Rehearse public-fixture release demo
+        run: uv run --locked python scripts/rehearse_release.py
+      - name: Retain sanitized demo evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-demo-evidence
+          path: .cache/release-rehearsal.json
+          if-no-files-found: error
 
   web:
     runs-on: ubuntu-latest
