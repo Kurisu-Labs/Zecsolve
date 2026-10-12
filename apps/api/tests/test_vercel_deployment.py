@@ -3,8 +3,10 @@ import os
 import subprocess
 import sys
 
+import certifi
 import pytest
 from sqlalchemy import text
+from sqlalchemy.engine import make_url
 from zecsolve.config import Settings
 from zecsolve.deployment import vercel
 
@@ -65,6 +67,13 @@ def test_server_uses_platform_port_without_startup_migrations(vercel_environment
     assert options["port"] == 8123
     assert options["access_log"] is False
     assert options["limit_concurrency"] == 32
+
+
+def test_database_uses_packaged_trust_roots_and_full_verification(vercel_environment):
+    settings, _, _ = vercel.runtime_configuration()
+    query = make_url(settings.database_url.get_secret_value()).query
+    assert query["sslmode"] == "verify-full"
+    assert query["sslrootcert"] == certifi.where()
 
 
 def test_bad_startup_has_only_secret_safe_logs(vercel_environment):

@@ -3,8 +3,10 @@
 import logging.config
 import os
 
+import certifi
 import uvicorn
 from alembic.script import ScriptDirectory
+from pydantic import SecretStr
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
 
@@ -25,6 +27,17 @@ def runtime_configuration():
     url = make_url(settings.database_url.get_secret_value())
     if url.drivername != "postgresql+psycopg" or url.query.get("sslmode") != "verify-full":
         raise ValueError("Certificate-verified PostgreSQL connection required")
+    # psycopg's bundled libpq/OpenSSL may not find the host system trust store.
+    # Keep certificate and hostname verification on with the packaged CA bundle.
+    settings = settings.model_copy(
+        update={
+            "database_url": SecretStr(
+                url.update_query_dict({"sslrootcert": certifi.where()}).render_as_string(
+                    hide_password=False
+                )
+            )
+        }
+    )
     if settings.browser_origins != [f"https://{deployment.host}"]:
         raise ValueError("One exact browser origin matching the deployment host is required")
     if not settings.evidence_key_id or not settings.evidence_key.get_secret_value():
