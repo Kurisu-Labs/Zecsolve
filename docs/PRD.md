@@ -8,7 +8,7 @@
 
 **Document baseline:** 2026-10-10
 
-**Implementation/assignment status refreshed:** 2026-10-11; see the [four-person assignment board](IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks).
+**Implementation/assignment status refreshed:** 2026-10-12; see the [four-person assignment board](IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks).
 
 **Delivery window:** October 10–13, 2026; planned submission on October 12
 
@@ -18,7 +18,7 @@
 
 **Funding / budget:** Not specified
 
-**Status:** Requirements consolidated. M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh is implemented but live-node validation is pending. M4 is in progress with M4.3 implemented and locally validated; M5 remains pending; Person 4 owns all M6 frontend work, which remains deferred. M7 release acceptance is incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains recorded results; the M4.3 entry records its local backend acceptance runs; PR review, CI and merge remain the integration gate.
+**Status:** M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh exists but live-node validation is pending. M4.0–M4.4 are merged, unblocking Person 2's scoped reports; M5 remains pending. Person 4's initial frontend is partial and its remaining integration/acceptance retains the resumption gate. M7.1 backend preparation is merged; Person 3's [M7.2 backend recovery rehearsal](recovery.md) is in progress. Full release acceptance remains incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains historical results; each current feature still requires review, CI and merge.
 
 The cutoff above follows the [official hackathon rules, §5](https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf). The internal sprint is shorter than the full competition period.
 
@@ -109,21 +109,21 @@ The chosen architecture is a modular monolith: a planned Vue 3/TypeScript/Tailwi
 | Area | Present as of October 12 | Remaining for the target MVP |
 |---|---|---|
 | Verification | Pinned Glasspane integration, historical Orchard/tampered fixtures, persisted real verification | Historical Sapling fixture before claiming equivalent demonstrated coverage |
-| API | Owned invoices/cases/evidence, paginated merchant case listing, persisted verification, reports, atomic merchant resolutions, chain refresh, scoped customer claims/evidence, grants/sessions, health and stateless POC | Scoped reviewer reports and export; M4.4 PR integration |
+| API | Owned invoices/cases/evidence, paginated merchant case listing, persisted verification, reports, atomic merchant resolutions, chain refresh, scoped customer claims/evidence, grants/sessions, health and stateless POC | Scoped reviewer reports and export |
 | Database | Migrations through `0009`, access/session/consent/attribution persistence, immutable snapshots/history, encrypted bundles, atomic retries/allocations/events | Retention/rotation workflows |
 | Rules | Approved aggregation, candidate projection, binding/conflict findings, stored policy/evaluation context and decision-time observation gates | Preserve historical context in scoped reports and replay packets |
 | Access | Revocable merchant credentials, case grants, HTTPS sessions, explicit customer submission consent and scoped writes | Scoped reviewer reads and authorized export |
 | Chain observations | Offline default, trusted Zebra adapter, idempotent refresh/provenance and later loss-of-inclusion review | Actual trusted node validation and live merchant approval trace |
-| Frontend | Vue 3/TypeScript/Tailwind architecture selected; all work assigned to Person 4 | M6.0–M6.6; execution remains deferred |
+| Frontend | Initial Vue 3/TypeScript/Tailwind implementation from PR #12; all work assigned to Person 4 | Remaining M6 integration and actual-backend acceptance |
 | Export | Verifier result schema and fixture provenance manifest | Complete, authorized, replayable case packet |
-| Delivery | Setup/tests/CI, development containers and M7.1 backend TLS/session/limit preparation (PR #17) | Browser acceptance, full release/restore validation, demo and evidence bundle |
+| Delivery | Setup/tests/CI, M7.1 backend TLS/session/limits (PR #17), M7.2 backend migration/restart/encrypted-restore preparation | Recovery PR validation/integration, browser/live/export acceptance, full demo and release evidence |
 
 This table reflects inspected source and [recorded development results](DEVELOPMENT.md), not a fresh execution of acceptance tests. The merchant approval service is implemented and demonstrated with isolated simulated confirmation; that does not establish live chain inclusion or full release readiness. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map and [assignment board](IMPLEMENTATION_PLAN.md#feature-board) for remaining work.
 
 ### 6.2 Verification and evidence flow
 
 1. Authenticate the caller and authorize access to the invoice/case before accepting or returning private evidence.
-2. Store permitted evidence privately, preserving the submitted bytes, input hashes, source, and submission context. Encrypted merchant evidence storage is implemented; scoped customer consent/submission is implemented in M4.4, pending PR integration ([handoff](customer-submissions.md)). The separate POC endpoint stays stateless.
+2. Store permitted evidence privately, preserving the submitted bytes, input hashes, source, and submission context. Encrypted merchant evidence storage and scoped customer consent/submission are implemented; M4.4 merged in PR #18 ([handoff](customer-submissions.md)). The separate POC endpoint stays stateless.
 3. Invoke the configured Rust executable with explicit arguments, isolated temporary files, size limits, and a timeout. User input must not select server paths, executable commands, or arbitrary fetch URLs.
 4. Validate the returned result contract and input bindings. Interpret `receipt_state` and `reason_code`, not process exit zero alone.
 5. Obtain any chain observation through a trusted application integration and record its source and observation time separately. Never accept a customer's claimed confirmation state as authoritative.
@@ -394,10 +394,10 @@ The coverage column reflects October 11 implementation and [recorded development
 | A-09 | Receiver mismatch or absent invoice reference binding blocks eligibility; projected overpayment requires review | Recorded binding/policy/approval safety tests; frontend presentation remains |
 | A-10 | A valid receipt with unavailable confirmation cannot become confirmed through request input or receive automatic credit | Recorded offline blocking, simulated approval and trusted-RPC adapter tests; actual-node observation/approval remains M3.1 |
 | A-11 | Another merchant cannot read, modify, resolve, or export the case; customers and reviewers cannot exceed their grants | Recorded merchant API/service isolation; customer/reviewer route matrix is M4, exports M5, browser coverage M6 |
-| A-12 | Grant revocation stops future application access; disclosures explain that previously downloaded receipts remain reusable | Grant/consent implementation and tests pending |
+| A-12 | Grant revocation stops future application access; disclosures explain that previously downloaded receipts remain reusable | Grant/session/submission consent tests implemented; recovery checks restored revocation; scoped reads and browser disclosures remain |
 | A-13 | Authorized packet includes the §6.5 inputs, reproduces verification and historical rules, and identifies missing/redacted context without leaking other cases | Complete exporter and replay tests pending |
 | A-14 | A failed or stale approval commits no partial allocation/resolution/event; invoice corrections cannot rewrite the original snapshot | Recorded transaction rollback, stale-version, audit and immutability tests; correction/version-linkage workflow is outside P0 |
-| A-15 | Errors/logs/exports omit tokens and wallet-wide keys; limits constrain hostile inputs; deployment and demo are repeatable | Existing adapter/API tests and configurations; release/export/deployment validation pending |
+| A-15 | Errors/logs/exports omit tokens and wallet-wide keys; limits constrain hostile inputs; deployment and demo are repeatable | M7.1 actual TLS controls and M7.2 backend recovery preparation; export redaction, browser and full release evidence remain |
 
 Existing suites are [verifier tests](../apps/api/tests/test_verifier.py), [rules tests](../apps/api/tests/test_rules.py), [API tests](../apps/api/tests/test_api.py), and [PostgreSQL tests](../apps/api/tests/test_postgres.py). The documented commands are `make test`, `make lint`, and `make test-db` against a disposable PostgreSQL database. `make poc` exercises the offline demonstration. Case, persisted-verification and resolution tests already exist; remaining grant/session, export/replay and UI acceptance is assigned in M4–M6. No blanket “all acceptance tests complete” claim is supported by this document.
 

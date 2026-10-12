@@ -4,11 +4,11 @@
 
 **Baseline:** October 10, 2026
 
-**Assignment/status update:** October 11, 2026
+**Assignment/status update:** October 12, 2026
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** M1/M2 backend implementation is complete. M3 adapter, refresh, and negative paths are implemented; live-node validation is externally blocked. M4 is in progress: M4.3 listing is implemented and locally validated; M5 is pending. Person 4 owns all M6 frontend tasks, which remain deferred until the user resumes frontend work. M7 release acceptance is incomplete. M4.3 validation is recorded below; other future task cards still require their own implementation and acceptance evidence. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
+**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.4 are merged; M4.5 scoped reports and M5.0 packet contracts are ready for Person 2. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is implemented and locally validated pending PR integration; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 **Start here:** [ownership and feature tasks](#3-ownership-and-feature-tasks), [task cards](#task-cards), and [definition of done](#definition-of-done). Milestone requirements below remain the acceptance specification; the board is the current assignment and dependency source of truth.
 
@@ -49,12 +49,12 @@ Build one backend workflow through the real Rust verifier, real PostgreSQL trans
 |---|---|
 | Stored invoice policies, authoritative balances, and historical evaluation snapshots | Preserve these inputs in scoped reports and replay packets |
 | Atomic merchant decisions, invoice locking, output uniqueness, retries, and chained events | Preserve these guarantees when introducing new principals and browser clients |
-| Encrypted optional receipt/raw-tx bundles and persisted real verification | Add customer attribution, sharing consent, and selected reviewer disclosure |
+| Encrypted optional receipt/raw-tx bundles, customer attribution/consent and persisted real verification | Add selected reviewer disclosure |
 | Offline and trusted RPC observers, refresh history, and later chain-review findings | Validate against an actual trusted node and retain the live approval trace |
-| Revocable merchant credentials and request/transaction authorization checks | Add case grants, browser sessions, and common scoped authorization interfaces |
-| Case create/detail/report routes and merchant listing with case versions | Add claim writers; retain separate detail/report contracts |
-| Readiness tracks the packaged migration head; revisions through `0008` exist | Add forward access migrations without rewriting history |
-| Recorded real-verifier and PostgreSQL workflow/race/rollback tests | Add grant/session/disclosure, export/replay, browser, and release acceptance evidence |
+| Merchant credentials, case grants, browser sessions and transaction authorization | Complete scoped reviewer read/export enforcement |
+| Case create/detail/report/list routes and scoped claim writers | Retain separate detail/report contracts in frontend integration |
+| Readiness tracks the packaged migration head; revisions through `0009` exist | Rehearse forward migration/recovery without rewriting history |
+| Recorded real-verifier, PostgreSQL workflow and grant/session/submission tests | Add scoped disclosure, export/replay, browser, and release acceptance evidence |
 
 Primary implementation references: [models](../apps/api/src/zecsolve/db/models.py), [rules](../apps/api/src/zecsolve/domain/rules.py), [API assembly](../apps/api/src/zecsolve/main.py), [verifier adapter](../apps/api/src/zecsolve/adapters/verifier.py), and [initial migration](../apps/api/migrations/versions/0001_initial_schema.py).
 
@@ -67,10 +67,10 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 | M1 | Backend complete; development Items 01–06 | Authenticated invoice/case/evidence through persisted real verification | P0-01, P0-02, P0-05, merchant portion of P0-06 |
 | M2 | Backend complete; Item 07 uses simulated confirmation | Atomic merchant allocation, initial report, retries/conflicts/rollback | P0-03, P0-04, core P0-07 |
 | M3 | Adapter implemented, Item 08; live gate blocked | M3.1 live node/approval evidence | P0-02, P0-04, P0-05 |
-| M4 | In progress; M4.0–M4.3 merged | M4.0–M4.5 plus the route-wide role/consent matrix | Remaining P0-01 and P0-06 |
+| M4 | In progress; M4.0–M4.4 merged | M4.5 plus the route-wide role/consent matrix | Remaining P0-01 and P0-06 |
 | M5 | Pending | M5.0–M5.2 authorized export/replay; live release still requires M3.1 | P0-08 |
-| M6 | Assigned to Person 4; deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
-| M7 | Incomplete | M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
+| M6 | Person 4 initial frontend partial; remaining integration/acceptance deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
+| M7 | M7.1 backend preparation merged; M7.2 backend recovery in progress | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
 
 ### Ownership and coordination
 
@@ -93,13 +93,13 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 `Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
 
-Person 1 has implemented M4.0–M4.2; their API and authorization handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md). Person 3 has implemented M4.3. M4.0–M4.3 are merged. Person 2 can start M5.0; Person 3 has implemented M4.4 pending its PR integration; Person 2 can finish M5.1 before M4.5/M5.2. This leaves useful parallel work without competing identity/report implementations. Person 3 can prepare deployment controls while waiting, but cannot mark M7.1 complete before its integration dependencies.
+M4.0–M4.4 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 can start M4.5 and M5.0, then M5.1/M5.2 in dependency order. Person 3's M7.1 backend preparation is merged and M7.2 backend recovery is active on `test/m7-release-rehearsal`; full M7 completion still needs the listed integration gates.
 
-All M6 tasks remain deferred and assigned to Person 4. When frontend is resumed, M6.0 can start against current contracts; fixtures may unblock development of dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
+Person 4's PR #12 supplies partial frontend implementation. Remaining M6 integration/acceptance is assigned to Person 4 and retains its explicit-resumption gate. Fixtures may unblock dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
 
 ### Feature board
 
-The links below lead to the scope and acceptance card for each branch. M4.3 implementation and local validation are recorded in DEVELOPMENT.md; other future-task validation remains pending. The common PR/CI/merge gate still applies.
+The links below lead to the scope and acceptance card for each branch. DEVELOPMENT.md retains each implementation's historical evidence; merged status is recorded here separately. The common PR/CI/merge gate still applies.
 
 | Task | Owner | Branch | Prerequisites | Status |
 |---|---|---|---|---|
@@ -108,8 +108,8 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | [M4.1 — Grant lifecycle](#m4-1) | Person 1 | `feat/m4-case-grants` | M4.0 merged | Done: PR #15 merged |
 | [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Done: PR #16 merged |
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Done: PR #13 merged |
-| [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Implemented; PR integration pending |
-| [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Waiting |
+| [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Done: PR #18 merged |
+| [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Ready |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Ready |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
 | [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Waiting |
@@ -121,7 +121,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 | [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-reviewer-export` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Deferred |
 | [M6.6 — Browser acceptance](#m6-6) | Person 4 | `test/m6-browser-acceptance` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Deferred |
 | [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend and TLS session preparation validated; browser integration pending |
-| [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-release-rehearsal` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | Waiting |
+| [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-release-rehearsal` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | In progress: backend recovery preparation; full release waiting |
 
 ### Task cards
 
@@ -181,7 +181,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.3 — Case listing
 
-- **Owner:** Person 3. **Branch:** `feat/m4-case-listing`. **Status:** Implemented and locally validated; review/CI/merge tracked in the feature PR. No claim of M4 completion.
+- **Owner:** Person 3. **Branch:** `feat/m4-case-listing`. **Status:** Done: PR #13 merged. No claim of M4 completion.
 - **Prerequisites:** Existing merchant case backend on main.
 - **Goal:** Supply merchant dashboard summaries without requiring full reports.
 - **Owned code:** Case-list schema and focused additions to case router/service/tests.
@@ -194,7 +194,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.4 — Customer submissions
 
-- **Owner:** Person 3. **Branch:** `feat/m4-customer-submissions`. **Status:** Implemented; PR integration pending.
+- **Owner:** Person 3. **Branch:** `feat/m4-customer-submissions`. **Status:** Done: PR #18 merged.
 - **Prerequisites:** M4.2 merged, including the M4.0 persistence interfaces.
 - **Goal:** Accept scoped customer claims and evidence with honest attribution and recorded disclosure consent.
 - **Owned code:** Claim writer/router/contracts and submission changes to evidence service/router; new audit payload versions and focused tests. Request additional shared schema work from Person 1 before using it.
@@ -207,7 +207,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M4.5 — Scoped reports
 
-- **Owner:** Person 2. **Branch:** `feat/m4-scoped-reports`. **Status:** Waiting.
+- **Owner:** Person 2. **Branch:** `feat/m4-scoped-reports`. **Status:** Ready; M4.2/M4.4 merged.
 - **Prerequisites:** M4.2 and M4.4 merged.
 - **Goal:** Expose only explicitly selected report fields and consented evidence to reviewers.
 - **Owned code:** Role projections, report service/router integration, authorized evidence-read interfaces, and disclosure tests. Person 1 retains shared auth/model ownership; Person 3 retains evidence submission.
@@ -220,7 +220,7 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M5.0 — Packet contract
 
-- **Owner:** Person 2. **Branch:** `feat/m5-packet-contract`. **Status:** Waiting.
+- **Owner:** Person 2. **Branch:** `feat/m5-packet-contract`. **Status:** Ready; M4.0 merged.
 - **Prerequisites:** M4.0 merged.
 - **Goal:** Freeze the common packet format consumed by both exporter and replay.
 - **Owned code:** Packet schemas, integrity/canonicalization contract, public/synthetic complete and scoped fixtures, and schema tests.
@@ -363,14 +363,14 @@ The links below lead to the scope and acceptance card for each branch. M4.3 impl
 
 #### M7.2 — Release rehearsal
 
-- **Owner:** Person 3. **Branch:** `test/m7-release-rehearsal`. **Status:** Waiting.
+- **Owner:** Person 3. **Branch:** `test/m7-release-rehearsal`. **Status:** In progress: backend recovery preparation. Full release remains waiting.
 - **Prerequisites:** M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier.
 - **Goal:** Assemble reproducible release acceptance and recovery evidence.
 - **Owned code:** Release checklist, migration/restart/retry/restore rehearsal, sanitized demo traces, limitations and release documentation. Person 4 supplies browser results and UI screenshots.
 - **Exclusions:** No assumed discovery results, automatic outreach, skipped gate marked passed, production pilot claim, or mutation of historical DEVELOPMENT.md results.
 - **Public interfaces:** Use existing workflow/export/replay/deployment interfaces; collect team-provided discovery/submission evidence and preserve attribution.
 - **Acceptance checks:** Migration, restart/lost-response recovery and encrypted restore pass; all A-01–A-15 rows have attributable evidence and required gates pass. Missing live validation or deferred frontend keeps full release incomplete. Document limits and recovery without losing accepted allocations.
-- **Validation evidence:** Pending: acceptance matrix with command/scenario, result, revision, environment/time; live/simulated traces separated; restore/demo/replay/UI evidence and team-supplied discovery artifacts. All cards also require the common definition of done below.
+- **Validation evidence:** [Backend recovery procedure and acceptance matrix](recovery.md) and [Item 15](DEVELOPMENT.md#item-15--m72-backend-recovery-rehearsal) record forward migrations, process/database restarts, lost-response retries, encrypted fresh-database restore and restored invariants: 19 actual-container groups, 211 PostgreSQL tests and six archive tests passed locally. The native subprocess timeout limitation is recorded explicitly. Combined deployment/recovery CI emits a sanitized revision/time/environment report. Final PR integration is pending; live, scoped export/replay, UI and team-supplied release artifacts remain separate gates. All cards also require the common definition of done below.
 
 ### Definition of done
 
