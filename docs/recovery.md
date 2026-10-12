@@ -1,6 +1,6 @@
 # M7.2 backend recovery rehearsal
 
-Person 3 owns this rehearsal. The migration/restart/restore foundation merged in PR #19; `test/m7-export-recovery` integrates the scoped reports, packet contract, replay and export merged in PRs #20–#23. It exercises the current application and PostgreSQL in an isolated deployment. Full M7.2 remains open for trusted live validation, Person 4's browser acceptance, and the complete release evidence bundle.
+Person 3 owns this rehearsal. The migration/restart/restore foundation merged in PR #19; [PR #24](https://github.com/Kurisu-Labs/zecsolve/pull/24) merged the scoped report/export/replay recovery integration consuming PRs #20–#23. It exercises the current application and PostgreSQL in an isolated deployment. Full M7.2 remains open for trusted live validation, Person 4's browser acceptance, and the complete release evidence bundle.
 
 ## Run and inspect
 
@@ -47,7 +47,7 @@ This small-fixture envelope buffers at most 64 MiB of archive payload. It is a r
 
 ## Release acceptance tracking
 
-This matrix locates evidence and remaining work; it does not mark all PRD scenarios passed. Existing tests remain attributable to their own recorded runs in [DEVELOPMENT.md](DEVELOPMENT.md).
+The [release evidence index](release-evidence.md) expands this matrix into named tests, revision-specific CI runs, a retained sanitized report, offline demo commands and remaining owners. This summary locates evidence and remaining work; it does not mark all PRD scenarios passed. Existing tests remain attributable to their own recorded runs in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 | PRD row | Backend evidence / contribution here | Remaining release evidence |
 |---|---|---|

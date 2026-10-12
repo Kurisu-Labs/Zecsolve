@@ -132,11 +132,13 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 | Owner / work stream | First deliverable | Integration boundary |
 |---|---|---|
 | Person 1 — access | M4.0–M4.2 access foundation, grants and sessions merged | Own shared auth/models/migrations; consumers reuse the same authorization context |
-| Person 2 — reports/export | M4.5/M5 backend implemented; see task board for PR integration | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
-| Person 3 — workflow/integration/release | Listing, submissions, deployment/recovery preparation merged; live validation needs an endpoint | Own submission services and deployment; consume access contracts and Person 4's built app |
-| Person 4 — all frontend | M6.0 Vue shell when frontend work is resumed | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
+| Person 2 — reports/export | M4.5/M5 backend merged in PRs #20–#23 | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
+| Person 3 — workflow/integration/release | Listing, submissions and deployment/recovery/export integration merged, including PR #24; consolidate release evidence while live validation awaits an endpoint | Own submission services and deployment; consume access contracts and Person 4's built app |
+| Person 4 — all frontend | Complete remaining M6 integration and browser acceptance after resumption | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
-These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. All M6 work remains deferred despite Person 4's assignment. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
+These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. The initial frontend is partial; remaining M6 integration/acceptance retains its explicit-resumption gate. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
+
+Person 3 maintains the [release evidence index](docs/release-evidence.md): recorded A-01–A-15 scenarios, sanitized CI recovery results, offline demo steps and operator/P4/team handoffs. Full M7 remains incomplete until its required gates pass.
 
 ## Before handing off a change
 

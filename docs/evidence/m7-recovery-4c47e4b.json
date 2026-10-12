@@ -1,0 +1,197 @@
+{
+  "checks": [
+    "trusted TLS certificate and migrated/encrypted/verifier readiness",
+    "HTTP redirects to the configured HTTPS hostname",
+    "actual frontend build, assets, SPA routes and API share one origin",
+    "public POC and documentation routes are disabled",
+    "TLS session cookies, restoration, Origin/CSRF, logout and parent revocation",
+    "ingress rejects oversized fixed-length and chunked bodies",
+    "API rate limit cannot be bypassed with forwarded client headers",
+    "non-root containers enforce memory/CPU/PID limits and private API binding",
+    "readiness fails during database outage and recovers after restart",
+    "container logs exclude request codes, authorization and configured secrets",
+    "populated 0008 to packaged-head forward migration preserves legacy rows and allocation",
+    "public fixture verifies; offline approval denied; simulated allocation seeded",
+    "before_restart: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "after_api_restart: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "API crash preserves sessions and claim/evidence/approval retries without new rows",
+    "after_database_restart: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "database restart preserves balances, exact evidence, consent, audit and retry records",
+    "encrypted full-database archive rejects wrong backup key and tampering before restore",
+    "after_encrypted_restore: scoped HTTPS permissions, exact exports and isolated offline replay",
+    "fresh-database restore preserves every application row, decryption and retry outcome",
+    "restored constraints/triggers reject invalid writes; missing/wrong evidence keys fail",
+    "restored reviewer revocation prevents new reports, evidence reads and exports",
+    "restored grant revocation blocks even a previously accepted customer retry",
+    "recovery logs exclude credentials, cookies, claims and database secrets"
+  ],
+  "scope": "M7.1 backend and TLS session preparation; browser acceptance pending",
+  "at": "2026-10-12T07:34:34.032559+00:00",
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.14.8",
+  "docker": "28.0.4",
+  "revision": "4c47e4bf9f3c603c9ae6853c82de1fb0f207d8da",
+  "working_tree_changes": false,
+  "recovery": {
+    "scope": "M7.2 backend and export/replay recovery integration",
+    "migration": {
+      "from_revision": "0008",
+      "to_revision": "0009",
+      "preserved_tables": [
+        "cases",
+        "claims",
+        "evidence",
+        "evidence_contents",
+        "invoices",
+        "merchants",
+        "output_allocations",
+        "resolutions",
+        "verifications"
+      ],
+      "legacy_allocation_zat": 100000,
+      "source_kind": "SYNTHETIC",
+      "schema_removed": true
+    },
+    "source_kind": "PUBLIC_FIXTURE_AND_SIMULATED_ACCOUNTING",
+    "live_confirmation": false,
+    "release_complete": false,
+    "archive_sha256": "b4df48f1ac6ee836fcd881620783f807d0b7f08e177f77558f1f49248fbbc4e8",
+    "restored_rows_sha256": "52ea00c48b161da88f5b8930d84d9170e04ae9890e291576e2a0abe73ce1cb06",
+    "counts": {
+      "access_submission_requests": 3,
+      "browser_sessions": 7,
+      "case_creation_requests": 1,
+      "case_events": 7,
+      "case_grants": 5,
+      "case_resolution_requests": 1,
+      "case_verification_requests": 1,
+      "cases": 1,
+      "chain_observations": 3,
+      "claims": 1,
+      "decision_evaluations": 1,
+      "evidence": 3,
+      "evidence_consents": 2,
+      "evidence_contents": 3,
+      "evidence_submission_requests": 1,
+      "grant_creation_requests": 5,
+      "grant_evidence": 3,
+      "invoice_creation_requests": 1,
+      "invoice_policies": 1,
+      "invoices": 1,
+      "merchant_credentials": 2,
+      "merchants": 2,
+      "observation_requests": 0,
+      "output_allocations": 1,
+      "resolutions": 1,
+      "verification_evaluations": 1,
+      "verifications": 1
+    },
+    "export_replay": {
+      "network": "none",
+      "checkpoints": [
+        {
+          "stage": "before_restart",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "6c5b52eb7ebd4cabd21a928c5ac50a78764d78b6c218ba0ac079c21d5459d98f",
+              "history_sha256": "d46063d45f6ce2337343fb7f81caa31cf018cdd5da064e304a6c32725d5cad5d",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "9eae47b7cce47315dbf258f8e516f99fd7fbacb50a74d15271a055f064595976",
+              "history_sha256": "f4cc72ffe937c1ad61e908b64ab8a7a180457ed35b4080bca7390b1a11eae5a6",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "25a8ea22a277ca760a7f39305d41d90328983782fcfd1b8ad747070b398255c1",
+              "history_sha256": "b5d9448f1aa017d97245611e538e1f8b48a251c2bc051e88d2bf4196da48156d",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        },
+        {
+          "stage": "after_api_restart",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "d36b523eafeb5820b0ffb6f0e354364e8d6d360825998eacf6007de511a86add",
+              "history_sha256": "d46063d45f6ce2337343fb7f81caa31cf018cdd5da064e304a6c32725d5cad5d",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "3f764343f35cf5d12a3c6e16ab1eab404c9aa0098cec430de460e5be7108681b",
+              "history_sha256": "f4cc72ffe937c1ad61e908b64ab8a7a180457ed35b4080bca7390b1a11eae5a6",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "25c144a444c0ea41cd4c91089901f148c60ddf7337d7d37b2d79d74192a8edfb",
+              "history_sha256": "b5d9448f1aa017d97245611e538e1f8b48a251c2bc051e88d2bf4196da48156d",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        },
+        {
+          "stage": "after_database_restart",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "b50f461e2a5ed054eee0c3936bc888adf657de40c6ee8665cc578db96e865fee",
+              "history_sha256": "d46063d45f6ce2337343fb7f81caa31cf018cdd5da064e304a6c32725d5cad5d",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "eeb089a88635c27904a9f23de57f1e1209c1dd0db5e88b7401e7a8d13109d964",
+              "history_sha256": "f4cc72ffe937c1ad61e908b64ab8a7a180457ed35b4080bca7390b1a11eae5a6",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "cbc8a294c1b2e779415c697d45da9d4c1e06fce5ab1e668d60fd5f8b9cb0c410",
+              "history_sha256": "b5d9448f1aa017d97245611e538e1f8b48a251c2bc051e88d2bf4196da48156d",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        },
+        {
+          "stage": "after_encrypted_restore",
+          "exports": {
+            "merchant": {
+              "packet_sha256": "6583bc87a1cb1798b2c02576ad4613d1494aabcd3ae358daf8dd0f4834d0e746",
+              "history_sha256": "d46063d45f6ce2337343fb7f81caa31cf018cdd5da064e304a6c32725d5cad5d",
+              "replay_status": "REPRODUCED",
+              "exit_code": 0
+            },
+            "reviewer": {
+              "packet_sha256": "bae97ad0a423eb54b538658967c1eab0e2baf85e683543d42aab6691b6fb84e7",
+              "history_sha256": "f4cc72ffe937c1ad61e908b64ab8a7a180457ed35b4080bca7390b1a11eae5a6",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            },
+            "case_only": {
+              "packet_sha256": "cb9c7e2f5e972a6dc6947f1f24c808ffaf57ced6e91ff0ff3c5fad2c607dc389",
+              "history_sha256": "b5d9448f1aa017d97245611e538e1f8b48a251c2bc051e88d2bf4196da48156d",
+              "replay_status": "LIMITED",
+              "exit_code": 2
+            }
+          },
+          "tampered_replay": "FAILED"
+        }
+      ],
+      "restored_reviewer_revocation": "PASS"
+    },
+    "remaining_gates": [
+      "M3.1 live validation",
+      "M6 browser acceptance",
+      "full M7 release evidence"
+    ]
+  }
+}

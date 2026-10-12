@@ -95,7 +95,7 @@ The harness creates a unique Compose project, random test-only credentials, a sh
 
 `--keep-on-failure` retains the unique test project and private diagnostics for local repair; use the reported `coordinates.json` to recover its project name and nonsecret settings, then remove only that project. Do not share the retained directory: it also holds disposable secrets. The [deployment workflow](../.github/workflows/deployment.yml) runs the same actual-container checks in CI. Configuration parsing alone is not acceptance evidence.
 
-Add `--recovery` for the [M7.2 backend recovery rehearsal](recovery.md): populated forward migrations, API crash/database restart, lost-response retries, and an encrypted full-database backup restored into a fresh database. CI runs this combined command and retains its sanitized evidence. This backend preparation does not close the live, export/replay, browser or full release gates.
+Add `--recovery` for the [M7.2 backend recovery rehearsal](recovery.md): populated forward migrations, API crash/database restart, lost-response retries, and an encrypted full-database backup restored into a fresh database. CI runs this combined command and retains its sanitized evidence. Scoped export/replay recovery merged in PR #24; the [release evidence index](release-evidence.md) records its results. Live validation, browser acceptance and full release remain open.
 
 Local results and the remaining M7.1 gate are recorded in [DEVELOPMENT.md](DEVELOPMENT.md). General application changes still require `make test`, `make lint`, and the relevant PostgreSQL suite under [CONTRIBUTING.md](../CONTRIBUTING.md).
 
