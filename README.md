@@ -1,6 +1,6 @@
 # zecsolve
 
-**Person 4 frontend integration (October 12):** M6 integration and actual-backend browser evidence merged in [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); see [frontend handoff](docs/frontend.md). P3 browser CI and the packaged deployment rehearsal merged in [PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28). The final release bundle and demo rehearsal are tracked on `test/m7-final-release-bundle`; operator/team handoffs remain open.
+**Person 4 frontend integration (October 12):** M6 integration and actual-backend browser evidence merged in [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); see [frontend handoff](docs/frontend.md). P3 browser CI and the packaged deployment rehearsal merged in [PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28). The final release bundle and demo rehearsal merged in [PR #29](https://github.com/Kurisu-Labs/zecsolve/pull/29); operator/team handoffs remain open.
 
 **Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
 

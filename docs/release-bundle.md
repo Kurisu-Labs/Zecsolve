@@ -10,9 +10,10 @@ artifacts remain outstanding. See the [handoff table](#remaining-release-handoff
 The tested implementation candidate is
 `775ca5d80956a79c836e9cccd209f26025af310a`, based on main
 `ded49e1f6a38cd3d88bc475ed8c688dcf4acec9f` (merged PR #28).
-Subsequent commits on `test/m7-final-release-bundle` assemble reports and docs.
+The subsequent documentation commit and candidate merged in [PR #29](https://github.com/Kurisu-Labs/zecsolve/pull/29) at
+`5ed3cc1feae322eab4bf3fd9e5b459efc05bbe34`. Retained candidate reports stay unchanged.
 This is a pinned candidate, not a claim about every future `main` or a deployed
-image. After merge, record the merge SHA/image in the operator handoff; rerun
+image. Record the chosen merge SHA/image in the operator handoff; rerun
 relevant checks if implementation changes.
 
 Start with the [machine-readable inventory](evidence/m7-release-bundle.json).
@@ -164,7 +165,7 @@ prevent the public-fixture demo. See [recovery](recovery.md) and
 
 | Owner | State | Concrete evidence required |
 |---|---|---|
-| P3 / reviewer | Pending PR review/merge | Review this bundle, final branch CI and lineage; after merge bind the chosen image to the actual merge SHA. Branch creation/code alone is not completion. |
+| P3 / reviewer | Bundle/rehearsal merged in PR #29 | Technical slice complete at merge `5ed3cc1`; chosen deployment image still needs exact revision attribution in the operator handoff. See [browser failure investigation](browser-ci.md#pr-29-intermittent-browser-failure-investigation) for the recorded transient CI failure. |
 | Operator + P3 | Not run on a real target | Host/domain and exact image; TLS/access provisioning; explicit RPC configuration; encrypted volume; external evidence/backup-key custody; actual backup/restore record and recovery/revocation reconciliation. No target is selected here. |
 | P4 | Not supplied | Reviewed merchant/customer/reviewer screenshots showing disclosure, permission and proof limits, with revision/time/scenario attribution. Automated browser results are already recorded. |
 | Team lead + team | Not supplied | Two genuine merchant/provider discovery notes (including negative feedback/evidence availability), English presentation/demo recording, and registration/submission confirmation. P3 indexes supplied artifacts; no outreach or submission occurs in this task. |
@@ -174,5 +175,5 @@ Use the [evidence handoff fields](release-evidence.md#remaining-handoffs-and-rel
 owner, A-IDs, exact revision/image, UTC time, environment, command/scenario, actual
 outcome, input classification, sanitized artifact path/hash and CI/PR link, limits.
 Missing evidence remains `not supplied` or `not run`; do not turn it into a pass.
-This bundle closes P3's assembly/rehearsal slice only after review/CI/merge. Full
+PR #29 closed P3's technical assembly/rehearsal slice after review/CI/merge. Full
 M7 remains incomplete until the required operator/team artifacts are accepted.

@@ -1,12 +1,12 @@
 # Zecsolve — P0 Implementation and Assignment Board
 
-**Person 4 frontend integration (October 12):** M6 integration and actual-backend browser evidence merged in [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); see [frontend handoff](frontend.md). P3 browser CI and the packaged deployment rehearsal merged in [PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28). The final release bundle and demo rehearsal are tracked on `test/m7-final-release-bundle`; operator/team handoffs remain open.
+**Person 4 frontend integration (October 12):** M6 integration and actual-backend browser evidence merged in [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); see [frontend handoff](frontend.md). P3 browser CI and the packaged deployment rehearsal merged in [PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28). The final release bundle and demo rehearsal merged in [PR #29](https://github.com/Kurisu-Labs/zecsolve/pull/29); operator/team handoffs remain open.
 
 **Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
 
 **Baseline:** October 10, 2026
 
-**Assignment/status update:** October 12, 2026
+**Assignment/status update:** October 13, 2026
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
@@ -72,7 +72,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 | M4 | Backend complete; M4.0–M4.5 merged | Browser implementation/evidence merged in PR #26; deployed CI integration merged in PR #28 | Remaining P0-01 and P0-06 |
 | M5 | Backend implemented and validated | Download/browser integration merged in PR #26 and live evidence in PR #27; full release remains gated | P0-08 |
 | M6 | Person 4 implementation and recorded browser acceptance merged in PR #26 | M6.0–M6.6 integrated against the actual backend | P0-07 |
-| M7 | Backend deployment/recovery merged (PRs #17/#19/#24); PR #25 evidence changes are in main; browser CI/release integration merged in PR #28; final bundle/demo validated; review/merge pending | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
+| M7 | Backend deployment/recovery merged (PRs #17/#19/#24); PR #25 evidence changes are in main; browser CI/release integration merged in PR #28; final bundle/demo merged in PR #29 | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
 
 ### Ownership and coordination
 
@@ -95,9 +95,9 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 `Ready` means prerequisites exist, not that work is claimed. `Waiting` means a listed merge/integration dependency is incomplete. `Externally blocked` means an operator-supplied dependency is missing. `Deferred` means the user has not resumed that scope. Add `In progress`, `In review`, and `Done` only with branch/PR and validation evidence.
 
-M4.0–M4.5 and M5.0–M5.2 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 has implemented scoped reports, packet contracts, replay and export; task validation and integration references are tracked below. Person 3's M7.1 backend preparation and M7.2 recovery/export integration are merged in PRs #17/#19/#24. Release evidence consolidation is in main through PR #25. Browser CI/release integration merged in PR #28; the final bundle proceeds on `test/m7-final-release-bundle`; full M7 still requires operator/team and final evidence gates.
+M4.0–M4.5 and M5.0–M5.2 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 has implemented scoped reports, packet contracts, replay and export; task validation and integration references are tracked below. Person 3's M7.1 backend preparation and M7.2 recovery/export integration are merged in PRs #17/#19/#24. Release evidence consolidation is in main through PR #25. Browser CI/release integration merged in PR #28; the final bundle/demo rehearsal merged in PR #29; full M7 still requires operator/team and final evidence gates.
 
-Person 4's PR #26 merged the resumed M6 implementation and actual-backend browser evidence. M3.1 live validation merged in PR #27. Person 3 completed browser CI/packaged deployment integration in PR #28 and can assemble the release bundle without waiting for frontend or RPC setup. These tests remain offline/simulated; ongoing deployment still requires operator configuration.
+Person 4's PR #26 merged the resumed M6 implementation and actual-backend browser evidence. M3.1 live validation merged in PR #27. Person 3 completed browser CI/packaged deployment integration in PR #28 and the technical release bundle/demo rehearsal in PR #29. These tests remain offline/simulated; ongoing deployment still requires operator configuration.
 
 ### Feature board
 
@@ -123,7 +123,8 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Implementation and recorded browser evidence merged in PR #26; P3 CI/deployment integration merged in PR #28 |
 | [M6.6 — Browser acceptance](#m6-6) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Implementation and recorded browser evidence merged in PR #26; P3 CI/deployment integration merged in PR #28 |
 | [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend/TLS preparation and browser CI/deployment integration merged in PRs #17/#28; target-specific operator acceptance remains |
-| [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-final-release-bundle` | PRs #24/#26/#27/#28 merged and PR #25 changes in main; operator/team artifacts for full completion | Final bundle/demo rehearsal validated; review/merge pending; browser CI and historical recovery/evidence merged; operator/team release gates remain |
+| [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-final-release-bundle` | PRs #24/#26/#27/#28 merged and PR #25 changes in main; operator/team artifacts for full completion | Final bundle/demo rehearsal merged in PR #29; browser CI and historical recovery/evidence merged; operator/team release gates remain |
+| [M7 follow-up — Browser CI diagnostics](#m7-browser-diagnostics) | Person 3 | `fix/browser-ci-diagnostics` | PR #29 merged; existing P4 suite | Diagnostics implemented and investigation recorded; review/merge pending; original intermittent cause undetermined |
 
 ### Task cards
 
@@ -365,7 +366,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M7.2 — Release rehearsal
 
-- **Owner:** Person 3. **Branch:** `test/m7-final-release-bundle` (follows PRs #19/#24/#28 and the PR #25 evidence changes). **Status:** Final bundle/demo rehearsal validated; review/merge pending; PR #28 browser CI integration is merged; full release remains waiting on operator/team evidence.
+- **Owner:** Person 3. **Branch:** `test/m7-final-release-bundle` (follows PRs #19/#24/#28 and the PR #25 evidence changes). **Status:** Final bundle/demo rehearsal merged in PR #29; PR #28 browser CI integration is merged; full release remains waiting on operator/team evidence.
 - **Prerequisites:** M4.5/M5.0–M5.2 and the PR #19/#24 recovery/export integration are merged, enabling evidence consolidation without RPC. M7.1, M3.1, all M4/M5 tasks and M6.6 are required for full completion.
 - **Goal:** Assemble reproducible release acceptance and recovery evidence. The current slice assembles a revision-pinned technical release bundle, asserts the three demo scenarios and replay limits, retains sanitized CI reports, and refreshes A-01–A-15 and status references.
 - **Owned code:** Current slice: `scripts/rehearse_release.py`, the existing service demo and authorized public sample, shared CI registration, rehearsal regression checks, and documentation/evidence. P4 retains scenario/UI ownership; no independent UI implementation. Person 4 supplies reviewed UI screenshots.
@@ -373,6 +374,19 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 - **Public interfaces:** Use P4’s Playwright suite and build output, existing workflow/export/replay/deployment interfaces, and sanitized JSON evidence artifacts; collect team-provided discovery/submission evidence and preserve attribution.
 - **Acceptance checks:** For this slice, the three PRD demo scenarios and six replay outcomes and the authorized public sample pass in the repeatable runner; the pinned candidate has attributable repository, frontend, deployed browser/recovery and simulated browser CI. The bundle covers A-01–A-15 and associates the unchanged historical live run without relabeling it as a new execution. Results identify revision/environment and simulation limits, contain no secrets/raw browser diagnostics, and stale statuses are corrected without rewriting history. For full M7.2, migration, restart/lost-response recovery and encrypted restore pass. At every checkpoint, exact permitted bytes/history, balances and authorization survive; merchant packets reproduce with the packaged offline CLI, reviewer packets remain limited, and tampering fails. Restored revocation denies future reads/exports. All A-01–A-15 rows must have attributable evidence and required gates pass for full completion. Missing required evidence or operator/team handoffs keeps full release incomplete. Document limits and recovery without losing accepted allocations.
 - **Validation evidence:** [Backend recovery procedure and acceptance matrix](recovery.md) and [Item 15](DEVELOPMENT.md#item-15--m72-backend-recovery-rehearsal) record forward migrations, process/database restarts, lost-response retries, encrypted fresh-database restore and restored invariants: 19 actual-container groups, 211 PostgreSQL tests and six archive tests passed locally. The native subprocess timeout limitation is recorded explicitly. Combined deployment/recovery CI emits a sanitized revision/time/environment report. PR #19 merged. PR #24 merged the export/replay integration with 24 container groups and complete Linux suites, recorded in [Item 20](DEVELOPMENT.md#item-20--m72-exportreplay-recovery-integration). The [release evidence index](release-evidence.md) retains the sanitized CI report and scenario mapping; [Item 21](DEVELOPMENT.md#item-21--m72-release-evidence-consolidation) records this documentation validation. Live evidence merged in PR #27 and P4 browser evidence in PR #26. The [browser CI procedure](browser-ci.md), E-07–E-09 in the release index and [Item 23](DEVELOPMENT.md#item-23--m7-browser-ci-and-release-integration) record the passing integration; [Item 24](DEVELOPMENT.md#item-24--m72-final-release-bundle-and-demo-rehearsal), the [candidate release bundle](release-bundle.md) and E-10–E-13 add fresh repository/browser/recovery/demo evidence and an authorized public sample; operator, reviewed UI screenshots and team-supplied release artifacts remain separate handoffs. All cards also require the common definition of done below.
+
+<a id="m7-browser-diagnostics"></a>
+
+#### M7 follow-up — Browser CI diagnostics
+
+- **Owner:** Person 3. **Branch:** `fix/browser-ci-diagnostics`. **Status:** Implemented and validated; review/merge pending.
+- **Prerequisites:** PR #29 merged; consume the existing P4 suite and P3 CI/deployment harness.
+- **Goal:** Retain useful, safe failure evidence and investigate PR #29's intermittent browser failure without masking it.
+- **Owned code:** P3 browser/deployment runners, shared CI artifact registration, reporter regression tests, current status and investigation documentation.
+- **Exclusions:** No frontend application/scenario edits, automatic retries, relaxed assertions/timeouts/limits, RPC calls, private artifacts or full-release declaration.
+- **Public interfaces:** Sanitized schema-version-1 browser JSON with outcome/reason, exit code, selected scenario and attempt status/duration, known source locations, environment/revision and unchanged proof limits. Exact CI artifact paths are in [browser-ci.md](browser-ci.md).
+- **Acceptance checks:** Browser failure still fails the job while its safe report survives cleanup; malformed/missing/retried/skipped/flaky selections fail closed; injected secrets never escape into reports/errors. Unchanged packaged scenarios pass on fresh disposable deployments. Distinguish reproduced facts from unresolved hypotheses and record original/fresh runs.
+- **Validation evidence:** [Investigation and commands](browser-ci.md#pr-29-intermittent-browser-failure-investigation) and [Item 25](DEVELOPMENT.md#item-25--browser-ci-failure-diagnostics-and-pr-29-investigation). The original failure cannot be attributed because its raw report was discarded; passing repeats are not a root-cause finding. Common definition of done still requires review, CI and merge.
 
 ### Definition of done
 
@@ -618,7 +632,7 @@ Use the [release evidence index](release-evidence.md) for A-01–A-15 run refere
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** M4.0–M4.5 and M5.0–M5.2 are merged. Person 3’s export/replay recovery merged in PR #24. The release-evidence consolidation is present in main. The M3.1 live fixture observation and merchant approval trace merged in PR #27. The [remaining handoffs](release-evidence.md#remaining-handoffs-and-release-decision) identify operator/team artifacts for full release. Person 4's M6 implementation/browser evidence merged in PR #26. P3 browser CI/deployed acceptance merged in PR #28. P3 has assembled the [release bundle and demo rehearsal](release-bundle.md) on `test/m7-final-release-bundle`. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** M4.0–M4.5 and M5.0–M5.2 are merged. Person 3’s export/replay recovery merged in PR #24. The release-evidence consolidation is present in main. The M3.1 live fixture observation and merchant approval trace merged in PR #27. The [remaining handoffs](release-evidence.md#remaining-handoffs-and-release-decision) identify operator/team artifacts for full release. Person 4's M6 implementation/browser evidence merged in PR #26. P3 browser CI/deployed acceptance merged in PR #28. P3's [release bundle and demo rehearsal](release-bundle.md) merged in PR #29. The P3 follow-up on `fix/browser-ci-diagnostics` retains safe failure artifacts and records the [intermittent-failure investigation](browser-ci.md#pr-29-intermittent-browser-failure-investigation); its review/CI/merge remain required. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 
