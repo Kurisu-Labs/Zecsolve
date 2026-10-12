@@ -7,6 +7,8 @@ import os
 import time
 from http.cookies import SimpleCookie
 
+from recovery_exports import ExportRecovery
+
 
 def rehearse(root, directory, compose, run, request, origin, passed):
     worker = (root / "scripts/recovery_state.py").read_text()
@@ -107,8 +109,17 @@ def rehearse(root, directory, compose, run, request, origin, passed):
     )
     assert status == 201
     evidence_ack = json.loads(body)
+    status, _, body = http(
+        path + "/evidence",
+        method="POST",
+        body={**scoped, "source": "Consented public fixture excluded from reviewer selection"},
+        headers={**customer, "Idempotency-Key": "recovery-unselected"},
+    )
+    assert status == 201
     context = {
         **identity,
+        "claim_id": claim_ack["submission_id"],
+        "unselected_id": json.loads(body)["submission_id"],
         "evidence_id": evidence_ack["submission_id"],
         "legacy_request": legacy,
         "evidence_request": scoped,
@@ -122,11 +133,14 @@ def rehearse(root, directory, compose, run, request, origin, passed):
     )
     assert status == 409 and "CREDIT_INELIGIBLE" in body.decode()
     accepted = state("approve", **context)
+    exports = ExportRecovery(root, compose, run, http, origin, context, customer, claim, passed)
     baseline = state("check", **context)
     assert baseline["counts"]["output_allocations"] == 1
     passed("public fixture verifies; offline approval denied; simulated allocation seeded")
+    exports.check("before_restart")
+    assert state("check", **context) == baseline
 
-    def recovered():
+    def recovered(stage):
         assert http("/api/session", headers=customer)[0] == 200
         for route, payload, expected in (
             ("claims", claim, claim_ack),
@@ -165,18 +179,19 @@ def rehearse(root, directory, compose, run, request, origin, passed):
             assert status == 409 and "IDEMPOTENCY_CONFLICT" in body.decode()
         assert http(path + "/report", headers=customer)[0] == 403
         assert http(path + "/report", headers=merchant)[0] == 200
+        exports.check(stage)
         assert state("check", **context) == baseline
 
     # Exercise a real process loss, rather than recreating only Python service objects.
     run(compose + ["kill", "-s", "SIGKILL", "api"])
     run(compose + ["up", "-d", "--wait", "--wait-timeout", "120", "api"])
-    recovered()
+    recovered("after_api_restart")
     passed("API crash preserves sessions and claim/evidence/approval retries without new rows")
     run(compose + ["stop", "api"])
     run(compose + ["restart", "db"])
     run(compose + ["up", "-d", "--wait", "--wait-timeout", "120", "db"])
     run(compose + ["up", "-d", "--wait", "--wait-timeout", "120", "api"])
-    recovered()
+    recovered("after_database_restart")
     passed("database restart preserves balances, exact evidence, consent, audit and retry records")
 
     # Stop the sole writer for a consistent recovery point. Never dump an existing user database.
@@ -274,9 +289,10 @@ def rehearse(root, directory, compose, run, request, origin, passed):
     assert source_url.endswith("/zecsolve")
     database_secret.write_text(source_url.removesuffix("/zecsolve") + "/recovery_restored")
     run(compose + ["up", "-d", "--force-recreate", "--wait", "--wait-timeout", "120", "api"])
-    recovered()
+    recovered("after_encrypted_restore")
     passed("fresh-database restore preserves every application row, decryption and retry outcome")
     passed("restored constraints/triggers reject invalid writes; missing/wrong evidence keys fail")
+    exports.revoke_restored()
     # A final role revocation confirms restored access is still actively enforced.
     assert http(path + "/grants/" + identity["grant_id"], method="DELETE", headers=merchant)[0] in (
         200,
@@ -294,11 +310,12 @@ def rehearse(root, directory, compose, run, request, origin, passed):
     passed("restored grant revocation blocks even a previously accepted customer retry")
     secrets = [identity["token"], identity["access_code"], claim["note"], source_url]
     secrets += [cookie.value for cookie in cookies.values()]
+    secrets += exports.secrets
     logs = run(compose + ["logs", "--no-color", "api", "ingress"])
     assert all(secret not in logs for secret in secrets)
     passed("recovery logs exclude credentials, cookies, claims and database secrets")
     return {
-        "scope": "M7.2 backend recovery preparation",
+        "scope": "M7.2 backend and export/replay recovery integration",
         "migration": migration,
         "source_kind": "PUBLIC_FIXTURE_AND_SIMULATED_ACCOUNTING",
         "live_confirmation": False,
@@ -306,10 +323,13 @@ def rehearse(root, directory, compose, run, request, origin, passed):
         "archive_sha256": hashlib.sha256(stored).hexdigest(),
         "restored_rows_sha256": baseline["rows_sha256"],
         "counts": baseline["counts"],
+        "export_replay": {
+            "network": "none",
+            "checkpoints": exports.checkpoints,
+            "restored_reviewer_revocation": "PASS",
+        },
         "remaining_gates": [
             "M3.1 live validation",
-            "M4.5 scoped reports",
-            "M5 export/replay",
             "M6 browser acceptance",
             "full M7 release evidence",
         ],
