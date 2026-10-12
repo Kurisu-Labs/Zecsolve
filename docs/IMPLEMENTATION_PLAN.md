@@ -126,7 +126,9 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M6.6 — Browser acceptance](#m6-6) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Implementation and recorded browser evidence merged in PR #26; P3 CI/deployment integration merged in PR #28 |
 | [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend/TLS preparation and browser CI/deployment integration merged in PRs #17/#28; target-specific operator acceptance remains |
 | [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-final-release-bundle` | PRs #24/#26/#27/#28 merged and PR #25 changes in main; operator/team artifacts for full completion | Final bundle/demo rehearsal merged in PR #29; browser CI and historical recovery/evidence merged; operator/team release gates remain |
-| [M7 follow-up — Browser CI diagnostics](#m7-browser-diagnostics) | Person 3 | `fix/browser-ci-diagnostics` | PR #29 merged; existing P4 suite | Diagnostics implemented and investigation recorded; review/merge pending; original intermittent cause undetermined |
+| [M7 follow-up — Browser CI diagnostics](#m7-browser-diagnostics) | Person 3 | `fix/browser-ci-diagnostics` | PR #29 merged; existing P4 suite | Merged in PR #30; original intermittent cause undetermined |
+
+| [M7 follow-up — Vercel deployment](#m7-vercel-deployment) | Person 3 | `feat/vercel-deployment` | PRs #26–#30 merged; approved hosting and demo access | Hosted fixture validation recorded; integration tracked in [PR #31](https://github.com/Kurisu-Labs/zecsolve/pull/31); full operator/release gates remain |
 
 ### Task cards
 
@@ -390,9 +392,11 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 - **Acceptance checks:** Browser failure still fails the job while its safe report survives cleanup; malformed/missing/retried/skipped/flaky selections fail closed; injected secrets never escape into reports/errors. Unchanged packaged scenarios pass on fresh disposable deployments. Distinguish reproduced facts from unresolved hypotheses and record original/fresh runs.
 - **Validation evidence:** [Investigation and commands](browser-ci.md#pr-29-intermittent-browser-failure-investigation) and [Item 25](DEVELOPMENT.md#item-25--browser-ci-failure-diagnostics-and-pr-29-investigation). The original failure cannot be attributed because its raw report was discarded; passing repeats are not a root-cause finding. Common definition of done still requires review, CI and merge.
 
+<a id="m7-vercel-deployment"></a>
+
 #### M7 follow-up — Vercel public-fixture deployment
 
-- **Owner:** Person 3. **Branch:** `feat/vercel-deployment`. **Status:** Deployed and validated at `c721aea`; repository integration is subject to this branch's PR/CI/merge gate.
+- **Owner:** Person 3. **Branch:** `feat/vercel-deployment`. **Status:** Deployed and validated at `c721aea`; repository integration is tracked in [PR #31](https://github.com/Kurisu-Labs/zecsolve/pull/31).
 - **Prerequisites:** PRs #26–#30 merged; operator-authorized Vercel Hobby/Neon Free target, public RPC/fixture and private 30-day demo merchant access.
 - **Goal:** Host the actual application and native verifier under one HTTPS origin, preserving existing access and durable encrypted evidence.
 - **Owned code:** Shared Docker stages, Vercel service/routing configuration, dedicated backend runtime adapter/tests, deployment CI registration, operator guide and sanitized evidence.

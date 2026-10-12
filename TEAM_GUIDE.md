@@ -69,7 +69,7 @@ The POC runs without PostgreSQL; readiness requires a migrated database, verifie
 | `contracts/verifier-result.schema.json` | Generated result schema for future consumers |
 | `fixtures/` | Public historical receipt, raw transaction, tampered copy and provenance hashes |
 | `scripts/poc.py` | End-to-end offline demonstration with a synthetic invoice |
-| `infra/Dockerfile.api`, `compose.yaml` | Development deployment; Rust and FastAPI share one backend image |
+| `Dockerfile.vercel`, `compose.yaml`, `vercel.json` | Shared development/deployment image and same-origin Vercel service; [hosted operator guide](docs/vercel-deployment.md) |
 | `.github/workflows/ci.yml` | Formatting, linting, Rust/Python tests, PostgreSQL integration and POC |
 
 All commands in the README run from the repository root. Python source lives under `apps/api/src`; installing with uv makes `import zecsolve` work without ad hoc path changes.

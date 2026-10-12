@@ -9,6 +9,7 @@ origin. This is a public-fixture demonstration; no ZEC was sent during setup.
 
 | Item | Value |
 |---|---|
+| Delivery PR | [PR #31](https://github.com/Kurisu-Labs/zecsolve/pull/31) |
 | Application revision | `c721aea6ee2e3b7379bd19d90f70fbecb6f06da2` |
 | Deployment | `dpl_9KuhxWXxFjhPX8fCZSZ4XUXFYBoU` |
 | Container digest | `sha256:d09d502b23856c0db12862a976111d8173e5fac9c8112d5199209156b015adb9` |

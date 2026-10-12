@@ -947,3 +947,8 @@ remain operator tasks. Reviewed P4 screenshots and team release artifacts
 remain separate. Vercel Hobby organization-Git restrictions require manual CLI
 releases; Git pushes do not deploy automatically. Full M7/private-customer
 release is not complete. This slice requires its final PR checks and merge.
+
+The temporary local app/database containers were stopped and removed; Colima
+was returned to its initially stopped state. The hosted app/database and private
+operator handoff files remain available. Integration is tracked in
+[PR #31](https://github.com/Kurisu-Labs/zecsolve/pull/31).
