@@ -68,3 +68,44 @@ submission and observation formats, complete history and scoped disclosure.
 hashes, preserved historical hashes, scope invariants and ambiguous encodings.
 M5.0 freezes this contract only; M5.1 adds local replay and M5.2 adds authorized
 snapshot export.
+
+## Offline replay (M5.1)
+
+After `make setup`, use the installed command:
+
+```sh
+uv run --locked replay-case fixtures/packets/complete-v1.json
+uv run --locked replay-case /path/to/authorized-packet.json --verifier target/debug/zecsolve-verifier
+```
+
+`python -m zecsolve.replay` is equivalent. The packet path is a local file, never
+a URL. The trusted verifier path comes only from the operator's `--verifier`
+argument or `ZECSOLVE_VERIFIER_PATH`; packet strings never select commands,
+programs, imports, downloads or network destinations. No database is opened and
+no credit is changed. The normal bounded verifier adapter enforces per-run input,
+output and timeout limits; the packet file read is capped at 64 MiB.
+
+The JSON response (`case-replay-v1`) contains independent checks for packet and
+historical integrity, real cryptographic recovery, rules/arithmetic, and missing
+or external context. Dispatch recognizes only the locally implemented verifier
+0.1.0 / result schema 1 / pinned Glasspane revision and rules 0.1.0 (initial) and
+0.2.0 (decision). Decision arithmetic uses the recorded clock and source-authority
+assertion; it does not freshly authorize the source or refresh the chain.
+
+| Exit | Status | Meaning |
+| --- | --- | --- |
+| 0 | REPRODUCED | Included full history reproduces; business/chain assertions remain external |
+| 1 | FAILED | File, contract, integrity, relationship, recovery or arithmetic mismatch |
+| 2 | LIMITED | Scoped omissions, missing version metadata/inputs, unavailable local verifier or historical runtime failure prevent full replay |
+| 3 | UNSUPPORTED | A declared historical implementation is not locally supported |
+
+A negative receipt result may reproduce as `NEGATIVE_RESULT_REPRODUCED`; that is
+not successful output recovery. A self-consistent rewritten packet can pass its
+hash checks and still fail real recovery or arithmetic. Conversely, self-consistent
+business assertions are not authenticated just because replay succeeds.
+
+`fixtures/packets/replay-results.json` records actual CLI outputs and exact input
+file SHA-256 values for valid, one-byte tampered, scoped, missing-version and
+unsupported-version examples. Regenerate them using
+`uv run python scripts/record_replay_examples.py`; all inputs are deterministic
+variants of the public/synthetic fixtures. This file contains results, not packets.

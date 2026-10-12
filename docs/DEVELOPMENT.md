@@ -432,3 +432,30 @@ to its pre-implementation base. No M5 PR/CI/merge is claimed. Remaining P2 work
 continues on local dependent task branches so implementation and tests remain
 reviewable. Once account access returns, publish and integrate M5.0, M5.1 and
 M5.2 in order through passing CI and merge-commit PRs; do not push to main.
+
+## Item 18 — offline replay (M5.1)
+
+Person 2 continued on local `feat/m5-replay-case`, based on validated M5.0 commit
+`8f02391`; GitHub account suspension prevents publishing or merging prerequisites.
+The core implementation is committed as `0ea6971`. No GitHub retry will be made
+until the user reports restored access. No CI/PR/merge completion is claimed.
+
+On Linux x86_64/Python 3.14.7/Rust 1.99.0 at 2026-10-12T03:45Z, `make lint` passed,
+`make test` passed **12 Rust and 269 Python tests**, including **19 new replay
+scenarios**. All 32 focused packet/replay tests passed. The installed `replay-case`
+entry point also reproduced the current complete fixture. The recorded actual
+CLI examples return valid=0/REPRODUCED, tampered=1/FAILED, scoped=2/LIMITED,
+missing-version=2/LIMITED, unsupported-version=3/UNSUPPORTED with input file hashes.
+
+The engine verifies original components, historical hashes and relationships
+before invoking the real bounded local verifier. Fixed historical dispatch
+reproduces initial rules 0.1.0 and decision rules 0.2.0 using recorded time and
+inputs. It distinguishes self-consistent hashes from recovered output and from
+external invoice/claim/chain/allocation assertions. Missing version fields cannot
+silently inherit the schema's default implementation. Packet data cannot select
+executables, download code or initiate network requests. No database or credit
+mutation is performed. Existing historical formats/hashes remain unchanged.
+
+See [replay usage and limits](packets.md#offline-replay-m51) and
+[recorded examples](../fixtures/packets/replay-results.json). M5.2 authorized
+snapshot export is the next local task; full remote integration remains pending.
