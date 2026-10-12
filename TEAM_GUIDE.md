@@ -6,7 +6,7 @@ This guide explains the foundation and backend milestones completed through Octo
 
 ## What we are building
 
-zecsolve helps merchants investigate shielded Zcash payments that do not match an invoice. A customer supplies an output-specific receipt; the verifier recovers the selected amount, receiver, and memo; deterministic rules explain the match; the merchant decides whether to allocate credit. The eventual case packet preserves evidence and decisions for review.
+zecsolve helps merchants investigate shielded Zcash payments that do not match an invoice. A customer supplies an output-specific receipt; the verifier recovers the selected amount, receiver, and memo; deterministic rules explain the match; the merchant decides whether to allocate credit. The versioned case packet preserves authorized evidence and decisions for offline replay.
 
 No component holds ZEC, submits refunds, or needs wallet-wide keys. Successful receipt recovery does not establish payer identity, chain inclusion, or merchant approval.
 
@@ -23,12 +23,12 @@ The originals were relocated without rewriting their contents. In particular, en
 | Area | Implemented now | Still needed |
 |---|---|---|
 | Zcash verification | Real historical Orchard fixture, tamper rejection, transaction binding, JSON results | Historical Sapling fixture; any newer transaction support must be tested explicitly |
-| API | Health/readiness, POC verification, owned invoice/case create/read, paginated merchant case listing, encrypted evidence upload/metadata, persisted verification, reports, and merchant decisions | Claims, export, customer/reviewer projections |
-| Database | Immutable snapshots, one case per invoice, encrypted evidence, verification/evaluation history, chained events, atomic decisions/allocations/retries | Access grants, retention/rotation workflows |
+| API | Health/readiness, POC verification, owned invoice/case create/read, paginated merchant case listing, encrypted evidence upload/metadata, persisted verification, reports, merchant decisions, customer claims, scoped reviewer reads and authorized export | P4 actual-browser integration |
+| Database | Immutable snapshots, one case per invoice, encrypted evidence, verification/evaluation history, chained events, atomic decisions/allocations/retries | Retention/rotation workflows |
 | Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Real-node integration validation; the trusted RPC adapter is implemented and offline remains the default |
-| Access | POC token; merchant credentials; owned invoice/case/evidence access with authorization rechecks | Customer grants, reviewer consent/sharing, browser sessions |
-| Frontend | Planned Vue 3 + TypeScript + Tailwind architecture | Dashboard, customer submission and reviewer report |
-| Export | Versioned verifier result and fixture manifest | Complete replayable case packet |
+| Access | Merchant credentials, customer/reviewer grants, consent selection, HTTPS browser sessions and authorization rechecks | P4 browser disclosure/acceptance |
+| Frontend | Initial Vue implementation in PR #12; Person 4 owns it | Remaining actual-backend and browser integration |
+| Export | CasePacketV1, authorized snapshot export and offline historical replay | P4 download flow and release rehearsal |
 
 The POC runs without PostgreSQL; readiness requires a migrated database, verifier executable, and configured evidence encryption key. Database tests use public fixtures or synthetic rows. They prove the implemented workflow/database behavior; simulated RPC responses do not establish live chain inclusion.
 
@@ -131,9 +131,9 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 
 | Owner / work stream | First deliverable | Integration boundary |
 |---|---|---|
-| Person 1 — access | M4.0 shared actor/schema foundation, then grants and browser sessions | Own shared auth/models/migrations; consumers reuse the same authorization context |
-| Person 2 — reports/export | M5.0 packet contract after M4.0; scoped reports after submission/consent is ready | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
-| Person 3 — workflow/integration/release | M4.3 listing implemented and locally validated; customer submission after M4.2; live validation when an endpoint exists | Own submission services and deployment; consume access contracts and Person 4's built app |
+| Person 1 — access | M4.0–M4.2 access foundation, grants and sessions merged | Own shared auth/models/migrations; consumers reuse the same authorization context |
+| Person 2 — reports/export | M4.5/M5 backend implemented; see task board for PR integration | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
+| Person 3 — workflow/integration/release | Listing, submissions, deployment/recovery preparation merged; live validation needs an endpoint | Own submission services and deployment; consume access contracts and Person 4's built app |
 | Person 4 — all frontend | M6.0 Vue shell when frontend work is resumed | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
 These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. All M6 work remains deferred despite Person 4's assignment. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
@@ -150,4 +150,21 @@ Commit source and lockfiles, not `.env`, `.venv`, `.cache`, `target`, or real cu
 
 Read [docs/chain.md](docs/chain.md) before configuring a node. The adapter is composed only from server settings; request bodies cannot supply URLs or trust assertions. New approvals always refresh; a merchant can also refresh an already resolved case with `POST /api/cases/{id}/chain-observations`. Keep the existing observation-v1 snapshot format intact: observation-v2 adds sanitized RPC provenance without changing older decision hashes.
 
-The user has no RPC endpoint yet. The live historical-fixture observation and merchant-approval trace are **pending**, as is recording the actual node version/capabilities. The initial frontend is recorded in PR #12. M4.3 now supplies merchant listing; customer/reviewer grants, browser sessions, claims, replay packets, and release validation remain separate milestones.
+The user has no RPC endpoint yet. The live historical-fixture observation and merchant-approval trace are **pending**, as is recording the actual node version/capabilities. The initial frontend is recorded in PR #12. M4/M5 backend now supplies merchant listing, grants, sessions, claims, scoped reports and replay packets. Browser acceptance and full release validation remain separate gates.
+
+## P2 report/export/replay handoff
+
+- `schemas/disclosure.py` and `services/reviewer_reports.py` define explicit
+  consented reviewer fields. Case detail/listing remain merchant-only.
+- `schemas/packet.py` and `domain/packets.py` define original byte encodings,
+  historical hash bases, complete/limited scope and integrity.
+- `replay/` implements `replay-case` with fixed local historical dispatch and
+  separate integrity/recovery/arithmetic/external-context results.
+- `services/exports.py` captures one authorized database snapshot, decrypts
+  outside the transaction and reauthorizes before disclosure.
+
+Start with [scoped report fields](docs/scoped-reports.md) and [packet/export/replay
+usage](docs/packets.md). Public/synthetic fixtures and recorded CLI outcomes are
+in `fixtures/packets/`. Do not use packet-provided strings as HTML, executable
+paths or URLs to fetch. Live validation is still pending; no frontend work was
+included in this P2 implementation.

@@ -109,3 +109,43 @@ file SHA-256 values for valid, one-byte tampered, scoped, missing-version and
 unsupported-version examples. Regenerate them using
 `uv run python scripts/record_replay_examples.py`; all inputs are deterministic
 variants of the public/synthetic fixtures. This file contains results, not packets.
+
+## Authorized export (M5.2)
+
+`GET /api/cases/{case_id}/export` returns `CasePacketV1` with
+`Cache-Control: no-store` and an attachment filename containing only the case UUID.
+Use the normal merchant bearer credential or HTTPS browser session. Customers
+receive 403; inaccessible merchant/case IDs receive 404. Reviewers need their
+grant's explicit `allow_export` in addition to the selected report/evidence scope.
+A report-only grant does not authorize export. A case-only export grant produces
+an explicitly limited packet with no original evidence.
+
+The service reuses M4.5's explicit projection and P1's persisted authorization;
+selected evidence still requires processing and reviewer-sharing consent. Evidence
+selection authorizes exact original components even if the `evidence` report
+section was not selected. A reviewer packet never adds private linked claims,
+complete submission payloads, actor identities, full audit payloads, historical
+allocation inputs or arbitrary RPC dictionaries. Original receipts themselves
+are sensitive and remain lossless; previously downloaded copies cannot be revoked.
+
+One PostgreSQL repeatable-read transaction captures the report, current allocation
+context, evidence metadata and ciphertext. Decryption runs outside the transaction,
+using only the captured bytes. A fresh authorization transaction then revalidates
+the merchant credential/browser session or grant, its expiry/revocation and the
+entire evidence consent selection before returning the packet. Approval committed
+during export cannot mix old events with new balances or allocation inputs.
+A captured older consistent snapshot may be returned; export is not a claim to
+contain writes committed after that snapshot began.
+
+Oversized packets fail with `413 EXPORT_TOO_LARGE`; ciphertext-size budgeting
+precedes decryption and the final serialized packet is bounded at 64 MiB. Missing
+content/history and invalid stored integrity fail closed. Concurrent database
+serialization/lock conflicts return the existing retryable 409 boundary. The
+operation writes no credit, decisions or events and requires no idempotency key.
+
+The database/HTTP suite `test_exports.py` covers the five-role matrix, exact v2
+claim/evidence replay, legacy history with simulated approval, concurrent approval,
+opaque foreign conflicts, grant/credential/session revocation, expiry, private
+claim linkage, report-only and case-only export scope, size limits, tampering,
+and originally missing versus empty components. These are public/synthetic tests;
+live chain validation and P4's actual browser/download integration remain separate.
