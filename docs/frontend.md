@@ -1,6 +1,6 @@
 # Person 4 frontend integration and browser evidence
 
-The user explicitly resumed Person 4's frontend scope on October 12, 2026 and authorized implementation/testing locally when GitHub authentication prevented publishing the task branch. The local branch is `feat/m6-frontend-integration`, validated against main through `640b1b1` (PR #23 export merge), then synchronized with `4066ec8` (PR #25 release-evidence merge) before publication. Contributor identity beyond the Person 4 slot has not been specified.
+The user explicitly resumed Person 4's frontend scope on October 12, 2026 and authorized implementation/testing locally when GitHub authentication prevented publishing the task branch. The local branch is `feat/m6-frontend-integration`, validated against main through `640b1b1` (PR #23 export merge), then synchronized with `4066ec8` (PR #25 release-evidence merge) before publication and `7853d3f` (PR #27 live-validation evidence merge) while resolving PR #26 conflicts. Contributor identity beyond the Person 4 slot has not been specified.
 
 ## Implemented scope
 
@@ -43,6 +43,6 @@ The reproduction procedure, environment variables and platform limits are in [ap
 
 ## Remaining integration gates
 
-The local implementation and browser evidence do not mean these commits are merged. Publishing the branch, PR review, Linux CI and merge remain pending because GitHub authentication was unavailable. Person 3 owns registering the browser suite in shared CI/release wiring and validating the built app through deployment ingress. Live trusted-RPC validation remains M3.1; operational key management, retention/deletion and full release evidence remain their separate existing gates.
+The local implementation and browser evidence do not mean these commits are merged. The branch was published as [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); review, checks for the current revision and merge remain pending. Person 3 owns registering the browser suite in shared CI/release wiring and validating the built app through deployment ingress. M3.1 live trusted-RPC evidence merged in PR #27; operational key management, retention/deletion and full release evidence remain their separate existing gates.
 
 No teammates were messaged, and no public deployment or real customer operation was performed. Keep the common review/CI/merge definition of done before recording M6 as merged and release-complete.

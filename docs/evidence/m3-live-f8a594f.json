@@ -1,0 +1,445 @@
+{
+  "schema_version": "m3-live-validation-v1",
+  "started_at": "2026-10-12T13:23:24.163901+00:00",
+  "completed_at": "2026-10-12T13:23:30.760930+00:00",
+  "app_revision": "f8a594fa7364a47fd94d961054b1f88429195b90",
+  "tracked_worktree_clean": true,
+  "migration": "0009",
+  "environment": {
+    "os": "Darwin",
+    "os_release": "27.0.0",
+    "architecture": "arm64",
+    "python": "3.12.14",
+    "postgres": "17.11 (Homebrew)"
+  },
+  "verifier_binary_sha256": "dfe7b262147685d18a09435c01956f195a080023742935b4564055700d102ceb",
+  "input_classification": "public historical mainnet fixture; synthetic invoice; live RPC",
+  "api_transport": "FastAPI TestClient (in-process ASGI); RPC uses actual HTTPS",
+  "source_id": "quicknode-public-demo",
+  "methods_exercised": [
+    "getnetworkinfo",
+    "getblockchaininfo",
+    "getblockheader",
+    "getrawtransaction"
+  ],
+  "rpc_timeout_seconds": 30.0,
+  "rpc_tip_max_age_seconds": 900,
+  "live_confirmation": true,
+  "new_payment_sent": false,
+  "schema_removed": true,
+  "full_release_complete": false,
+  "fixture_manifest": "fixtures/manifest.json",
+  "fixture_file_sha256": {
+    "fixtures/mainnet/receipt.json": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+    "fixtures/mainnet/transaction.hex": "a8e89cb90511d6bf54beb26eb73cd980e676301fea9ce3f7464fe79931c72e39",
+    "fixtures/negative/tampered-ock.json": "57025034d2d5e54e7dddd4a0f83d25ac6592e39bc1afc0bac32eb0e751ea0ca2",
+    "third_party/glasspane/LICENSE": "44f231cab575574d56d6382686ffa28d88d3331352cde5cc45a7e651995feb25"
+  },
+  "readiness": {
+    "database_migrated": true,
+    "verifier_available": true,
+    "evidence_encryption_configured": true
+  },
+  "merchant_identity": {
+    "merchant_id": "16a3ef28-6558-42c9-9ef9-8d4535951498",
+    "credential_id": "8f752a61-5641-4676-a459-86d030c91d0b"
+  },
+  "invoice": {
+    "schema_version": "1",
+    "invoice_id": "b330ec51-7cf5-48f9-907c-047d57f7e5d4",
+    "merchant_id": "16a3ef28-6558-42c9-9ef9-8d4535951498",
+    "policy_id": "3a2715af-77b0-4a41-ac5a-41010980c269",
+    "created_at": "2026-10-12T13:23:24.938440Z",
+    "terms": {
+      "expected_zat": 200000,
+      "network": "mainnet",
+      "pool": "orchard",
+      "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+      "expected_memo": "glasspane first receipt",
+      "expires_at": null,
+      "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+      "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "policy": {
+      "policy_version": "invoice-policy-v1",
+      "rules_version": "0.1.0",
+      "minimum_confirmations": 10,
+      "max_observation_age_seconds": 60,
+      "memo_binding": "exact",
+      "allow_overpayment": false,
+      "unique_receiver_binding": false
+    },
+    "snapshot_hash": "d4d43c5d719c3c4d96450ff2d77c12445c1e80872d940809481344eb104b4549"
+  },
+  "references": {
+    "case_id": "85b41381-3037-4a30-b910-d6a72a2e616b",
+    "evidence_id": "5e8860a5-1115-4c74-b86e-ba9cbe659224",
+    "verification_id": "a2ead6aa-c5c3-4359-8bbc-8eaf9d77ee1e"
+  },
+  "verification": {
+    "schema_version": "1",
+    "verifier": {
+      "name": "zecsolve-verifier",
+      "version": "0.1.0",
+      "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+    },
+    "receipt_state": "VALID",
+    "chain_state": "UNAVAILABLE",
+    "reason_code": "OUTPUT_RECOVERED",
+    "raw_tx_verified": true,
+    "signature_state": "NONE",
+    "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+    "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+    "output": {
+      "network": "mainnet",
+      "pool": "orchard",
+      "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+      "output_index": 1,
+      "amount_zat": 100000,
+      "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+      "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+      "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  "initial_observation": {
+    "schema_version": "1",
+    "observation_id": "b09aaf35-49ca-4d72-b732-12714e505c04",
+    "verification_id": "a2ead6aa-c5c3-4359-8bbc-8eaf9d77ee1e",
+    "state": "UNAVAILABLE",
+    "source": "offline",
+    "reason_code": "NO_CHAIN_OBSERVER",
+    "observed_at": "2026-10-12T13:23:25.001222Z",
+    "network": "mainnet",
+    "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+    "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+    "confirmations": null,
+    "block_hash": null,
+    "block_height": null
+  },
+  "manual_refresh": {
+    "schema_version": "decision-observation-v2",
+    "observation_id": "cce4b323-4d97-40ff-b803-2de7927ad9f3",
+    "verification_id": "a2ead6aa-c5c3-4359-8bbc-8eaf9d77ee1e",
+    "state": "CONFIRMED",
+    "source_kind": "RPC",
+    "source": "quicknode-public-demo",
+    "reason_code": "RPC_BEST_CHAIN",
+    "observed_at": "2026-10-12T13:23:25.021589Z",
+    "network": "mainnet",
+    "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+    "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+    "confirmations": 153734,
+    "block_hash": "0000000000e48f1302b6293a705708816f2a36817c08561fcbb3ed822e064551",
+    "block_height": 3361512,
+    "rpc": {
+      "node": {
+        "version": 6040200,
+        "subversion": "/Zebra:6.4.2/"
+      },
+      "chain": {
+        "chain": "main",
+        "blocks": 3515245,
+        "headers": 3515245,
+        "estimatedheight": 3515245,
+        "bestblockhash": "00000000004cd78b96c3df280c554e87576fb2bd2cba1055025c343beed84f5e",
+        "synced": true
+      },
+      "tip_time": 1791811339,
+      "transaction": {
+        "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+        "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+        "confirmations": 153734,
+        "height": 3361512,
+        "in_active_chain": true,
+        "blockhash": "0000000000e48f1302b6293a705708816f2a36817c08561fcbb3ed822e064551"
+      },
+      "block": {
+        "hash": "0000000000e48f1302b6293a705708816f2a36817c08561fcbb3ed822e064551",
+        "height": 3361512,
+        "confirmations": 153734
+      }
+    }
+  },
+  "approval": {
+    "schema_version": "1",
+    "resolution_id": "3dfad984-1cf8-446a-9eeb-25db004291b2",
+    "case_id": "85b41381-3037-4a30-b910-d6a72a2e616b",
+    "merchant_id": "16a3ef28-6558-42c9-9ef9-8d4535951498",
+    "invoice_id": "b330ec51-7cf5-48f9-907c-047d57f7e5d4",
+    "actor_id": "8f752a61-5641-4676-a459-86d030c91d0b",
+    "action": "APPROVE_OUTPUT",
+    "reason": "M3.1 public fixture: reviewed live operator-selected RPC observation",
+    "decided_at": "2026-10-12T21:23:30.721153+08:00",
+    "verification_id": "a2ead6aa-c5c3-4359-8bbc-8eaf9d77ee1e",
+    "output_id": "mainnet:orchard:66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0:1",
+    "allocated_zat": 100000,
+    "case_version": 4,
+    "case_state": "UNDER_REVIEW",
+    "evaluation": {
+      "schema_version": "decision-evaluation-v1",
+      "evaluation_id": "ddac932b-6ec3-4826-8726-32e066d8d3c6",
+      "case_id": "85b41381-3037-4a30-b910-d6a72a2e616b",
+      "merchant_id": "16a3ef28-6558-42c9-9ef9-8d4535951498",
+      "evaluated_at": "2026-10-12T13:23:30.721153Z",
+      "invoice": {
+        "schema_version": "1",
+        "invoice_id": "b330ec51-7cf5-48f9-907c-047d57f7e5d4",
+        "merchant_id": "16a3ef28-6558-42c9-9ef9-8d4535951498",
+        "policy_id": "3a2715af-77b0-4a41-ac5a-41010980c269",
+        "created_at": "2026-10-12T13:23:24.938440Z",
+        "terms": {
+          "expected_zat": 200000,
+          "network": "mainnet",
+          "pool": "orchard",
+          "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+          "expected_memo": "glasspane first receipt",
+          "expires_at": null,
+          "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+          "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "policy": {
+          "policy_version": "invoice-policy-v1",
+          "rules_version": "0.1.0",
+          "minimum_confirmations": 10,
+          "max_observation_age_seconds": 60,
+          "memo_binding": "exact",
+          "allow_overpayment": false,
+          "unique_receiver_binding": false
+        },
+        "snapshot_hash": "d4d43c5d719c3c4d96450ff2d77c12445c1e80872d940809481344eb104b4549"
+      },
+      "verification_id": "a2ead6aa-c5c3-4359-8bbc-8eaf9d77ee1e",
+      "verification": {
+        "schema_version": "1",
+        "verifier": {
+          "name": "zecsolve-verifier",
+          "version": "0.1.0",
+          "glasspane_revision": "f6468e6d08a7adad53bf2991a311358dc84e869b"
+        },
+        "receipt_state": "VALID",
+        "chain_state": "UNAVAILABLE",
+        "reason_code": "OUTPUT_RECOVERED",
+        "raw_tx_verified": true,
+        "signature_state": "NONE",
+        "receipt_sha256": "d7caf254a40320441e930b24d114b5aeaa9d566f5f472d36ef15ffaf1eeefcb4",
+        "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+        "output": {
+          "network": "mainnet",
+          "pool": "orchard",
+          "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+          "output_index": 1,
+          "amount_zat": 100000,
+          "receiver_hex": "ab7196fa80c61c65508be3923dbb8b416fc9fc50516e33e7be761e5da01b35a857f1770483a36b0f2b07ad",
+          "receiver_address": "u1ug9ltzk9y74pgqtc7mtwnc8vsnlqlsalhamkfd4lyhegrfv6ff5znwr4syzylrpta36ehs3jjm3c4ssvpfar8zq2hamg35wwzqxqemeu",
+          "memo_hex": "676c61737370616e652066697273742072656365697074000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "observation": {
+        "schema_version": "decision-observation-v2",
+        "observation_id": "539e4bf9-e506-472e-8954-33059243f14d",
+        "verification_id": "a2ead6aa-c5c3-4359-8bbc-8eaf9d77ee1e",
+        "state": "CONFIRMED",
+        "source_kind": "RPC",
+        "source": "quicknode-public-demo",
+        "reason_code": "RPC_BEST_CHAIN",
+        "observed_at": "2026-10-12T13:23:28.120683Z",
+        "network": "mainnet",
+        "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+        "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+        "confirmations": 153734,
+        "block_hash": "0000000000e48f1302b6293a705708816f2a36817c08561fcbb3ed822e064551",
+        "block_height": 3361512,
+        "rpc": {
+          "node": {
+            "version": 6040200,
+            "subversion": "/Zebra:6.4.2/"
+          },
+          "chain": {
+            "chain": "main",
+            "blocks": 3515245,
+            "headers": 3515245,
+            "estimatedheight": 3515245,
+            "bestblockhash": "00000000004cd78b96c3df280c554e87576fb2bd2cba1055025c343beed84f5e",
+            "synced": true
+          },
+          "tip_time": 1791811339,
+          "transaction": {
+            "txid": "66167cd3020eb329446e86d80ccd0494baa3959bf9a0e586dbdccd204b6dcfd0",
+            "raw_tx_sha256": "bd616384a2268a293f0de81a9b3b713badba39803d637be48df3e3d4a504c943",
+            "confirmations": 153734,
+            "height": 3361512,
+            "in_active_chain": true,
+            "blockhash": "0000000000e48f1302b6293a705708816f2a36817c08561fcbb3ed822e064551"
+          },
+          "block": {
+            "hash": "0000000000e48f1302b6293a705708816f2a36817c08561fcbb3ed822e064551",
+            "height": 3361512,
+            "confirmations": 153734
+          }
+        }
+      },
+      "source_authorized": true,
+      "approved_allocations": [],
+      "foreign_conflict": false,
+      "result": {
+        "rules_version": "0.2.0",
+        "findings": [
+          "UNDERPAID",
+          "ELIGIBLE_FOR_CREDIT"
+        ],
+        "credited_zat": 0,
+        "outstanding_zat": 200000,
+        "excess_zat": 0,
+        "candidate_zat": 100000,
+        "projected_outstanding_zat": 100000,
+        "eligible_for_credit": true
+      },
+      "snapshot_hash": "0259c73c50b7f5c42a53b13e047cbd523e7099d7357357b40182e750146050a5"
+    },
+    "balances": {
+      "rules_version": "0.1.0",
+      "findings": [
+        "ALREADY_ALLOCATED",
+        "CHAIN_UNVERIFIED",
+        "UNDERPAID"
+      ],
+      "credited_zat": 100000,
+      "outstanding_zat": 100000,
+      "excess_zat": 0,
+      "candidate_zat": 0,
+      "projected_outstanding_zat": 100000,
+      "eligible_for_credit": false
+    },
+    "event_id": "e18a79fb-2216-495a-85e6-6eaff870cc78"
+  },
+  "decision_observation_age_seconds": 2.60047,
+  "before_balances": {
+    "rules_version": "0.1.0",
+    "findings": [
+      "CHAIN_UNVERIFIED",
+      "UNDERPAID"
+    ],
+    "credited_zat": 0,
+    "outstanding_zat": 200000,
+    "excess_zat": 0,
+    "candidate_zat": 100000,
+    "projected_outstanding_zat": 100000,
+    "eligible_for_credit": false
+  },
+  "after_balances": {
+    "rules_version": "0.1.0",
+    "findings": [
+      "ALREADY_ALLOCATED",
+      "CHAIN_UNVERIFIED",
+      "UNDERPAID"
+    ],
+    "credited_zat": 100000,
+    "outstanding_zat": 100000,
+    "excess_zat": 0,
+    "candidate_zat": 0,
+    "projected_outstanding_zat": 100000,
+    "eligible_for_credit": false
+  },
+  "report_scope": "MERCHANT_DECISIONS",
+  "http_steps": [
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "idempotency_replayed": null,
+      "elapsed_ms": 10
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "idempotency_replayed": null,
+      "elapsed_ms": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/invoices",
+      "status": 201,
+      "idempotency_replayed": "false",
+      "elapsed_ms": 646
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases",
+      "status": 201,
+      "idempotency_replayed": "false",
+      "elapsed_ms": 9
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/evidence",
+      "status": 201,
+      "idempotency_replayed": "false",
+      "elapsed_ms": 15
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/verify",
+      "status": 201,
+      "idempotency_replayed": "false",
+      "elapsed_ms": 40
+    },
+    {
+      "method": "GET",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/report",
+      "status": 200,
+      "idempotency_replayed": null,
+      "elapsed_ms": 10
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/chain-observations",
+      "status": 401,
+      "idempotency_replayed": null,
+      "elapsed_ms": 1
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/chain-observations",
+      "status": 201,
+      "idempotency_replayed": "false",
+      "elapsed_ms": 3082
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/chain-observations",
+      "status": 200,
+      "idempotency_replayed": "true",
+      "elapsed_ms": 8
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/resolve",
+      "status": 201,
+      "idempotency_replayed": "false",
+      "elapsed_ms": 2621
+    },
+    {
+      "method": "POST",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/resolve",
+      "status": 200,
+      "idempotency_replayed": "true",
+      "elapsed_ms": 7
+    },
+    {
+      "method": "GET",
+      "path": "/api/cases/85b41381-3037-4a30-b910-d6a72a2e616b/report",
+      "status": 200,
+      "idempotency_replayed": null,
+      "elapsed_ms": 11
+    }
+  ],
+  "checks": {
+    "refresh_retry_identical": true,
+    "approval_retry_identical": true,
+    "approval_observation_is_new": true,
+    "decision_count": 1,
+    "anonymous_refresh_denied": true,
+    "unresolved_chain_review": false
+  }
+}
