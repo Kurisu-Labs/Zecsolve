@@ -16,7 +16,7 @@ define the required behavior.
 
 ## Evidence register
 
-The following CI records all target implementation revision
+CI records E-01–E-03 target implementation revision
 `4c47e4bf9f3c603c9ae6853c82de1fb0f207d8da`, included in PR #24. Their runtime and
 test sources match the baseline above; the subsequent branch commit changes
 documentation only. Times are UTC. GitHub job status and artifact provenance were
@@ -27,7 +27,7 @@ rechecked during this consolidation; these are the original executions.
 | E-01 | `make lint`, `make test`, `make test-db`, `make poc`: passed; 12 Rust, 275 non-database Python and 236 PostgreSQL tests; offline fixture recovery/tamper rejection | [Foundation job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38218166014/job/114707697759), 2026-10-12 07:30:55–07:33:58; Ubuntu runner, Python 3.14, Rust 1.99.0, PostgreSQL 17. Counts recorded in [Item 20](DEVELOPMENT.md#item-20--m72-exportreplay-recovery-integration); setup in [CI](../.github/workflows/ci.yml). |
 | E-02 | `python scripts/check_deployment.py --recovery`: all 24 container groups passed; four recovery/export checkpoints; no live confirmation | [Container job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38218166043/job/114707697872), 2026-10-12 07:30:55–07:34:38; report time 07:34:34.032559; Linux 6.17.0-1022-azure x86_64, Python 3.14.8, Docker 28.0.4, PostgreSQL 17, packaged real verifier. [Retained report](evidence/m7-recovery-4c47e4b.json). |
 | E-03 | `npm ci --ignore-scripts --no-audit --no-fund`, `npm test`, `npm run build`: passed for the existing frontend | [Web job](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38218166014/job/114707697512), 2026-10-12 07:30:55–07:31:16; Ubuntu runner, Node 24. This is unit/build evidence; actual-browser acceptance remains open. |
-| E-04 | Installed offline replay examples: valid `0/REPRODUCED`, tampered `1/FAILED`, scoped and missing-version `2/LIMITED`, unsupported-version `3/UNSUPPORTED` | Exact file hashes and CLI output in [replay-results.json](../fixtures/packets/replay-results.json); historical run in [Item 18](DEVELOPMENT.md#item-18--offline-replay-m51), Linux x86_64, Python 3.14.7, Rust 1.99.0, 2026-10-12 03:45Z. E-01 also runs the CLI/engine regressions; E-02 runs downloaded authorized exports. |
+| E-04 | Installed offline replay examples: valid `0/REPRODUCED`, tampered `1/FAILED`, scoped and missing-version `2/LIMITED`, unsupported-version `3/UNSUPPORTED` | Exact file hashes and CLI output in [replay-results.json](../fixtures/packets/replay-results.json). Reproduced byte-for-byte locally by 2026-10-12 12:09:30Z, macOS 27.0.1 arm64, Python 3.12.14, Rust 1.99.0, baseline `f2436a9` plus documentation-only changes; [Item 21](DEVELOPMENT.md#item-21--m72-release-evidence-consolidation). E-01 also runs CLI/engine regressions; E-02 runs downloaded authorized exports. |
 
 E-02's retained JSON is the byte-for-byte `recovery-result.json` member of
 GitHub artifact **11732947385**, named `backend-recovery-evidence`, from run
