@@ -35,7 +35,7 @@ The actual browser scenarios cover:
 6. One-time grant code behavior, lost-code replay without redisclosure and revocation.
 7. Reviewer section/evidence selection; private claim omission; original receipt byte preservation; denied writes and report-only export; actual revocation returning to login.
 8. Reviewer scoped and merchant full-history packet downloads; source receipt bytes preserved; the downloaded merchant packet reproduces through the actual replay engine.
-9. Keyboard focus, mobile width and axe checks for login, invoice and customer forms; ignored query codes and stripped fragments on an already-open Connect page.
+9. Keyboard focus, mobile width and axe checks for login, invoice, customer, merchant case, grant and reviewer views; ignored query codes and stripped fragments on an already-open Connect page.
 10. Missing-CSRF recovery through another session and local eight-hour expiry using the browser's controlled clock.
 11. Separate, visibly simulated approval response-loss retry yielding one 100,000-zatoshi credit, a partially paid case, and an opaque cross-invoice duplicate-output finding.
 

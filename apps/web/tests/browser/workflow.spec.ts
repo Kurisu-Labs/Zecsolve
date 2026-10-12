@@ -160,6 +160,7 @@ test('three roles complete the real HTTPS submission and merchant review flow', 
   expect(report.balances.credited_zat).toBe(0)
   expect(report.balances.candidate_zat).toBe(100000)
   expect(report.chain_observations[0].state).toBe('UNAVAILABLE')
+  await checkAccessibility(page)
   await page.getByRole('link', { name: 'Manage access' }).click()
   await page.getByRole('combobox', { name: 'Role', exact: true }).selectOption('reviewer')
   await page.getByLabel('case', { exact: true }).check()
@@ -167,6 +168,7 @@ test('three roles complete the real HTTPS submission and merchant review flow', 
   await page.getByLabel('balances', { exact: true }).check()
   await page.getByLabel('evidence', { exact: true }).check()
   await page.getByLabel(/Sharing authorized/).check()
+  await checkAccessibility(page)
   await page.getByRole('button', { name: 'Create access code' }).click()
   const reviewerCode = await page.getByLabel('Private access code').inputValue()
   const reviewerContext = await browser.newContext({
@@ -176,6 +178,7 @@ test('three roles complete the real HTTPS submission and merchant review flow', 
   const reviewer = await reviewerContext.newPage()
   await login(reviewer, reviewerCode)
   await expect(reviewer.getByRole('heading', { name: 'Shared case report' })).toBeVisible()
+  await checkAccessibility(reviewer)
   await expect(reviewer.getByText('Report-only access. Packet export is not permitted.')).toBeVisible()
   await expect(reviewer.getByText(note, { exact: true })).toHaveCount(0)
   await expect(reviewer.getByRole('heading', { name: 'Invoice', exact: true })).toHaveCount(0)

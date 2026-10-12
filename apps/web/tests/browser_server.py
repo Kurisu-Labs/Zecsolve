@@ -44,7 +44,9 @@ if os.name == "nt":
     verifier.run_bounded = run_bounded
 
 scratch = Path(os.environ["ZECSOLVE_BROWSER_SCRATCH"]).resolve()
-scratch.mkdir(parents=True, exist_ok=True)
+scratch.mkdir(mode=0o700, parents=True, exist_ok=True)
+if os.name != "nt":
+    scratch.chmod(0o700)
 url = os.environ["ZECSOLVE_TEST_DATABASE_URL"]
 if not url.rsplit("/", 1)[-1].endswith("_browser"):
     raise ValueError("Use a dedicated disposable database ending in _browser")

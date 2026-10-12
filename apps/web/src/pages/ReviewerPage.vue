@@ -119,6 +119,9 @@ onMounted(load)
 </template>
 <style scoped>
 @media print {
+  :global(html) {
+    background: #fff;
+  }
   :global(body) {
     background: #fff;
     color: #111;

@@ -33,7 +33,7 @@ const decision = computed(() => {
 <template>
   <section class="tiles" aria-label="Case evidence by layer">
     <article class="tile">
-      <h3>Customer claim</h3>
+      <h2>Customer claim</h2>
       <StatusBadge
         :label="claim ? 'Claim recorded' : 'No claim'"
         :tone="claim ? 'neutral' : 'unknown'"
@@ -47,7 +47,7 @@ const decision = computed(() => {
     </article>
 
     <article class="tile">
-      <h3>Receipt</h3>
+      <h2>Receipt</h2>
       <StatusBadge :label="receipt.label" :tone="receipt.tone" :glyph="receipt.glyph" />
       <p class="detail">{{ receipt.detail }}</p>
       <p v-if="selected" class="meta">
@@ -57,7 +57,7 @@ const decision = computed(() => {
     </article>
 
     <article class="tile">
-      <h3>Chain</h3>
+      <h2>Chain</h2>
       <StatusBadge :label="chain.label" :tone="chain.tone" :glyph="chain.glyph" />
       <p class="detail">{{ chain.detail }}</p>
       <p v-if="observation" class="meta">{{ observation.source }}</p>
@@ -71,7 +71,7 @@ const decision = computed(() => {
     </article>
 
     <article class="tile" :class="{ decided: decision }">
-      <h3>Merchant decision</h3>
+      <h2>Merchant decision</h2>
       <StatusBadge
         v-if="decision"
         :label="actionView[decision.action].done"
@@ -121,7 +121,7 @@ const decision = computed(() => {
 .tile.decided {
   background: color-mix(in oklab, var(--color-zec) 5%, var(--color-ink-raised));
 }
-h3 {
+h2 {
   font-size: var(--step-0);
   font-weight: 600;
   letter-spacing: -0.01em;
