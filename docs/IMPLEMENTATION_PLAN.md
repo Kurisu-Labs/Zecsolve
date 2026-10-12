@@ -1,6 +1,8 @@
 # Zecsolve — P0 Implementation and Assignment Board
 
-**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, dashboard integration with the new case-list API, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+**Person 4 local integration (October 12):** The user explicitly resumed frontend work and authorized local implementation while GitHub authentication is unavailable. M6.0–M6.5 are implemented on `feat/m6-frontend-integration`, with actual-backend M6.6 browser evidence in [frontend.md](frontend.md). Publication, PR/CI review and merge remain pending; this is not a full release claim.
+
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration and evidence in [frontend.md](frontend.md) supersede that partial implementation status; review/CI/merge still govern completion.
 
 **Baseline:** October 10, 2026
 
@@ -8,7 +10,7 @@
 
 **Requirements:** [PRD](PRD.md), especially §§6–7 and acceptance scenarios A-01 through A-15
 
-**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.5 are merged. M5.0 packet contracts and M5.1 replay merged in PRs #21/#22; M5.2 export is implemented and validated. Person 4's initial frontend is partially implemented; remaining M6 integration/acceptance retains its explicit-resumption gate. M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is merged in PR #19; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
+**Status:** M1/M2 backend implementation is complete. M3 adapter/refresh exists; live-node validation is externally blocked. M4.0–M4.5 are merged. M5.0 packet contracts and M5.1 replay merged in PRs #21/#22; M5.2 export is implemented and validated. Person 4's frontend integration is implemented and browser-validated locally; publication/PR/CI/merge remain pending (see frontend.md). M7.1 backend preparation is merged in PR #17. Person 3's M7.2 backend recovery rehearsal is merged in PR #19; full M7 release remains incomplete. Recorded implementation results remain in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 **Start here:** [ownership and feature tasks](#3-ownership-and-feature-tasks), [task cards](#task-cards), and [definition of done](#definition-of-done). Milestone requirements below remain the acceptance specification; the board is the current assignment and dependency source of truth.
 
@@ -69,7 +71,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 | M3 | Adapter implemented, Item 08; live gate blocked | M3.1 live node/approval evidence | P0-02, P0-04, P0-05 |
 | M4 | Backend complete; M4.0–M4.5 merged | P4 browser integration/acceptance remains | Remaining P0-01 and P0-06 |
 | M5 | Backend implemented and validated | P4 download/browser integration and full release still require their acceptance gates; live release requires M3.1 | P0-08 |
-| M6 | Person 4 initial frontend partial; remaining integration/acceptance deferred | M6.0–M6.6 integrated against the actual backend | P0-07 |
+| M6 | Implemented and browser-validated locally by Person 4; publication/PR/CI/merge pending | M6.0–M6.6 integrated against the actual backend | P0-07 |
 | M7 | M7.1 backend preparation merged; M7.2 backend recovery in progress | Full M7.1/M7.2 and all preceding release gates | P0-09 and all acceptance gates |
 
 ### Ownership and coordination
@@ -95,7 +97,7 @@ Milestones are delivery checkpoints; each task below is one branch and one accou
 
 M4.0–M4.5 and M5.0/M5.1 are merged. Person 1's handoffs are in [access.md](access.md), [grants.md](grants.md), and [sessions.md](sessions.md); Person 3's M4.4 handoff is [customer-submissions.md](customer-submissions.md). Person 2 has implemented scoped reports, packet contracts, replay and export; task validation and integration references are tracked below. Person 3's M7.1 backend preparation is merged and M7.2 backend recovery merged in PR #19; full M7 completion still needs the listed integration gates.
 
-Person 4's PR #12 supplies partial frontend implementation. Remaining M6 integration/acceptance is assigned to Person 4 and retains its explicit-resumption gate. Fixtures may unblock dependent screens, but completion always requires the actual backend. M3.1 is independent external validation. M5 development and simulated tests may proceed while M3.1 is blocked; full live release cannot.
+Person 4's PR #12 supplied the initial frontend. The user explicitly resumed the remaining scope on October 12; local integration and actual-backend browser evidence are recorded in [frontend.md](frontend.md). Publication, review, CI and merge remain pending. M3.1 is independent live validation.
 
 ### Feature board
 
@@ -113,13 +115,13 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Done: PR #21 merged |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Done: PR #22 merged |
 | [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Implemented and validated; [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23) tracks integration |
-| [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
-| [M6.1 — Browser access](#m6-1) | Person 4 | `feat/m6-browser-access` | Frontend resumed; M6.0 and M4.2 merged | Deferred |
-| [M6.2 — Merchant workflow](#m6-2) | Person 4 | `feat/m6-merchant-workflow` | Frontend resumed; M6.1 and M4.3 merged | Deferred |
-| [M6.3 — Grant management](#m6-3) | Person 4 | `feat/m6-grant-management` | Frontend resumed; M6.2, M4.1 and M4.4 merged | Deferred |
-| [M6.4 — Customer submission](#m6-4) | Person 4 | `feat/m6-customer-submission` | Frontend resumed; M6.1 and M4.4 merged | Deferred |
-| [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-reviewer-export` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Deferred |
-| [M6.6 — Browser acceptance](#m6-6) | Person 4 | `test/m6-browser-acceptance` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Deferred |
+| [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-frontend-integration` | Frontend explicitly resumed; existing workflow contracts | Implemented and locally validated; publication/PR/CI/merge pending |
+| [M6.1 — Browser access](#m6-1) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.0 and M4.2 merged | Implemented and locally validated; publication/PR/CI/merge pending |
+| [M6.2 — Merchant workflow](#m6-2) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.1 and M4.3 merged | Implemented and locally validated; publication/PR/CI/merge pending |
+| [M6.3 — Grant management](#m6-3) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.2, M4.1 and M4.4 merged | Implemented and locally validated; publication/PR/CI/merge pending |
+| [M6.4 — Customer submission](#m6-4) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.1 and M4.4 merged | Implemented and locally validated; publication/PR/CI/merge pending |
+| [M6.5 — Reviewer and export views](#m6-5) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged | Implemented and locally validated; publication/PR/CI/merge pending |
+| [M6.6 — Browser acceptance](#m6-6) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Implemented and locally validated; publication/PR/CI/merge pending |
 | [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend and TLS session preparation validated; browser integration pending |
 | [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-release-rehearsal` | M7.1, M3.1, all M4/M5 tasks and M6.6 for full completion; partial backend evidence may be collected earlier | In progress: backend recovery preparation; full release waiting |
 
@@ -259,7 +261,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M6.0 — Application foundation
 
-- **Owner:** Person 4. **Branch:** `feat/m6-web-foundation`. **Status:** Deferred.
+- **Owner:** Person 4. **Branch:** `feat/m6-frontend-integration`. **Status:** Implemented and locally validated; publication/PR/CI/merge pending. See [frontend evidence](frontend.md).
 - **Prerequisites:** Frontend explicitly resumed; existing workflow contracts.
 - **Goal:** Establish the Vue 3/TypeScript/Tailwind app and reusable frontend contracts.
 - **Owned code:** New `apps/web` source, routing, components, styles, frontend package/build configuration, generated API client types and frontend tests.
@@ -272,7 +274,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M6.1 — Browser access
 
-- **Owner:** Person 4. **Branch:** `feat/m6-browser-access`. **Status:** Deferred.
+- **Owner:** Person 4. **Branch:** `feat/m6-frontend-integration`. **Status:** Implemented and locally validated; publication/PR/CI/merge pending. See [frontend evidence](frontend.md).
 - **Prerequisites:** Frontend resumed; M6.0 and M4.2 merged.
 - **Goal:** Connect all three roles to the browser session contract.
 - **Owned code:** Frontend access-code entry/exchange, session state, protected navigation, logout, expiry/revocation screens and tests.
@@ -285,7 +287,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M6.2 — Merchant workflow
 
-- **Owner:** Person 4. **Branch:** `feat/m6-merchant-workflow`. **Status:** Deferred.
+- **Owner:** Person 4. **Branch:** `feat/m6-frontend-integration`. **Status:** Implemented and locally validated; publication/PR/CI/merge pending. See [frontend evidence](frontend.md).
 - **Prerequisites:** Frontend resumed; M6.1 and M4.3 merged.
 - **Goal:** Deliver the merchant invoice-to-decision workflow using existing services.
 - **Owned code:** Frontend case list, invoice/case creation, evidence upload/selection, verification, report/balance display, decision forms and tests.
@@ -298,7 +300,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M6.3 — Grant management
 
-- **Owner:** Person 4. **Branch:** `feat/m6-grant-management`. **Status:** Deferred.
+- **Owner:** Person 4. **Branch:** `feat/m6-frontend-integration`. **Status:** Implemented and locally validated; publication/PR/CI/merge pending. See [frontend evidence](frontend.md).
 - **Prerequisites:** Frontend resumed; M6.2, M4.1 and M4.4 merged.
 - **Goal:** Let merchants manage access and allowed disclosure from a case.
 - **Owned code:** Frontend grant creation/list/revocation, field/evidence selection, export permission controls and tests.
@@ -311,7 +313,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M6.4 — Customer submission
 
-- **Owner:** Person 4. **Branch:** `feat/m6-customer-submission`. **Status:** Deferred.
+- **Owner:** Person 4. **Branch:** `feat/m6-frontend-integration`. **Status:** Implemented and locally validated; publication/PR/CI/merge pending. See [frontend evidence](frontend.md).
 - **Prerequisites:** Frontend resumed; M6.1 and M4.4 merged.
 - **Goal:** Provide the scoped disclosure, consent and submission experience.
 - **Owned code:** Frontend disclosure/consent, claim/evidence form, minimal acknowledgement and tests.
@@ -324,7 +326,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M6.5 — Reviewer and export views
 
-- **Owner:** Person 4. **Branch:** `feat/m6-reviewer-export`. **Status:** Deferred.
+- **Owner:** Person 4. **Branch:** `feat/m6-frontend-integration`. **Status:** Implemented and locally validated; publication/PR/CI/merge pending. See [frontend evidence](frontend.md).
 - **Prerequisites:** Frontend resumed; M6.1, M6.2, M4.5 and M5.2 merged.
 - **Goal:** Show reviewer disclosures and connect authorized downloads for reviewers and merchants.
 - **Owned code:** Frontend reviewer report, selected evidence display, download controls, merchant export integration and tests.
@@ -337,7 +339,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M6.6 — Browser acceptance
 
-- **Owner:** Person 4. **Branch:** `test/m6-browser-acceptance`. **Status:** Deferred.
+- **Owner:** Person 4. **Branch:** `feat/m6-frontend-integration`. **Status:** Implemented and locally validated; publication/PR/CI/merge pending. See [frontend evidence](frontend.md).
 - **Prerequisites:** Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged.
 - **Goal:** Close M6 with end-to-end proof across the three roles.
 - **Owned code:** Frontend actual-backend browser suite, accessibility/responsive QA, UI evidence and frontend setup documentation; coordinate CI registration with Person 3.
@@ -614,7 +616,7 @@ Recorded M1/M2 and M3 adapter results are in [DEVELOPMENT.md](DEVELOPMENT.md), i
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** Person 1 has implemented M4.0–M4.2. Person 3 has implemented M4.4 using the shared actor/session contracts, pending PR integration; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, and start M5.0 implementation against the merged M4.0 foundation. Person 4 owns the complete M6 backlog, but frontend execution remains deferred. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** Person 1 has implemented M4.0–M4.2. Person 3 has implemented M4.4 using the shared actor/session contracts, pending PR integration; M4.3 is already merged. Person 2 can review packet requirements and public fixtures, and start M5.0 implementation against the merged M4.0 foundation. Person 4 owns the complete M6 backlog, with local implementation/browser evidence recorded in frontend.md; publication/PR/CI/merge remain pending. M3.1 awaits a trusted endpoint. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 

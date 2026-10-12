@@ -1,6 +1,6 @@
 # zecsolve teammate guide
 
-**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, dashboard integration with the new case-list API, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration and evidence in [frontend.md](docs/frontend.md) supersede that partial implementation status; review/CI/merge still govern completion.
 
 This guide explains the foundation and backend milestones completed through October 11. Use [README.md](README.md) for runnable setup commands.
 
@@ -136,7 +136,7 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 | Person 3 — workflow/integration/release | Listing, submissions, deployment/recovery preparation merged; live validation needs an endpoint | Own submission services and deployment; consume access contracts and Person 4's built app |
 | Person 4 — all frontend | M6.0 Vue shell when frontend work is resumed | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
-These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. All M6 work remains deferred despite Person 4's assignment. No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
+These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. Person 4's M6 scope was explicitly resumed on October 12 and is locally implemented/browser-validated; publication/PR/CI/merge remain pending. See [frontend evidence](docs/frontend.md). No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
 
 ## Before handing off a change
 

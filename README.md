@@ -1,6 +1,8 @@
 # zecsolve
 
-**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, dashboard integration with the new case-list API, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+**Person 4 frontend integration (October 12):** Session access, merchant workflows, grants, scoped submissions/reviewer reports and authorized packets are implemented and browser-validated locally. See [frontend handoff](docs/frontend.md). Branch publication, PR/CI review and merge remain pending.
+
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration and evidence in [frontend.md](docs/frontend.md) supersede that partial implementation status; review/CI/merge still govern completion.
 
 Resolve shielded-payment exceptions with scoped evidence and explainable merchant decisions.
 
@@ -155,7 +157,7 @@ Implemented: pinned verifier integration; fixture provenance; bounded subprocess
 
 The trusted read-only Zebra adapter, idempotent refresh route, and later reorganization review are implemented. [Live endpoint validation](docs/chain.md) remains pending.
 
-Current milestone status: **M1/M2 backend complete; M3 adapter implemented with live validation pending; M4 in progress with M4.0–M4.4 merged; M5 pending; M6 partially implemented by Person 4; M7 release incomplete.** M4.4 customer submissions merged in PR #18, so Person 2 can start M4.5 scoped reports as well as M5.0 packet contracts. M7.1 backend deployment preparation is merged in PR #17. Person 3's [M7.2 backend recovery rehearsal](docs/recovery.md) covers forward migrations, restart/retry and encrypted restore; its PR integration and the full live/browser/export/release gates remain outstanding. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
+Current milestone status: **M1/M2 backend complete; M3 live validation pending; M4/M5 backend merged; M6 locally implemented and browser-validated, pending publication/PR/CI/merge; M7 release incomplete.** See [frontend evidence](docs/frontend.md), the [assignment board](docs/IMPLEMENTATION_PLAN.md) and [backend recovery evidence](docs/recovery.md). Development proof and full release acceptance remain separate.
 
 The deployed app blocks credit approval while offline; a server-configured trusted RPC source enables the policy-gated path. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed. Assigning or merging a feature does not close the separate live-validation or full-release gates.
 

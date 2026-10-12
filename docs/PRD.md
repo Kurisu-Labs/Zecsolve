@@ -1,6 +1,6 @@
 # Zecsolve — Product Requirements Document
 
-**Frontend handoff update (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplies the initial `apps/web` implementation. Earlier deferred labels below describe the assignment snapshot; frontend foundation and merchant previews are now implemented in part. This does not complete M6 acceptance: scoped browser roles, dashboard integration with the new case-list API, replay export, deployment integration, and full browser acceptance remain pending. Person 4 retains frontend ownership.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration and evidence in [frontend.md](frontend.md) supersede that partial implementation status; review/CI/merge still govern completion.
 
 **Project:** Zecsolve — a Shielded Payment Exception Engine
 
@@ -18,7 +18,7 @@
 
 **Funding / budget:** Not specified
 
-**Status:** M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh exists but live-node validation is pending. M4.0–M4.4 are merged, unblocking Person 2's scoped reports; M5 remains pending. Person 4's initial frontend is partial and its remaining integration/acceptance retains the resumption gate. M7.1 backend preparation is merged; Person 3's [M7.2 backend recovery rehearsal](recovery.md) is in progress. Full release acceptance remains incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains historical results; each current feature still requires review, CI and merge.
+**Status:** M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh exists but live-node validation is pending. M4.0–M4.4 are merged, unblocking Person 2's scoped reports; M5 remains pending. Person 4's frontend is locally integrated and browser-validated; publication/PR/CI/merge remain pending (see frontend.md). M7.1 backend preparation is merged; Person 3's [M7.2 backend recovery rehearsal](recovery.md) is in progress. Full release acceptance remains incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains historical results; each current feature still requires review, CI and merge.
 
 The cutoff above follows the [official hackathon rules, §5](https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf). The internal sprint is shorter than the full competition period.
 
