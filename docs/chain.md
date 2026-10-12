@@ -59,4 +59,57 @@ A later observation of an approved transaction in the mempool/side chain adds `c
 
 Once an endpoint exists, use the public fixture workflow to create an invoice/case/evidence and run the real verifier. Refresh via the route above, inspect the returned node version, chain/binding/header facts, and then approve through the normal merchant resolution route. Record the exact app revision, time, node version, supported methods, sanitized observation, and decision IDs. Never save credentials or a credential-bearing endpoint in the trace.
 
+### Repeatable live validation procedure
+
+The opt-in [validation harness](../scripts/validate_live_chain.py) exercises the
+normal authenticated FastAPI routes in process using `TestClient`; its configured
+`ZebraObserver` makes actual HTTPS requests. It does not replace the observer,
+source authority, verifier or RPC transport. This is backend/API validation,
+not browser, TLS ingress or deployed-container acceptance.
+
+1. Start from a clean, committed revision and build the matching verifier with
+   `make build`. Run from the repository root with the development dependencies
+   installed (`uv sync --locked`).
+2. Set `ZECSOLVE_TEST_DATABASE_URL` privately to a **disposable PostgreSQL** database
+   whose role can create/drop schemas. The harness creates a random isolated
+   schema, applies all migrations, and removes that schema in `finally`; it does
+   not use the ordinary application's database URL. Do not use a production DB.
+3. Configure the operator-selected endpoint in `.env` using the settings above.
+   For this task the operator selected QuickNode's public documentation endpoint,
+   `https://docs-demo.zec-mainnet.quiknode.pro/`, source label
+   `quicknode-public-demo`, HTTPS, no Basic authentication, a 30-second lookup
+   budget and the existing 900-second tip age limit. QuickNode publishes this URL
+   in its [RPC examples](https://www.quicknode.com/docs/zcash/getnetworkinfo).
+   This choice is for the public-fixture validation; continued availability and
+   quotas are not established. Configure an operator-managed endpoint for ongoing
+   deployment and record new evidence when the source or runtime changes.
+4. Run once, choosing a new evidence filename:
+
+   ```sh
+   uv run --locked python scripts/validate_live_chain.py --output /tmp/m3-live-validation.json
+   ```
+
+The run verifies the fixture manifest hashes, provisions an ephemeral merchant
+credential and encryption key, creates a synthetic 200,000-zatoshi invoice and
+case, submits encrypted public evidence, and recovers the real 100,000-zatoshi
+output. Initial verification stays offline and credits zero. Anonymous refresh
+is denied. Authenticated refresh must bind the actual transaction bytes to
+mainnet block/confirmation data. A same-key refresh returns the identical result.
+Approval must perform a **different, fresh RPC observation**, satisfy the invoice's
+10-confirmation/60-second policy, and allocate exactly 100,000 zatoshis. Retrying
+approval must return the identical decision and leave exactly one decision,
+100,000 credited and 100,000 outstanding.
+
+No wallet or new payment is needed. The only source evidence is the already-public
+Glasspane fixture. Saved JSON contains revision/time/environment, verifier binary
+and fixture hashes, selected public observation facts, synthetic invoice/decision
+data, sanitized HTTP steps and schema cleanup status. It excludes the RPC URL,
+authentication headers, merchant token, encryption key and database URL. Review
+the output before committing it. A failed assertion produces no successful
+evidence file; a moving chain tip or provider outage can require a separate fresh
+run. Never overwrite a historical run or treat a failed lookup as a live pass.
+
+This command is deliberately absent from CI: the offline suites and container
+rehearsal must not acquire a dependency on the shared public RPC service.
+
 Until that real observation and approval trace exists, keep the M3 live gate and release credit path marked incomplete. Customer/reviewer grants, disclosure consent, browser sessions and authorized replay packets are merged. Person 4’s initial frontend is partial; remaining M6 integration/acceptance retains its explicit-resumption gate. See the [release evidence index](release-evidence.md) for current proof and outstanding handoffs.
