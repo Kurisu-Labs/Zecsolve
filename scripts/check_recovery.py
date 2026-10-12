@@ -191,11 +191,40 @@ def rehearse(root, directory, compose, run, request, origin, passed):
     key_file = directory / "recovery-backup.key"
     key_file.write_bytes(backup_key)
     key_file.chmod(0o600)
+    container = run(compose + ["ps", "-aq", "api"]).strip()
+    image = run(["docker", "inspect", "--format", "{{.Image}}", container]).strip()
+    # Decryption stdout contains a full database dump. Disable Docker logging as well
+    # as keeping host subprocess pipes private; --rm alone would retain logs until exit.
+    crypto_command = [
+        "docker",
+        "run",
+        "--rm",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--log-driver",
+        "none",
+        "--memory",
+        "1g",
+        "--cpus",
+        "1",
+        "--pids-limit",
+        "64",
+        image,
+        "python",
+        "-c",
+        crypto,
+    ]
 
     def transform(action, data, key):
         return json.loads(
             run(
-                compose + ["run", "--rm", "--no-deps", "-T", "api", "python", "-c", crypto],
+                crypto_command,
                 input=json.dumps(
                     {
                         "action": action,
