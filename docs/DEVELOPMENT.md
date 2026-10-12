@@ -505,3 +505,10 @@ grants, private linked claims, foreign conflicts, byte limits and negative repla
 README, PRD and TEAM_GUIDE provide the backend handoff. M3.1 still needs a trusted
 live endpoint; P4 frontend/download/browser acceptance and full release gates
 remain separate. Final-head CI and PR merge are required before M5.2 completion.
+
+M5.1 final review after access restoration added a raw-transaction omission
+regression: a scoped packet may retain the selected verification's decoded hash
+while withholding the raw bytes, so replay reports missing input rather than a
+false integrity mismatch. Both receipt and raw-byte omissions now remain LIMITED.
+All 33 focused packet/replay checks pass; no full-history packet permits omitted
+inputs. This correction is part of PR #22 before merge.
