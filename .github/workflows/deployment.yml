@@ -1,4 +1,4 @@
-name: deployment preparation
+name: deployment and recovery preparation
 on:
   push:
     paths:
@@ -13,6 +13,10 @@ on:
       - 'alembic.ini'
       - '.dockerignore'
       - 'scripts/check_deployment.py'
+      - 'scripts/check_recovery.py'
+      - 'scripts/recovery_*.py'
+      - 'scripts/rehearse_migration.py'
+      - 'fixtures/**'
       - '.github/workflows/deployment.yml'
   pull_request:
 permissions:
@@ -20,11 +24,17 @@ permissions:
 jobs:
   container-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-      - name: Validate actual TLS deployment with disposable data
-        run: python scripts/check_deployment.py
+      - name: Validate TLS deployment and backend recovery with disposable data
+        run: python scripts/check_deployment.py --recovery
+      - name: Retain sanitized recovery evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-recovery-evidence
+          path: .cache/recovery-result.json
+          if-no-files-found: error

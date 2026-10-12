@@ -34,6 +34,9 @@ def free_port():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keep-on-failure", action="store_true")
+    parser.add_argument(
+        "--recovery", action="store_true", help="Also rehearse M7.2 backend recovery"
+    )
     options = parser.parse_args()
     (ROOT / ".cache").mkdir(exist_ok=True)
     directory = Path(tempfile.mkdtemp(prefix="deployment-", dir=ROOT / ".cache"))
@@ -70,12 +73,22 @@ def main():
         )
     )
 
-    def run(args, *, check=True):
+    def run(args, *, check=True, input=None, binary=False):
         result = subprocess.run(
-            args, cwd=ROOT, env=env, capture_output=True, text=True, check=False, timeout=1200
+            args,
+            cwd=ROOT,
+            env=env,
+            capture_output=True,
+            text=not binary,
+            input=input,
+            check=False,
+            timeout=1200,
         )
         if check and result.returncode:
-            (directory / "command-failure.log").write_text(result.stdout + result.stderr)
+            output = result.stdout + result.stderr
+            (directory / "command-failure.log").write_text(
+                output.decode(errors="replace") if binary else output
+            )
             raise RuntimeError("Container command failed; private diagnostic retained on request")
         return result.stdout
 
@@ -294,6 +307,11 @@ print(json.dumps(result))
         logs = run(compose + ["logs", "--no-color", "api", "ingress"])
         assert all(secret not in logs for secret in [marker, password, key, *session_secrets])
         passed("container logs exclude request codes, authorization and configured secrets")
+        recovery = None
+        if options.recovery:
+            from check_recovery import rehearse
+
+            recovery = rehearse(ROOT, directory, compose, run, request, origin, passed)
         report = {
             "checks": results,
             "scope": "M7.1 backend and TLS session preparation; browser acceptance pending",
@@ -304,6 +322,9 @@ print(json.dumps(result))
             "revision": run(["git", "rev-parse", "HEAD"]).strip(),
             "working_tree_changes": bool(run(["git", "status", "--porcelain"]).strip()),
         }
+        if recovery is not None:
+            report["recovery"] = recovery
+            (ROOT / ".cache/recovery-result.json").write_text(json.dumps(report, indent=2) + "\n")
         (ROOT / ".cache/deployment-result.json").write_text(json.dumps(report, indent=2) + "\n")
         success = True
     finally:
