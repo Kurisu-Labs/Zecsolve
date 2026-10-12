@@ -523,3 +523,6 @@ link/diff checks. This includes all 16 export and 20 replay scenarios. The only
 merge conflict was two appended validation notes; both records were retained.
 M7.2 backend preparation is also confirmed merged as PR #19, correcting an older
 progress-board label. Export final-head CI remains its integration gate.
+
+M5.2 integration is tracked in [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23),
+with the full final validation results and the reviewed export-only diff.

@@ -112,7 +112,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Done: PR #20 merged |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Done: PR #21 merged |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Done: PR #22 merged |
-| [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Implementation complete and validated; see branch PR for integration |
+| [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Implemented and validated; [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23) tracks integration |
 | [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
 | [M6.1 — Browser access](#m6-1) | Person 4 | `feat/m6-browser-access` | Frontend resumed; M6.0 and M4.2 merged | Deferred |
 | [M6.2 — Merchant workflow](#m6-2) | Person 4 | `feat/m6-merchant-workflow` | Frontend resumed; M6.1 and M4.3 merged | Deferred |
@@ -246,7 +246,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M5.2 — Authorized export
 
-- **Owner:** Person 2. **Branch:** `feat/m5-case-export`. **Status:** Implementation complete and validated; see branch PR for integration.
+- **Owner:** Person 2. **Branch:** `feat/m5-case-export`. **Status:** Implemented and validated; [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23) tracks integration.
 - **Prerequisites:** M4.5 and M5.1 merged.
 - **Goal:** Export an authorized, internally consistent packet that the local replay command can consume.
 - **Owned code:** Export snapshot assembler/router, shared projection consumption, and export/replay integration tests.
