@@ -109,7 +109,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M4.2 — Browser sessions](#m4-2) | Person 1 | `feat/m4-browser-sessions` | M4.1 merged | Done: PR #16 merged |
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Done: PR #13 merged |
 | [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Done: PR #18 merged |
-| [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Ready |
+| [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | In progress: Codex, `feat/m4-scoped-reports` |
 | [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Ready |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
 | [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Waiting |
@@ -207,7 +207,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M4.5 — Scoped reports
 
-- **Owner:** Person 2. **Branch:** `feat/m4-scoped-reports`. **Status:** Ready; M4.2/M4.4 merged.
+- **Owner:** Person 2. **Branch:** `feat/m4-scoped-reports`. **Status:** In progress: Codex, `feat/m4-scoped-reports`; M4.2/M4.4 merged.
 - **Prerequisites:** M4.2 and M4.4 merged.
 - **Goal:** Expose only explicitly selected report fields and consented evidence to reviewers.
 - **Owned code:** Role projections, report service/router integration, authorized evidence-read interfaces, and disclosure tests. Person 1 retains shared auth/model ownership; Person 3 retains evidence submission.

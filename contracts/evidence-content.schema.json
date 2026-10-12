@@ -1,0 +1,45 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "evidence-content-v1",
+      "default": "evidence-content-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "evidence_id": {
+      "format": "uuid",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "receipt_json": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Receipt Json"
+    },
+    "raw_tx_hex": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Raw Tx Hex"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "receipt_json",
+    "raw_tx_hex"
+  ],
+  "title": "EvidenceContentV1",
+  "type": "object"
+}

@@ -1,5 +1,6 @@
 from sqlalchemy import func, select, text
 
+from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.db.models import ChainObservation, Claim, Evidence, Resolution, Verification
 from zecsolve.domain.offline_evaluation import evaluate_offline
 from zecsolve.schemas.case import CaseSummaryV1
@@ -22,6 +23,10 @@ class CaseReportService:
         self.engine = engine
 
     def get(self, principal, case_id, verification_id=None):
+        if not isinstance(principal, MerchantPrincipal):
+            from zecsolve.services.reviewer_reports import ReviewerReportService
+
+            return ReviewerReportService(self.engine).get(principal, case_id, verification_id)
         with transaction(self.engine) as session:
             # A consistent snapshot; shared credential lock still enforces authorization.
             session.execute(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))

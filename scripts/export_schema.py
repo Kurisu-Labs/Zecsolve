@@ -12,6 +12,7 @@ from zecsolve.schemas.case import (
     CaseListV1,
     CaseOpenedV1,
 )
+from zecsolve.schemas.disclosure import EvidenceContentV1, ReviewerEvidenceV1, ReviewerReportV1
 from zecsolve.schemas.evidence import (
     EvidenceStoredV1,
     EvidenceStoredV2,
@@ -43,6 +44,9 @@ from zecsolve.schemas.workflow_verification import (
 
 root = Path(__file__).resolve().parents[1]
 for name, model in (
+    ("reviewer-report", ReviewerReportV1),
+    ("reviewer-evidence", ReviewerEvidenceV1),
+    ("evidence-content", EvidenceContentV1),
     ("access-context", AccessContextV1),
     ("grant-scope", GrantScopeV1),
     ("grant-create-request", GrantCreateRequest),

@@ -6,7 +6,8 @@ from fastapi.responses import JSONResponse
 
 from zecsolve.api.workflow import execute
 from zecsolve.auth.credentials import MerchantPrincipal
-from zecsolve.auth.dependencies import require_merchant
+from zecsolve.auth.dependencies import require_actor, require_merchant
+from zecsolve.schemas.disclosure import ReviewerReportV1
 from zecsolve.schemas.resolution import MerchantCaseReportV1
 from zecsolve.schemas.workflow_verification import (
     CaseVerifyRequest,
@@ -54,16 +55,26 @@ def verify_evidence(
     )
 
 
-@router.get("/report", response_model=MerchantCaseReportV1)
+@router.get("/report", response_model=MerchantCaseReportV1 | ReviewerReportV1)
 def case_report(
     case_id: uuid.UUID,
-    principal: Principal,
+    principal: Annotated[object, Depends(require_actor)],
     request: Request,
     verification_id: uuid.UUID | None = None,
 ):
-    return execute(
+    result = execute(
         lambda: CaseReportService(request.app.state.engine).get(
             principal, case_id, verification_id
         ),
         "REPORT",
     )
+
+    if isinstance(result, ReviewerReportV1):
+        return JSONResponse(
+            content={
+                key: value
+                for key, value in result.model_dump(mode="json").items()
+                if value is not None
+            }
+        )
+    return result
