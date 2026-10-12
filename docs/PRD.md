@@ -1,5 +1,7 @@
 # Zecsolve — Product Requirements Document
 
+**Hosted demo (October 13 local / October 12 UTC):** [zecsolve.vercel.app](https://zecsolve.vercel.app) runs the complete app on Vercel Hobby with Neon Free. Public checks and the authorized historical-receipt workflow passed, including live RPC approval and export/replay. See the [deployment record](vercel-deployment.md) for the exact revision, private access handoff, operating limits and remaining release gates. PR #30 merged the CI diagnostics follow-up.
+
 **Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
 
 **Project:** Zecsolve — a Shielded Payment Exception Engine
@@ -131,7 +133,7 @@ This table reflects inspected source and [recorded development results](DEVELOPM
 7. Present findings and candidate amounts for review. Verification and rule evaluation do not allocate credit.
 8. On authorized approval, recheck current state and commit the resolution, allocation, and event atomically. Produce reports from those recorded facts.
 
-The backend and pinned Rust binary share one Docker deployment. The implementation plan selects same-origin FastAPI serving of the built Vue app, with Vite proxying `/api` in development; separate Vercel hosting is deferred. Public access and real customer evidence remain gated on scoped access, retention/deletion terms and deployment controls in §7; use public fixtures for the current demo.
+The backend and pinned Rust binary share one Docker deployment. The implementation plan selects same-origin FastAPI serving of the built Vue app, with Vite proxying `/api` in development; the public-fixture demo now uses that same-origin application in one Vercel container with Neon PostgreSQL ([deployment record](vercel-deployment.md)). Real customer evidence remains gated on retention/deletion terms and target-specific operator controls in §7; use public fixtures for the current hosted demo.
 
 ### 6.3 Data and independent status contracts
 
@@ -397,7 +399,7 @@ The coverage column reflects October 12 implementation and [recorded development
 | A-12 | Grant revocation stops future application access; disclosures explain that previously downloaded receipts remain reusable | Grant/session/consent and restored revocation checks; browser disclosure/session checks in PR #28; reviewed UI screenshots remain |
 | A-13 | Authorized packet includes the §6.5 inputs, reproduces verification and historical rules, and identifies missing/redacted context without leaking other cases | Contract/replay/export and authorized HTTP recovery checkpoints; deployed browser downloads/replay in PR #28; pinned reports in the [release bundle](release-bundle.md) |
 | A-14 | A failed or stale approval commits no partial allocation/resolution/event; invoice corrections cannot rewrite the original snapshot | Transaction rollback, stale-version browser acceptance, audit and immutability tests; correction/version-linkage workflow remains outside P0 |
-| A-15 | Errors/logs/exports omit tokens and wallet-wide keys; limits constrain hostile inputs; deployment and demo are repeatable | TLS/limits/log and recovery/browser CI in PR #28; repeatable release demo; actual deployment and operator/team artifacts remain incomplete |
+| A-15 | Errors/logs/exports omit tokens and wallet-wide keys; limits constrain hostile inputs; deployment and demo are repeatable | TLS/limits/log and recovery/browser CI in PR #28; repeatable release demo; hosted fixture workflow recorded; target recovery/operating controls and operator/team artifacts remain incomplete |
 
 Existing suites are [verifier tests](../apps/api/tests/test_verifier.py), [rules tests](../apps/api/tests/test_rules.py), [API tests](../apps/api/tests/test_api.py), and [PostgreSQL tests](../apps/api/tests/test_postgres.py). The documented commands are `make test`, `make lint`, and `make test-db` against a disposable PostgreSQL database. `make poc` exercises the offline demonstration. Case, persisted-verification and resolution tests already exist; grant/session and export/replay backend coverage is merged; P3 recovery integration merged in PR #24; P4 UI acceptance merged in PR #26 and deployed browser CI in PR #28; full release operator/team evidence remains. The [A-01–A-15 index](release-evidence.md#a-01a-15-traceability) names specific scenarios, runs and outstanding owners. No blanket “all acceptance tests complete” claim is supported by this document.
 

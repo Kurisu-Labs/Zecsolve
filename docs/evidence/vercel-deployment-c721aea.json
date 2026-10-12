@@ -1,0 +1,342 @@
+{
+  "schema_version": "vercel-deployment-v1",
+  "full_release_complete": false,
+  "public_checks": {
+    "schema_version": 1,
+    "checked_at": "2026-10-12T17:37:27.465013+00:00",
+    "revision": "c721aea6ee2e3b7379bd19d90f70fbecb6f06da2",
+    "target": "https://zecsolve.vercel.app",
+    "deployment_id": "dpl_9KuhxWXxFjhPX8fCZSZ4XUXFYBoU",
+    "image_digest": "sha256:d09d502b23856c0db12862a976111d8173e5fac9c8112d5199209156b015adb9",
+    "status": "passed",
+    "checks": [
+      {
+        "path": "/health/ready",
+        "status": 200,
+        "no_store": true,
+        "hsts": true,
+        "readiness": {
+          "database_migrated": true,
+          "verifier_available": true,
+          "evidence_encryption_configured": true
+        }
+      },
+      {
+        "path": "/",
+        "status": 200,
+        "no_store": true,
+        "hsts": true
+      },
+      {
+        "path": "/connect",
+        "status": 200,
+        "no_store": true,
+        "hsts": true
+      },
+      {
+        "path": "/api/cases",
+        "status": 401,
+        "no_store": true,
+        "hsts": true
+      },
+      {
+        "path": "/api/session",
+        "status": 401,
+        "no_store": true,
+        "hsts": true
+      },
+      {
+        "path": "/api/poc/verify",
+        "status": 404,
+        "no_store": true,
+        "hsts": true
+      },
+      {
+        "path": "/docs",
+        "status": 404,
+        "no_store": true,
+        "hsts": true
+      },
+      {
+        "path": "/openapi.json",
+        "status": 404,
+        "no_store": true,
+        "hsts": true
+      },
+      {
+        "check": "HTTP redirects to HTTPS despite spoofed forwarded protocol",
+        "status": 308
+      },
+      {
+        "check": "Forwarded-host injection does not replace configured host",
+        "status": 200
+      },
+      {
+        "check": "Session exchange rejects foreign Origin",
+        "status": 403,
+        "no_cookies_issued": true
+      },
+      {
+        "check": "Session exchange rejects invalid code",
+        "status": 401,
+        "no_cookies_issued": true
+      }
+    ]
+  },
+  "authenticated_checks": {
+    "checked_at": "2026-10-12T17:44:34.685729+00:00",
+    "target": "https://zecsolve.vercel.app",
+    "transport": "HTTPS httpx cookie sessions; actual hosted container and Neon",
+    "input": "public historical Glasspane receipt; synthetic invoice",
+    "new_payment_sent": false,
+    "checks": {
+      "secure_cookie_flags": true,
+      "csrf_required": true,
+      "customer_minimal_acknowledgments": true,
+      "customer_retry_identical": true,
+      "customer_report_export_approval_denied": true,
+      "receipt_valid": true,
+      "receipt_amount_zat": 100000,
+      "live_confirmation": true,
+      "rpc_source": "quicknode-public-demo",
+      "approval_observation_is_new": true,
+      "approval_retry_identical": true,
+      "credited_zat": 100000,
+      "outstanding_zat": 100000,
+      "decision_count": 1,
+      "merchant_packet_replay": "REPRODUCED",
+      "reviewer_packet_replay": "LIMITED",
+      "grant_revocation_invalidates_sessions": true,
+      "logout_invalidates_session": true
+    },
+    "approval_observation": {
+      "state": "CONFIRMED",
+      "source_kind": "RPC",
+      "source": "quicknode-public-demo",
+      "observed_at": "2026-10-12T17:44:21.332747Z",
+      "confirmations": 153940
+    },
+    "packet_sha256": {
+      "merchant": "932d20c40affbd918c25a3c679564c174197d88eeb20474be707e810acdc0a96",
+      "reviewer": "987b055c76026657637ff5914e5d42f7a7aee67154af3615aa0a478a050d5a1c"
+    },
+    "http_steps": [
+      {
+        "method": "POST",
+        "route": "/api/session",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/session",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/invoices",
+        "status": 403,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/invoices",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/grants",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/session",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/session",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/claims",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/evidence",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/evidence",
+        "status": 200,
+        "retry": true
+      },
+      {
+        "method": "GET",
+        "route": "/api/cases/{case_id}/report",
+        "status": 403,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/cases/{case_id}/export",
+        "status": 403,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/verify",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/chain-observations",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/resolve",
+        "status": 403,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/resolve",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/resolve",
+        "status": 200,
+        "retry": true
+      },
+      {
+        "method": "GET",
+        "route": "/api/cases/{case_id}/report",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/cases/{case_id}/export",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/cases/{case_id}/grants",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "POST",
+        "route": "/api/session",
+        "status": 201,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/session",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/cases/{case_id}/report",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/cases/{case_id}/export",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "DELETE",
+        "route": "/api/cases/{case_id}/grants/{id}",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/session",
+        "status": 401,
+        "retry": false
+      },
+      {
+        "method": "DELETE",
+        "route": "/api/cases/{case_id}/grants/{id}",
+        "status": 200,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/session",
+        "status": 401,
+        "retry": false
+      },
+      {
+        "method": "DELETE",
+        "route": "/api/session",
+        "status": 204,
+        "retry": false
+      },
+      {
+        "method": "GET",
+        "route": "/api/session",
+        "status": 401,
+        "retry": false
+      }
+    ]
+  },
+  "browser_smoke": {
+    "status": "passed",
+    "scenarios": [
+      "merchant sign-in",
+      "case listing",
+      "case detail: confirmed observation and approved balance",
+      "session restored after reload"
+    ],
+    "full_hosted_browser_suite": false,
+    "known_display_limitation": "Historical offline Chain not verified finding appears alongside later confirmed chain and approved credit; P4 follow-up remains."
+  },
+  "ci": [
+    {
+      "revision": "c721aea6ee2e3b7379bd19d90f70fbecb6f06da2",
+      "url": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38283817789",
+      "conclusion": "success"
+    },
+    {
+      "revision": "c721aea6ee2e3b7379bd19d90f70fbecb6f06da2",
+      "url": "https://github.com/Kurisu-Labs/zecsolve/actions/runs/38283817800",
+      "conclusion": "success"
+    }
+  ],
+  "not_run": [
+    "Hosted backup/restore and external key custody confirmation",
+    "Provider storage/encryption control review",
+    "Host-wide custom rate-limit and capacity acceptance",
+    "Full browser suite against hosted database",
+    "P4 reviewed UI screenshots and team release artifacts"
+  ]
+}

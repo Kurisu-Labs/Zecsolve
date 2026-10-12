@@ -1,5 +1,7 @@
 # Zecsolve — P0 Implementation and Assignment Board
 
+**Hosted demo (October 13 local / October 12 UTC):** [zecsolve.vercel.app](https://zecsolve.vercel.app) runs the complete app on Vercel Hobby with Neon Free. Public checks and the authorized historical-receipt workflow passed, including live RPC approval and export/replay. See the [deployment record](vercel-deployment.md) for the exact revision, private access handoff, operating limits and remaining release gates. PR #30 merged the CI diagnostics follow-up.
+
 **Person 4 frontend integration (October 12):** M6 integration and actual-backend browser evidence merged in [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); see [frontend handoff](frontend.md). P3 browser CI and the packaged deployment rehearsal merged in [PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28). The final release bundle and demo rehearsal merged in [PR #29](https://github.com/Kurisu-Labs/zecsolve/pull/29); operator/team handoffs remain open.
 
 **Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
@@ -39,7 +41,7 @@ Build one backend workflow through the real Rust verifier, real PostgreSQL trans
 - Retain FastAPI, SQLAlchemy/Alembic, PostgreSQL, the existing Rust/Glasspane wrapper, and Vue 3/TypeScript/Tailwind. Keep synchronous bounded verification for P0; do not introduce a queue or microservices.
 - Keep receipt-result schema version 1 and the existing POC endpoint compatible. Add separate workflow/report contracts instead of overloading `VerificationReport.chain_state`.
 - Provision merchant access through an operator CLI for the hackathon. No signup, email delivery, wallet authentication, or identity-verification product is required.
-- Use a same-origin deployment: FastAPI serves the built Vue application and `/api`; Vite proxies `/api` in development. This removes a separate frontend-hosting dependency from P0. Vercel can remain a later hosting choice.
+- Use a same-origin deployment: FastAPI serves the built Vue application and `/api`; Vite proxies `/api` in development. This removes a separate frontend-hosting dependency from P0. The public-fixture demo now uses a Vercel container for this complete same-origin app, with Neon PostgreSQL; see [target evidence and limits](vercel-deployment.md).
 - Use one case per invoice snapshot in P0. Multiple approved outputs can accumulate on that invoice. Do not implement split allocations, allocation reversal, or reassigning an approved output.
 - Default invoice policy: ten confirmations for credit, an observation no more than 60 seconds old at commit, exact memo binding, and no overpayment approval. These are explicit engineering defaults, stored with the invoice, not a guarantee against reorganization.
 - Leave `unique_receiver_binding=false` in the public P0 workflow. No registry currently proves receiver uniqueness, so callers must not be able to assert it. Missing memo evidence remains reviewable but cannot bypass binding requirements.
@@ -124,7 +126,9 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M6.6 — Browser acceptance](#m6-6) | Person 4 | `feat/m6-frontend-integration` | Frontend resumed; M6.2, M6.3, M6.4 and M6.5 merged | Implementation and recorded browser evidence merged in PR #26; P3 CI/deployment integration merged in PR #28 |
 | [M7.1 — Deployment controls](#m7-1) | Person 3 | `feat/m7-deployment-controls` | Backend preparation can start on current main; completion requires M4.2 and M6.0 | Backend/TLS preparation and browser CI/deployment integration merged in PRs #17/#28; target-specific operator acceptance remains |
 | [M7.2 — Release rehearsal](#m7-2) | Person 3 | `test/m7-final-release-bundle` | PRs #24/#26/#27/#28 merged and PR #25 changes in main; operator/team artifacts for full completion | Final bundle/demo rehearsal merged in PR #29; browser CI and historical recovery/evidence merged; operator/team release gates remain |
-| [M7 follow-up — Browser CI diagnostics](#m7-browser-diagnostics) | Person 3 | `fix/browser-ci-diagnostics` | PR #29 merged; existing P4 suite | Diagnostics implemented and investigation recorded; review/merge pending; original intermittent cause undetermined |
+| [M7 follow-up — Browser CI diagnostics](#m7-browser-diagnostics) | Person 3 | `fix/browser-ci-diagnostics` | PR #29 merged; existing P4 suite | Merged in PR #30; original intermittent cause undetermined |
+
+| [M7 follow-up — Vercel deployment](#m7-vercel-deployment) | Person 3 | `feat/vercel-deployment` | PRs #26–#30 merged; approved hosting and demo access | Hosted fixture validation recorded; integration tracked in [PR #31](https://github.com/Kurisu-Labs/zecsolve/pull/31); full operator/release gates remain |
 
 ### Task cards
 
@@ -353,7 +357,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M7.1 — Deployment controls
 
-- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Backend preparation merged in PR #17; browser CI/deployment integration merged in PR #28; actual target acceptance remains an operator handoff.
+- **Owner:** Person 3. **Branch:** `feat/m7-deployment-controls`. **Status:** Backend preparation merged in PR #17; browser CI/deployment integration merged in PR #28; Vercel public-fixture deployment is recorded separately below; target recovery/capacity/key custody acceptance remains an operator handoff.
 - **Prerequisites:** Backend preparation can start on current main; completion requires M4.2 and M6.0.
 - **Goal:** Provide a bounded same-origin deployment of the backend and Person 4's built application.
 - **Owned code:** `infra/`, Compose/ingress deployment configuration, backend static-serving integration, readiness/logging/limits and coordinated CI wiring.
@@ -379,7 +383,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M7 follow-up — Browser CI diagnostics
 
-- **Owner:** Person 3. **Branch:** `fix/browser-ci-diagnostics`. **Status:** Implemented and validated; review/merge pending.
+- **Owner:** Person 3. **Branch:** `fix/browser-ci-diagnostics`. **Status:** Merged in PR #30; original intermittent failure cause remains undetermined.
 - **Prerequisites:** PR #29 merged; consume the existing P4 suite and P3 CI/deployment harness.
 - **Goal:** Retain useful, safe failure evidence and investigate PR #29's intermittent browser failure without masking it.
 - **Owned code:** P3 browser/deployment runners, shared CI artifact registration, reporter regression tests, current status and investigation documentation.
@@ -387,6 +391,21 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 - **Public interfaces:** Sanitized schema-version-1 browser JSON with outcome/reason, exit code, selected scenario and attempt status/duration, known source locations, environment/revision and unchanged proof limits. Exact CI artifact paths are in [browser-ci.md](browser-ci.md).
 - **Acceptance checks:** Browser failure still fails the job while its safe report survives cleanup; malformed/missing/retried/skipped/flaky selections fail closed; injected secrets never escape into reports/errors. Unchanged packaged scenarios pass on fresh disposable deployments. Distinguish reproduced facts from unresolved hypotheses and record original/fresh runs.
 - **Validation evidence:** [Investigation and commands](browser-ci.md#pr-29-intermittent-browser-failure-investigation) and [Item 25](DEVELOPMENT.md#item-25--browser-ci-failure-diagnostics-and-pr-29-investigation). The original failure cannot be attributed because its raw report was discarded; passing repeats are not a root-cause finding. Common definition of done still requires review, CI and merge.
+
+<a id="m7-vercel-deployment"></a>
+
+#### M7 follow-up — Vercel public-fixture deployment
+
+- **Owner:** Person 3. **Branch:** `feat/vercel-deployment`. **Status:** Deployed and validated at `c721aea`; repository integration is tracked in [PR #31](https://github.com/Kurisu-Labs/zecsolve/pull/31).
+- **Prerequisites:** PRs #26–#30 merged; operator-authorized Vercel Hobby/Neon Free target, public RPC/fixture and private 30-day demo merchant access.
+- **Goal:** Host the actual application and native verifier under one HTTPS origin, preserving existing access and durable encrypted evidence.
+- **Owned code:** Shared Docker stages, Vercel service/routing configuration, dedicated backend runtime adapter/tests, deployment CI registration, operator guide and sanitized evidence.
+- **Exclusions:** Frontend source/tests/build configuration (P4), auth/schema changes (P1), packet contracts (P2), paid plans, private customer onboarding and claims that hosted backup/recovery or global rate controls passed.
+- **Public interfaces:** Existing `/api`, readiness, cookie/Origin/CSRF, RPC and packet/replay contracts; provider `PORT` and Production secrets; explicit operator migrations.
+- **Acceptance checks:** Actual container builds; verified database TLS and schema guard pass; HTTPS app/API and private sessions work; POC/docs remain disabled; authorized fixture submission/verification/live approval/retry/export/replay pass without new payment or leaked secrets; Compose regression CI remains green.
+- **Validation evidence:** [Operator procedure and limits](vercel-deployment.md), [sanitized hosted record](evidence/vercel-deployment-c721aea.json), [Item 26](DEVELOPMENT.md#item-26--vercel-public-fixture-deployment), foundation/web/simulated CI and packaged deployment/browser/recovery CI on `c721aea`. Browser smoke covers sign-in/list/detail/restoration; P4 must review the historical chain-finding display ambiguity. Hosted restore and external key custody remain separate gates. Apply the common definition of done.
+
+---
 
 ### Definition of done
 
@@ -632,7 +651,7 @@ Use the [release evidence index](release-evidence.md) for A-01–A-15 run refere
 - **Private-data retention:** before a real customer pilot, specify retention/deletion for original bundles, derived verification fields, invoice/claim/decision data, and backups together. Implement an authorized purge process consistent with the append-only application's limits. Expiring only the original blob while retaining all recovered personal fields is insufficient. This gate does not prevent a public-fixture hackathon demo.
 - **P1 exclusions:** no CipherPay adapter, notifications, refund execution, signed report, browser WASM, CSV, or new-chain/transaction-format work on this path.
 
-**Immediate tasks:** M4.0–M4.5 and M5.0–M5.2 are merged. Person 3’s export/replay recovery merged in PR #24. The release-evidence consolidation is present in main. The M3.1 live fixture observation and merchant approval trace merged in PR #27. The [remaining handoffs](release-evidence.md#remaining-handoffs-and-release-decision) identify operator/team artifacts for full release. Person 4's M6 implementation/browser evidence merged in PR #26. P3 browser CI/deployed acceptance merged in PR #28. P3's [release bundle and demo rehearsal](release-bundle.md) merged in PR #29. The P3 follow-up on `fix/browser-ci-diagnostics` retains safe failure artifacts and records the [intermittent-failure investigation](browser-ci.md#pr-29-intermittent-browser-failure-investigation); its review/CI/merge remain required. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
+**Immediate tasks:** M4.0–M4.5 and M5.0–M5.2 are merged. Person 3’s export/replay recovery merged in PR #24. The release-evidence consolidation is present in main. The M3.1 live fixture observation and merchant approval trace merged in PR #27. The [remaining handoffs](release-evidence.md#remaining-handoffs-and-release-decision) identify operator/team artifacts for full release. Person 4's M6 implementation/browser evidence merged in PR #26. P3 browser CI/deployed acceptance merged in PR #28. P3's [release bundle and demo rehearsal](release-bundle.md) merged in PR #29. The P3 follow-up on `fix/browser-ci-diagnostics` retains safe failure artifacts and records the [intermittent-failure investigation](browser-ci.md#pr-29-intermittent-browser-failure-investigation); it merged in PR #30. The [Vercel public-fixture deployment](vercel-deployment.md) now has live HTTPS/session/RPC/export evidence; hosted recovery, key custody, operating controls and P4/team handoffs remain open. Check active branches/PRs again when claiming any task; this document does not reserve remote work by itself.
 
 ### Sources checked for the proposed approach
 

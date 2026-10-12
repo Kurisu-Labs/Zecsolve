@@ -23,7 +23,7 @@ services:
   api:
     build:
       context: ..
-      dockerfile: infra/Dockerfile.api
+      dockerfile: Dockerfile.vercel
       target: deployment
     environment:
       ZECSOLVE_DEPLOY_HOST: ${ZECSOLVE_DEPLOY_HOST:?Set the deployment hostname}
