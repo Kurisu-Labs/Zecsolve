@@ -1,5 +1,6 @@
 <script setup lang="ts">
-defineProps<{ value: unknown }>()
+import { reportValue } from '@/lib/report'
+defineProps<{ value: unknown; field?: string }>()
 function label(key: string) {
   return key.replaceAll('_', ' ').replace(/^./, (c) => c.toUpperCase())
 }
@@ -10,16 +11,16 @@ function entries(value: object) {
 <template>
   <p v-if="value === null || value === undefined">Not recorded</p>
   <ol v-else-if="Array.isArray(value) && value.length" class="records">
-    <li v-for="(item, index) in value" :key="index"><ReportFields :value="item" /></li>
+    <li v-for="(item, index) in value" :key="index"><ReportFields :value="item" :field="field" /></li>
   </ol>
   <p v-else-if="Array.isArray(value)">No disclosed records</p>
   <dl v-else-if="typeof value === 'object'" class="fields">
     <div v-for="[key, item] in entries(value)" :key="key">
       <dt>{{ label(key) }}</dt>
-      <dd><ReportFields :value="item" /></dd>
+      <dd><ReportFields :value="item" :field="key" /></dd>
     </div>
   </dl>
-  <span v-else class="text">{{ value }}</span>
+  <span v-else class="text">{{ reportValue(value, field) }}</span>
 </template>
 <style scoped>
 .fields > div {

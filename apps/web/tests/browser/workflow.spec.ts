@@ -22,7 +22,7 @@ async function login(page: Page, code: string) {
 async function checkAccessibility(page: Page) {
   await expect(page.locator('.route-enter-active, .route-leave-active')).toHaveCount(0)
   const result = await new AxeBuilder({ page }).analyze()
-  expect(result.violations.map(v => ({ id: v.id, targets: v.nodes.map(n => n.target) }))).toEqual([])
+  expect(result.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) }))).toEqual([])
 }
 async function createCase(page: Page) {
   const invoice = await call(page, '/api/invoices', {
@@ -179,6 +179,13 @@ test('three roles complete the real HTTPS submission and merchant review flow', 
   await expect(reviewer.getByText('Report-only access. Packet export is not permitted.')).toBeVisible()
   await expect(reviewer.getByText(note, { exact: true })).toHaveCount(0)
   await expect(reviewer.getByRole('heading', { name: 'Invoice', exact: true })).toHaveCount(0)
+  await reviewer.emulateMedia({ media: 'print' })
+  await expect(reviewer.getByRole('heading', { name: 'Shared case report' })).toBeVisible()
+  await expect(reviewer.getByRole('button', { name: 'Refresh report' })).not.toBeVisible()
+  expect(await reviewer.locator('.workflow-page').evaluate((el) => getComputedStyle(el).color)).toBe(
+    'rgb(17, 17, 17)',
+  )
+  await reviewer.emulateMedia({ media: 'screen' })
   await reviewer.getByRole('button', { name: /^Read / }).click()
   await expect(reviewer.getByLabel('Receipt preview')).toHaveValue(receipt.replaceAll('\r\n', '\n'))
   const originalDownload = reviewer.waitForEvent('download')
@@ -432,6 +439,8 @@ test('keyboard and accessibility checks cover login, invoice and scoped submissi
   const grant = await call(page, `/api/cases/${id}/grants`, { scope: { role: 'customer' }, ttl_hours: 1 })
   await login(page, grant.data.access_code)
   await expect(page).toHaveURL(`/submit/${id}`)
+  await page.getByLabel('Include receipt JSON').check()
+  await page.getByLabel('Include raw transaction', { exact: true }).check()
   await checkAccessibility(page)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
@@ -441,7 +450,16 @@ test('case listing paginates and filters the server summaries', async ({ page })
   const ids: string[] = []
   for (let i = 0; i < 26; i++) ids.push(await createCase(page))
   const closedId = ids[0]!
-  expect((await call(page, `/api/cases/${closedId}/resolve`, { action: 'CLOSE_UNRESOLVED', expected_case_version: 1, verification_id: null, reason: 'Public fixture case closed for browser filter test.' })).status).toBe(201)
+  expect(
+    (
+      await call(page, `/api/cases/${closedId}/resolve`, {
+        action: 'CLOSE_UNRESOLVED',
+        expected_case_version: 1,
+        verification_id: null,
+        reason: 'Public fixture case closed for browser filter test.',
+      })
+    ).status,
+  ).toBe(201)
   await page.goto('/cases')
   await expect(page.locator('tbody tr')).toHaveCount(25)
   await page.getByRole('button', { name: 'Load more cases' }).click()

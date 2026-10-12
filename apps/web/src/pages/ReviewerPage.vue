@@ -4,6 +4,7 @@ import { api, type Contract } from '@/api/client'
 import { session } from '@/api/session'
 import ReportFields from '@/components/ReportFields.vue'
 import ExportButton from '@/components/ExportButton.vue'
+import { limitationLabel } from '@/lib/report'
 const props = defineProps<{ id: string }>()
 const report = ref<Contract['reviewerReport'] | null>(null)
 const original = ref<Contract['evidenceContent'] | null>(null)
@@ -71,7 +72,7 @@ onMounted(load)
         replay packet.
       </p>
       <ul>
-        <li v-for="limit in report.limitations" :key="limit">{{ limit }}</li>
+        <li v-for="limit in report.limitations" :key="limit">{{ limitationLabel(limit) }}</li>
       </ul>
       <section v-for="section in report.sections" :key="section" class="workflow-card">
         <h2>{{ section[0]?.toUpperCase() }}{{ section.slice(1) }}</h2>
@@ -118,6 +119,30 @@ onMounted(load)
 </template>
 <style scoped>
 @media print {
+  :global(body) {
+    background: #fff;
+    color: #111;
+  }
+  :global(.header),
+  :global(.footer) {
+    display: none;
+  }
+  .workflow-page {
+    color: #111;
+    background: #fff;
+    max-width: none;
+    padding: 0;
+  }
+  .workflow-card {
+    border-color: #aaa;
+    break-inside: avoid;
+  }
+  :deep(dt) {
+    color: #555;
+  }
+  :deep(.fields > div) {
+    border-color: #ccc;
+  }
   .no-print {
     display: none;
   }

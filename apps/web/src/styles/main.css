@@ -176,6 +176,8 @@ html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after 
 .workflow-card { border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: 1.25rem; display: grid; gap: 1rem; min-width: 0; }
 .workflow-fields { border: 0; padding: 0; display: grid; gap: 1rem; min-width: 0; }
 .workflow-fields label { display: grid; gap: .4rem; }
+.workflow-fields label { min-width: 0; }
+.workflow-fields input:not([type='checkbox']), .workflow-fields select, .workflow-fields textarea { min-width: 0; max-width: 100%; width: 100%; box-sizing: border-box; }
 .workflow-fields label.check { display: flex; gap: .65rem; align-items: baseline; }
 .workflow-fields input[type=checkbox] { accent-color: var(--color-zec); }
 .workflow-page .error { color: var(--color-fail); }
