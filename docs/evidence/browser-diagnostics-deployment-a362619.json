@@ -1,0 +1,167 @@
+{
+  "node": "v24.21.0",
+  "playwright": "1.64.0",
+  "schema_version": 1,
+  "boundary": "packaged-nginx-TLS",
+  "chain_mode": "OFFLINE",
+  "live_confirmation": false,
+  "release_complete": false,
+  "revision": "a362619f8c9b04ba90691046b58935f7ee05f9a6",
+  "working_tree_changes": false,
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.14.8",
+  "outcome": "passed",
+  "counts": {
+    "expected": 8,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0
+  },
+  "scenarios": [
+    {
+      "title": "three roles complete the real HTTPS submission and merchant review flow",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 97,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 20696,
+          "error_locations": []
+        }
+      ]
+    },
+    {
+      "title": "mobile login, invalid access and explicitly selected demo",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 282,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 1195,
+          "error_locations": []
+        }
+      ]
+    },
+    {
+      "title": "merchant sees tampered and missing evidence without credit",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 297,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 8450,
+          "error_locations": []
+        }
+      ]
+    },
+    {
+      "title": "stale merchant decisions refresh for explicit review and noncredit decisions retry safely",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 325,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 4827,
+          "error_locations": []
+        }
+      ]
+    },
+    {
+      "title": "lost grant creation responses expose no replacement secret",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 370,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 2533,
+          "error_locations": []
+        }
+      ]
+    },
+    {
+      "title": "keyboard and accessibility checks cover login, invoice and scoped submission on mobile",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 445,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 5913,
+          "error_locations": []
+        }
+      ]
+    },
+    {
+      "title": "case listing paginates and filters the server summaries",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 473,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 18302,
+          "error_locations": []
+        }
+      ]
+    },
+    {
+      "title": "local expiry returns to login and missing CSRF can recover with a new session",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 497,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 2835,
+          "error_locations": []
+        }
+      ]
+    }
+  ],
+  "duration_ms": 66823.512,
+  "global_error_count": 0,
+  "reason": "completed",
+  "exit_code": 0,
+  "started_at": "2026-10-12T16:12:34.500076+00:00",
+  "finished_at": "2026-10-12T16:13:42.033052+00:00",
+  "browser_channel": "chromium",
+  "api_interval_ms": 300,
+  "browser_certificate_verification": "disabled for generated localhost certificate"
+}

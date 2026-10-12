@@ -814,3 +814,65 @@ recording and team submission evidence are still outstanding. Private-customer
 retention/purge remains a separate prerequisite. This task does not deploy,
 contact anyone, submit to an event or fabricate missing evidence. PR review,
 current CI and merge remain required for this slice's completion.
+
+
+## Item 25 — Browser CI failure diagnostics and PR #29 investigation
+
+**Date:** October 13, 2026 (local; recorded executions below use UTC). **Owner:**
+Person 3. **Branch:** `fix/browser-ci-diagnostics`, published from clean merged
+PR #29 main `5ed3cc1` after fetching remote branches and checking open PRs. No
+open PR or unmerged remote contribution overlapped this scope.
+
+Implementation increment `a362619` retains an allowlisted browser result before
+raising on failure or deleting temporary files. Known scenario names, expected
+selection counts, attempt status/retry/duration, fixed reason/exit code and known
+spec coordinates survive; raw messages, stacks, snippets, paths, stdout/stderr,
+attachments, DOM and evidence do not. Malformed output, nonzero child exits,
+startup/timeout, missing/duplicate/retried attempts and expected failures cannot
+be reported as acceptance success. Both CI jobs upload only their exact sanitized
+JSON when present, including on job failure. Deployment browser evidence is
+independent of the later recovery result. Cancellation or failure before the
+harness starts can still prevent report creation.
+
+The [investigation](browser-ci.md#pr-29-intermittent-browser-failure-investigation)
+records the original failed job and unchanged successful PR run/retry. Original
+cause remains undetermined: the old runner discarded the failed JSON without
+recording its scenario or assertion. Inspection found possible revoke/refresh
+synchronization and response-loss request pacing issues for P4 triage; neither
+was observed failing or attributed to PR #29. No P4 scenario, frontend source,
+production limit, assertion, timeout, retry policy, auth/schema or chain policy
+changed. No live RPC call was made.
+
+### Validation
+
+- Twenty-six focused runner checks passed, including injected secrets in errors,
+  titles, counters, paths, stdout/stderr and attachments; stale-success removal;
+  nonzero exit with otherwise passing JSON; and failure cleanup.
+- A real Playwright assertion in a temporary standalone spec intentionally failed
+  with exit 1. Its raw JSON included a private canary; the retained result kept
+  the known scenario and source line 3 without the canary. The temporary private
+  files were deleted. This is reporter validation, not product acceptance.
+- Two clean local `a362619` packaged runs passed all eight unchanged browser
+  scenarios with zero skips/retries: 2026-10-12 16:10:08–16:11:10 UTC and
+  16:13:35–16:14:36 UTC, on macOS 27.0.1 arm64, Python 3.12.14, Node 26.11.0,
+  Playwright 1.64.0. The first continued through all 26 deployment/recovery groups;
+  the second repeated deployment/browser on fresh data. Both projects/volumes
+  were removed, and Colima was restored to its originally stopped state.
+- Local `make lint` passed. `make test` passed 12 Rust and 300 Python tests but
+  hit the same five macOS 0.2-second process/address timeout failures recorded in
+  Items 23–24; this is not a local full-suite pass. Limits remain unchanged.
+- Clean Linux CI passed all four jobs at `a362619`: 12 Rust, 305 non-database
+  Python, 237 PostgreSQL, lint, POC/release demo, 8 frontend unit tests, generated
+  types/build, eight deployed browser cases plus all 26 recovery/deployment
+  groups, and one separately simulated browser case. See
+  [foundation/web/simulated](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38275414758)
+  and [packaged deployment/recovery](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38275414753).
+- Both browser artifact archives contained only the named sanitized JSON member;
+  downloaded archive SHA-256 matched GitHub's digest. Exact reports and member
+  hashes are retained in [browser-ci.md](browser-ci.md). Historical evidence and
+  Items 01–24 remain byte-for-byte unchanged. Current README, PRD, assignment
+  board and release bundle acknowledge merged PR #29; full M7 remains gated on
+  the existing operator/P4/team handoffs.
+
+The diagnostics/investigation slice still requires final PR review, CI and merge.
+Passing repetitions do not prove the original intermittent failure is fixed.

@@ -1,0 +1,48 @@
+{
+  "node": "v24.21.0",
+  "playwright": "1.64.0",
+  "schema_version": 1,
+  "boundary": "isolated-FastAPI-TLS",
+  "chain_mode": "SIMULATED",
+  "live_confirmation": false,
+  "release_complete": false,
+  "revision": "a362619f8c9b04ba90691046b58935f7ee05f9a6",
+  "working_tree_changes": false,
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "python": "3.14.8",
+  "outcome": "passed",
+  "counts": {
+    "expected": 1,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0
+  },
+  "scenarios": [
+    {
+      "title": "simulated approval retries once and a second invoice cannot reuse its output",
+      "location": {
+        "file": "apps/web/tests/browser/workflow.spec.ts",
+        "line": 393,
+        "column": 1
+      },
+      "status": "passed",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration_ms": 3384,
+          "error_locations": []
+        }
+      ]
+    }
+  ],
+  "duration_ms": 4984.4349999999995,
+  "global_error_count": 0,
+  "reason": "completed",
+  "exit_code": 0,
+  "started_at": "2026-10-12T16:10:54.294549+00:00",
+  "finished_at": "2026-10-12T16:10:59.959622+00:00",
+  "browser_channel": "chromium",
+  "api_interval_ms": 0,
+  "browser_certificate_verification": "disabled for generated localhost certificate"
+}

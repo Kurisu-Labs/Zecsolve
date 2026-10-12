@@ -106,7 +106,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Test explicitly simulated approval, retry and conflict
         run: uv run --locked python scripts/browser_acceptance.py --simulated-chain
-      - name: Retain sanitized simulated browser evidence
+      - name: Retain sanitized simulated browser evidence even on failure
+        if: ${{ !cancelled() && hashFiles('.cache/browser-simulated-result.json') != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: browser-simulated-evidence

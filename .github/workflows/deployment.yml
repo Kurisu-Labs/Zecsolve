@@ -53,3 +53,10 @@ jobs:
           name: backend-recovery-evidence
           path: .cache/recovery-result.json
           if-no-files-found: error
+      - name: Retain sanitized browser diagnostics even on failure
+        if: ${{ !cancelled() && hashFiles('.cache/browser-deployment-result.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-deployment-evidence
+          path: .cache/browser-deployment-result.json
+          if-no-files-found: error
