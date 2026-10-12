@@ -18,6 +18,7 @@ from zecsolve.domain.snapshots import digest
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / ".cache/release-rehearsal.json"
+PUBLIC_PACKET = ROOT / ".cache/release-demo-packet.json"
 VERIFIER = ROOT / "target/debug/zecsolve-verifier"
 
 
@@ -150,11 +151,27 @@ def replay_examples():
 def main():
     OUTPUT.parent.mkdir(exist_ok=True)
     OUTPUT.unlink(missing_ok=True)
+    PUBLIC_PACKET.unlink(missing_ok=True)
     started = datetime.now(UTC).isoformat()
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     dirty = bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT).strip())
     poc = run_json([sys.executable, "scripts/poc.py"])
-    demo = run_json([sys.executable, "scripts/demo_resolution.py"])
+    with tempfile.TemporaryDirectory(prefix="zecsolve-release-export-") as directory:
+        packet = Path(directory) / "public-demo.json"
+        demo = run_json(
+            [sys.executable, "scripts/demo_resolution.py", "--export-public-packet", str(packet)]
+        )
+        exported = packet.read_bytes()
+        replayed = run_json(
+            [sys.executable, "-m", "zecsolve.replay", str(packet), "--verifier", str(VERIFIER)]
+        )
+        exported_hash = hashlib.sha256(exported).hexdigest()
+        require(
+            replayed["status"] == "REPRODUCED"
+            and replayed["full_replay"] is True
+            and replayed["packet_file_sha256"] == exported_hash,
+            "Authorized public demo export did not reproduce",
+        )
     scenarios = check_scenarios(poc, demo)
     replay = replay_examples()
     manifest = json.loads((ROOT / "fixtures/manifest.json").read_text())
@@ -179,6 +196,14 @@ def main():
         status="passed",
         scenarios=scenarios,
         replay=replay,
+        authorized_public_export=dict(
+            packet_file="release-demo-packet.json",
+            sha256=exported_hash,
+            exit_code=0,
+            status="REPRODUCED",
+            boundary="authorized merchant export service",
+            inputs="exact public fixture; synthetic invoice; SIMULATED approval history",
+        ),
         fixture_manifest_sha256=hashlib.sha256(
             (ROOT / "fixtures/manifest.json").read_bytes()
         ).hexdigest(),
@@ -193,8 +218,12 @@ def main():
             "Hashes identify bytes, not authors or fresh chain inclusion",
         ],
     )
+    PUBLIC_PACKET.write_bytes(exported)
     OUTPUT.write_text(json.dumps(report, indent=2) + "\n")
-    print("PASS: three demo scenarios, six replay outcomes and fixture/license hashes")
+    print(
+        "PASS: three demo scenarios, authorized public export, "
+        "six replay outcomes and fixture/license hashes"
+    )
     return 0
 
 

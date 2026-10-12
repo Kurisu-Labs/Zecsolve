@@ -1,5 +1,6 @@
 """Release evidence must fail closed and never publish child diagnostics."""
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -35,6 +36,9 @@ def test_failed_run_removes_previous_success_report(tmp_path, monkeypatch):
     output = tmp_path / "report.json"
     output.write_text('{"status": "passed"}')
     monkeypatch.setattr(runner, "OUTPUT", output)
+    packet = tmp_path / "packet.json"
+    packet.write_text("previous public export")
+    monkeypatch.setattr(runner, "PUBLIC_PACKET", packet)
 
     def fail(*args, **kwargs):
         raise RuntimeError("simulated failure")
@@ -43,20 +47,24 @@ def test_failed_run_removes_previous_success_report(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError):
         runner.main()
     assert not output.exists()
+    assert not packet.exists()
 
 
 @pytest.mark.postgres
-def test_release_rehearsal_records_actual_scenarios_and_replay(root, tmp_path):
+def test_release_rehearsal_records_actual_scenarios_and_replay(root, tmp_path, monkeypatch):
     if not os.getenv("ZECSOLVE_TEST_DATABASE_URL"):
         pytest.skip("Disposable PostgreSQL required")
     original_examples = (root / "fixtures/packets/replay-results.json").read_bytes()
     # Separate the test output from the CI artifact produced by the documented CLI.
-    runner.OUTPUT = tmp_path / "rehearsal.json"
-    try:
-        assert runner.main() == 0
-        report = json.loads(runner.OUTPUT.read_text())
-    finally:
-        runner.OUTPUT = root / ".cache/release-rehearsal.json"
+    monkeypatch.setattr(runner, "OUTPUT", tmp_path / "rehearsal.json")
+    monkeypatch.setattr(runner, "PUBLIC_PACKET", tmp_path / "packet.json")
+    assert runner.main() == 0
+    report = json.loads(runner.OUTPUT.read_text())
+    assert (
+        report["authorized_public_export"]["sha256"]
+        == hashlib.sha256(runner.PUBLIC_PACKET.read_bytes()).hexdigest()
+    )
+    assert report["authorized_public_export"]["status"] == "REPRODUCED"
     assert len(report["scenarios"]) == 3
     assert report["replay"]["complete-v2"]["status"] == "REPRODUCED"
     assert {name: entry["exit_code"] for name, entry in report["replay"].items()} == {

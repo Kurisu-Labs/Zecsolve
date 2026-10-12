@@ -44,7 +44,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-demo-evidence
-          path: .cache/release-rehearsal.json
+          path: |
+            .cache/release-rehearsal.json
+            .cache/release-demo-packet.json
           if-no-files-found: error
 
   web:

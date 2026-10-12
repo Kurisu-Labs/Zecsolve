@@ -1,5 +1,6 @@
 """Public fixture + explicitly simulated confirmation, in a disposable schema only."""
 
+import argparse
 import base64
 import json
 import os
@@ -24,6 +25,7 @@ from zecsolve.schemas.resolution import ResolveRequest
 from zecsolve.schemas.workflow_verification import CaseVerifyRequest
 from zecsolve.services.cases import CaseService
 from zecsolve.services.evidence import EvidenceService
+from zecsolve.services.exports import CaseExportService
 from zecsolve.services.invoices import InvoiceService
 from zecsolve.services.reports import CaseReportService
 from zecsolve.services.resolutions import ResolutionService
@@ -55,7 +57,7 @@ def simulated_demo_authority(observation):
     return observation.source_kind == "SIMULATED" and observation.source == "isolated-demo"
 
 
-def run_demo(engine):
+def run_demo(engine, export_packet=None):
     slots = threading.BoundedSemaphore(2)
     cipher = EvidenceCipher("ephemeral-demo", SecretStr(base64.b64encode(os.urandom(32)).decode()))
     binary = ROOT / "target/debug/zecsolve-verifier"
@@ -131,6 +133,17 @@ def run_demo(engine):
     invalid = rejected(decisions, second, tampered, "invalid")
     report = CaseReportService(engine).get(principal, case.case_id)
     rejected_report = CaseReportService(engine).get(principal, second.case_id)
+    if export_packet is not None:
+        # This newly provisioned merchant/case contains only the public fixture
+        # and synthetic demo history. Use the ordinary authorization/decryption
+        # service, never a hand-assembled packet or a customer-provided case ID.
+        packet = CaseExportService(engine, cipher, slots).export(principal, case.case_id)
+        if len(packet.payload.evidence) != 1:
+            raise AssertionError("Unexpected demo evidence")
+        original = packet.payload.evidence[0]
+        if original.receipt.text() != receipt or original.raw_transaction_hex.text() != raw:
+            raise AssertionError("Demo packet did not preserve the exact public fixture")
+        export_packet.write_text(packet.model_dump_json(indent=2) + "\n")
     return dict(
         source_kind="SIMULATED",
         live_confirmation=False,
@@ -161,6 +174,9 @@ def run_demo(engine):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--export-public-packet", type=Path)
+    options = parser.parse_args()
     url = os.getenv("ZECSOLVE_TEST_DATABASE_URL")
     if not url:
         raise SystemExit("Set ZECSOLVE_TEST_DATABASE_URL to a disposable PostgreSQL database")
@@ -177,7 +193,7 @@ def main():
         with engine.begin() as connection:
             config.attributes["connection"] = connection
             command.upgrade(config, "head")
-        trace = run_demo(engine)
+        trace = run_demo(engine, options.export_public_packet)
         with engine.connect() as connection:
             trace["postgres_version"] = connection.execute(text("SHOW server_version")).scalar_one()
     finally:
