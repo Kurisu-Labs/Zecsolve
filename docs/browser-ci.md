@@ -1,7 +1,7 @@
 # Browser CI and release integration
 
-Person 3 integrates Person 4's merged [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26)
-suite into shared CI and the release rehearsal. Frontend behavior remains owned
+Person 3 integrated Person 4's merged [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26)
+suite into shared CI and the release rehearsal in [PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28). Frontend behavior remains owned
 by Person 4; the integration changes only test origin/request scheduling and
 runner wiring. No application, authorization, database schema or chain policy
 changes are needed.
@@ -86,6 +86,6 @@ required in addition to browser acceptance.
   retains private diagnostics locally for inspection; remove the retained test
   project/data afterwards. Share only reviewed, sanitized result files.
 
-This closes the automation handoff when the integration PR is reviewed, CI passes
-and it merges. Full release still requires the [operator/team evidence](release-evidence.md#remaining-handoffs-and-release-decision),
+The automation handoff merged in PR #28 after all four CI jobs passed. The
+[release bundle](release-bundle.md) records a fresh run at its pinned candidate. Full release still requires the [operator/team evidence](release-evidence.md#remaining-handoffs-and-release-decision),
 the final revision's assembled acceptance/demo and reviewed UI screenshots.

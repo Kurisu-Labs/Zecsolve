@@ -1,0 +1,118 @@
+{
+  "schema_version": "release-rehearsal-v1",
+  "revision": "775ca5d80956a79c836e9cccd209f26025af310a",
+  "working_tree_changes": false,
+  "started_at": "2026-10-12T15:32:54.790387+00:00",
+  "finished_at": "2026-10-12T15:32:58.373334+00:00",
+  "environment": {
+    "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.14.8",
+    "rust": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "postgres": "17.11 (Debian 17.11-1.pgdg12+2)"
+  },
+  "command": "uv run --locked python scripts/rehearse_release.py",
+  "status": "passed",
+  "scenarios": [
+    {
+      "scenario": "1-candidate-projection",
+      "acceptance": [
+        "A-01",
+        "A-03",
+        "A-10"
+      ],
+      "status": "passed",
+      "inputs": "public historical Orchard receipt; synthetic invoice; offline observer",
+      "outcome": {
+        "credited_zat": 0,
+        "outstanding_zat": 200000,
+        "candidate_zat": 100000,
+        "projected_outstanding_zat": 100000,
+        "eligible_for_credit": false
+      }
+    },
+    {
+      "scenario": "2-retry-and-conflict",
+      "acceptance": [
+        "A-05",
+        "A-06"
+      ],
+      "status": "passed",
+      "inputs": "public receipt; synthetic invoices; explicitly SIMULATED confirmation",
+      "outcome": {
+        "balances": {
+          "credited_zat": 100000,
+          "outstanding_zat": 100000,
+          "candidate_zat": 0
+        },
+        "retry_same_resolution": true,
+        "second_invoice": "OUTPUT_ALLOCATION_CONFLICT",
+        "source_kind": "SIMULATED"
+      }
+    },
+    {
+      "scenario": "3-invalid-evidence",
+      "acceptance": [
+        "A-02"
+      ],
+      "status": "passed",
+      "inputs": "public tampered OCK fixture; synthetic invoice",
+      "outcome": {
+        "tampered_receipt": "INVALID",
+        "tampered_reason": "OUTPUT_RECOVERY_FAILED",
+        "tampered_approval": "CREDIT_INELIGIBLE",
+        "rejected_invoice_credited_zat": 0
+      }
+    }
+  ],
+  "replay": {
+    "complete-v1": {
+      "exit_code": 0,
+      "status": "REPRODUCED",
+      "packet_file_sha256": "3178cbbb996811037a0ec49228608baeaabdd5d6d9eb15ef1ce733da7f914c35"
+    },
+    "complete-v2": {
+      "exit_code": 0,
+      "status": "REPRODUCED",
+      "packet_file_sha256": "2c95bc2abf08f1d25da6e41f2026067a2c63acd52333b8e20953d8ed910b836e"
+    },
+    "tampered": {
+      "exit_code": 1,
+      "status": "FAILED",
+      "packet_file_sha256": "c15906484d0043b2e7c0530f883a687bfd82b58eeaba45ff8cf791fe088f4d60"
+    },
+    "scoped": {
+      "exit_code": 2,
+      "status": "LIMITED",
+      "packet_file_sha256": "e0362c1dec03662bea868381869e11315a695114bfaf560558bef63eeb18b020"
+    },
+    "missing-version": {
+      "exit_code": 2,
+      "status": "LIMITED",
+      "packet_file_sha256": "ed75a351bf4c28f9fb33b2f3a04003de527abc8e01e8e11cb45f9d2cedf1b78c"
+    },
+    "unsupported-version": {
+      "exit_code": 3,
+      "status": "UNSUPPORTED",
+      "packet_file_sha256": "4721dbed21b594a85cc334aee1894e1255e153c4591972372d2dbcc8e2b3b84c"
+    }
+  },
+  "authorized_public_export": {
+    "packet_file": "release-demo-packet.json",
+    "sha256": "71fe7a47e1f6842657757ac4abf91ac9add271fac1d299a7c2d9a517374c4c4a",
+    "exit_code": 0,
+    "status": "REPRODUCED",
+    "boundary": "authorized merchant export service",
+    "inputs": "exact public fixture; synthetic invoice; SIMULATED approval history"
+  },
+  "fixture_manifest_sha256": "000b9b9fdd7da9ab88144abf95e9b2ca6b4558df285b92516c5f1f3ace121833",
+  "schema_removed": true,
+  "live_confirmation": false,
+  "release_complete": false,
+  "limitations": [
+    "Service/CLI rehearsal, not a browser recording or public deployment",
+    "SIMULATED credit is test-only; no new payment or live RPC used",
+    "Packet samples mix public evidence with synthetic business history",
+    "Authorized HTTP export, live and browser results are separately indexed",
+    "Hashes identify bytes, not authors or fresh chain inclusion"
+  ]
+}
