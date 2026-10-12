@@ -1,6 +1,6 @@
 # Zecsolve — Product Requirements Document
 
-**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration and evidence in [frontend.md](frontend.md) supersede that partial implementation status; review/CI/merge still govern completion.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration in [frontend.md](frontend.md) supersedes that partial implementation status; review/CI/merge still govern completion.
 
 **Project:** Zecsolve — a Shielded Payment Exception Engine
 
@@ -18,7 +18,7 @@
 
 **Funding / budget:** Not specified
 
-**Status:** M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh exists but live-node validation is pending. M4.0–M4.4 are merged, unblocking Person 2's scoped reports; M5 remains pending. Person 4's frontend is locally integrated and browser-validated; publication/PR/CI/merge remain pending (see frontend.md). M7.1 backend preparation is merged; Person 3's [M7.2 backend recovery rehearsal](recovery.md) is in progress. Full release acceptance remains incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains historical results; each current feature still requires review, CI and merge.
+**Status:** M1/M2 backend implementation is complete; M3 trusted-chain adapter/refresh exists but live-node validation is pending. M4.0–M4.5 and M5.0–M5.2 are merged. Person 4's frontend is locally integrated and browser-validated; publication/PR/CI/merge remain pending (see [frontend.md](frontend.md)). M7.1 backend preparation and M7.2 backend recovery merged in PRs #17/#19; Person 3’s export/replay [recovery integration](recovery.md) merged in PR #24. The [release evidence index](release-evidence.md) consolidates attributable backend runs and outstanding handoffs. Full release acceptance remains incomplete. [DEVELOPMENT.md](DEVELOPMENT.md) retains historical results; each current feature still requires review, CI and merge.
 
 The cutoff above follows the [official hackathon rules, §5](https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf). The internal sprint is shorter than the full competition period.
 
@@ -116,7 +116,7 @@ The chosen architecture is a modular monolith: a planned Vue 3/TypeScript/Tailwi
 | Chain observations | Offline default, trusted Zebra adapter, idempotent refresh/provenance and later loss-of-inclusion review | Actual trusted node validation and live merchant approval trace |
 | Frontend | Initial Vue 3/TypeScript/Tailwind implementation from PR #12; all work assigned to Person 4 | Remaining M6 integration and actual-backend acceptance |
 | Export | CasePacketV1, original inputs, historical replay CLI and authorized snapshot export | P4 download integration and full release rehearsal |
-| Delivery | Setup/tests/CI, M7.1 backend TLS/session/limits (PR #17), M7.2 backend migration/restart/encrypted-restore preparation (PR #19) | Browser/live/export release acceptance, full demo and release evidence |
+| Delivery | Setup/tests/CI, M7.1 backend TLS/session/limits (PR #17), M7.2 migration/restart/encrypted restore (PR #19), scoped export/replay recovery (PR #24), [evidence index](release-evidence.md) | Browser/live acceptance, operator/team handoffs, full demo and final release evidence |
 
 This table reflects inspected source and [recorded development results](DEVELOPMENT.md), not a fresh execution of acceptance tests. The merchant approval service is implemented and demonstrated with isolated simulated confirmation; that does not establish live chain inclusion or full release readiness. See the [teammate guide](../TEAM_GUIDE.md) for the implementation map and [assignment board](IMPLEMENTATION_PLAN.md#feature-board) for remaining work.
 
@@ -379,7 +379,7 @@ These are product and implementation decisions still to be made, not reasons to 
 
 ### 13.1 Acceptance scenarios — required outcomes, not reported passes
 
-The coverage column reflects October 11 implementation and [recorded development evidence](DEVELOPMENT.md). **It is not a new test execution log or a blanket release pass.** Record pass/fail outcomes, commands, revision, environment, and time separately when running release validation.
+The coverage column reflects October 12 implementation and [recorded development evidence](DEVELOPMENT.md). **It is not a new test execution log or a blanket release pass.** Record pass/fail outcomes, commands, revision, environment, and time separately when running release validation.
 
 | ID | Scenario and required outcome | Recorded coverage / remaining gate |
 |---|---|---|
@@ -387,7 +387,7 @@ The coverage column reflects October 11 implementation and [recorded development
 | A-02 | Tampered OCK, transaction-ID mismatch, or invalid selected-output index is rejected without recovered credit or automatic invoice payment | Verifier negative tests and recorded persisted-verification/resolution safety coverage; browser gate remains |
 | A-03 | Synthetic 200,000-zatoshi invoice with the unapproved 100,000-zatoshi output shows 0 credited, 200,000 outstanding, 100,000 candidate, and 100,000 projected outstanding | Rules/POC and recorded real HTTP invoice-to-report workflow; browser gate remains |
 | A-04 | Approved allocations of 600,000 and 400,000 satisfy a 1,000,000-zatoshi invoice | Recorded M2 synthetic aggregation/service tests; not additional historical crypto fixtures |
-| A-05 | Reusing an output for the same invoice returns the prior allocation outcome and adds no credit or duplicate approval side effect | Recorded M2 semantic/key retry and concurrent replay tests; browser/restart rehearsal remains |
+| A-05 | Reusing an output for the same invoice returns the prior allocation outcome and adds no credit or duplicate approval side effect | Recorded M2 semantic/key retry and concurrent replay tests; restart/restore rehearsal recorded; browser acceptance remains |
 | A-06 | Reusing an allocated output for another invoice produces a conflict; simultaneous approvals produce exactly one allocation with consistent resolution/events | Recorded M2 transaction/race tests and simulated demo; browser/release evidence remains |
 | A-07 | Two distinct outputs from one transaction may be allocated independently | Existing database test with synthetic rows |
 | A-08 | Missing receipt is `NONE`; unsupported input is `UNSUPPORTED`; absent data/binary is `UNAVAILABLE`; timeout or malformed raw transaction is `ERROR`; none is presented as tampering | Verifier/adapter/rules and recorded persisted/RPC negative paths; browser/live validation remains |
@@ -395,11 +395,11 @@ The coverage column reflects October 11 implementation and [recorded development
 | A-10 | A valid receipt with unavailable confirmation cannot become confirmed through request input or receive automatic credit | Recorded offline blocking, simulated approval and trusted-RPC adapter tests; actual-node observation/approval remains M3.1 |
 | A-11 | Another merchant cannot read, modify, resolve, or export the case; customers and reviewers cannot exceed their grants | Recorded merchant API/service isolation; customer/reviewer read/export matrix implemented in M4/M5; browser coverage remains M6 |
 | A-12 | Grant revocation stops future application access; disclosures explain that previously downloaded receipts remain reusable | Grant/session/submission consent tests implemented; recovery checks restored revocation; scoped read/export revocation checks implemented; browser disclosures remain |
-| A-13 | Authorized packet includes the §6.5 inputs, reproduces verification and historical rules, and identifies missing/redacted context without leaking other cases | P2 contract/replay/export tests and recorded CLI outcomes implemented; PR integration tracked on the task board, P4 download/browser acceptance remains |
+| A-13 | Authorized packet includes the §6.5 inputs, reproduces verification and historical rules, and identifies missing/redacted context without leaking other cases | P2 contract/replay/export tests and recorded CLI outcomes implemented; merged in PRs #21–#23; P3 recovery integration merged in PR #24 with [indexed evidence](release-evidence.md); P4 download/browser acceptance and the final release trace remain |
 | A-14 | A failed or stale approval commits no partial allocation/resolution/event; invoice corrections cannot rewrite the original snapshot | Recorded transaction rollback, stale-version, audit and immutability tests; correction/version-linkage workflow is outside P0 |
 | A-15 | Errors/logs/exports omit tokens and wallet-wide keys; limits constrain hostile inputs; deployment and demo are repeatable | M7.1 actual TLS controls and M7.2 backend recovery preparation; scoped export disclosure tests implemented; browser and full release evidence remain |
 
-Existing suites are [verifier tests](../apps/api/tests/test_verifier.py), [rules tests](../apps/api/tests/test_rules.py), [API tests](../apps/api/tests/test_api.py), and [PostgreSQL tests](../apps/api/tests/test_postgres.py). The documented commands are `make test`, `make lint`, and `make test-db` against a disposable PostgreSQL database. `make poc` exercises the offline demonstration. Case, persisted-verification and resolution tests already exist; remaining grant/session, export/replay and UI acceptance is assigned in M4–M6. No blanket “all acceptance tests complete” claim is supported by this document.
+Existing suites are [verifier tests](../apps/api/tests/test_verifier.py), [rules tests](../apps/api/tests/test_rules.py), [API tests](../apps/api/tests/test_api.py), and [PostgreSQL tests](../apps/api/tests/test_postgres.py). The documented commands are `make test`, `make lint`, and `make test-db` against a disposable PostgreSQL database. `make poc` exercises the offline demonstration. Case, persisted-verification and resolution tests already exist; grant/session and export/replay backend coverage is merged; P3 recovery integration merged in PR #24; P4 UI acceptance and full release evidence remain. The [A-01–A-15 index](release-evidence.md#a-01a-15-traceability) names specific scenarios, runs and outstanding owners. No blanket “all acceptance tests complete” claim is supported by this document.
 
 ### 13.2 Demonstration narrative
 

@@ -526,3 +526,46 @@ progress-board label. Export final-head CI remains its integration gate.
 
 M5.2 integration is tracked in [PR #23](https://github.com/Kurisu-Labs/zecsolve/pull/23),
 with the full final validation results and the reviewed export-only diff.
+
+
+## Item 20 — M7.2 export/replay recovery integration
+
+Implemented October 12, 2026 as Person 3 from main `640b1b1`, after P2 scoped reports, packet contracts, replay and authorized export merged in PRs #20–#23. No open PR or remote feature branch overlapped when checked. `test/m7-export-recovery` was published before implementation; the runtime rehearsal and five comparison regressions were committed/pushed as `4c47e4b` before this documentation increment. Items 01–19 are retained unchanged as historical evidence.
+
+The existing disposable TLS/restore harness now exercises the merged HTTP report/evidence/export interfaces before interruption, after API SIGKILL/restart, after PostgreSQL restart and after encrypted fresh-database restore. Reviewer access uses real exchanged browser-session cookies. A private linked claim, nonconsented legacy evidence and a consented but unselected submission stay undisclosed. Report-only grants cannot export; anonymous/customer/revoked access is denied. A grant revoked before backup stays revoked after restore, and revoking the restored active reviewer denies new report/content/export reads.
+
+At every checkpoint the merchant packet reproduces real output recovery and historical accounting through the installed `replay-case` CLI (`0/REPRODUCED`); selected reviewer and case-only packets return `2/LIMITED` with explicit omissions. Original receipt/transaction bytes match the fixture exactly. A one-byte change without rehashing returns `1/FAILED` at integrity validation. Replay uses the built application image and packaged Rust verifier, with no networking, database or secret mounts, a read-only root and bounded tmpfs, and Docker logging disabled. The sanitized CI artifact contains only hashes and expected statuses for these packets.
+
+The entire exported payload remains equal across recovery after excluding only the fresh `report.generated_at` timestamp. This compares historical identities, consent/provenance projections, evidence components, allocations and audit history as well as amounts. Existing full-table row fingerprints remain equal after all reads/replays/retries. Five regression checks prove timestamp tolerance without mutating inputs, and detect changed amounts, evidence, historical hashes and omissions.
+
+### Recorded validation
+
+[Linux deployment/recovery CI](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38218166043) passed all **24 actual-container groups** at **2026-10-12T07:34:34.032559Z**, revision `4c47e4bf9f3c603c9ae6853c82de1fb0f207d8da`, `working_tree_changes=false`. Environment: Linux 6.17.0-1022-azure x86_64, Python 3.14.8, Docker 28.0.4, PostgreSQL 17 and the packaged real Rust verifier. Its `backend-recovery-evidence` artifact records all four export/replay checkpoints, equal per-role history hashes, unchanged database rows, correct CLI exits, tamper rejection and restored reviewer revocation. It retains `live_confirmation=false`, `release_complete=false` and the remaining live/browser/full-release gates.
+
+[Foundation and web CI](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38218166014) passed on the same revision: Rust/Python lint, **12 Rust tests, 275 non-database Python tests and 236 PostgreSQL tests**, the offline POC, frontend tests and production build. No frontend source or build configuration, production API/auth/schema, packet contract, verifier behavior or dependency version changed in this increment.
+
+Local macOS validation passed all **236 PostgreSQL tests**, the **five new comparison tests**, Rust format/Clippy, Python lint/format and all **12 Rust tests**. Native `make test` passed 267 Python tests and failed eight existing system-Python subprocess cases using a 0.2-second deadline (three normalizer, two process-runner and three verifier assertions timed out before their intended failure). This is the previously recorded native timeout limitation; no timeout or production behavior was altered to make it pass. The complete Linux suite above passed unchanged. The existing Starlette/httpx deprecation warning remains.
+
+The full local container rehearsal also passed all **24 groups** at **2026-10-12T07:38:39.967846+00:00**, revision `4c47e4b` with `working_tree_changes=true` (documentation edits; runtime code matches that commit). Host: macOS-27.0.1-arm64-arm-64bit, Python 3.12.14, Docker 29.5.2. It cleaned up its containers, volumes and private rehearsal directory after success. This local run and the clean Linux CI artifact independently exercised the same four export/replay checkpoints.
+
+Full M7.2 remains incomplete: M3.1 needs the operator's trusted RPC endpoint and live merchant approval trace; P4 owns actual-browser/download/accessibility results and screenshots; operator and team release/demo evidence remains outstanding. Public historical inputs and explicitly simulated accounting do not prove live chain inclusion or authorize a private-customer pilot. Final review, current-head CI and PR merge are still required for this integration slice.
+
+
+## Item 21 — M7.2 release evidence consolidation
+
+Person 3 started October 12, 2026 from `f2436a92e9c2f6068454e19f8f99732129223e6a`, after PR #24 merged. Remote branches and open PRs showed no overlapping work. `docs/m7-release-evidence` was published before editing. The evidence index and retained report were committed/pushed as `c1d15f4` before the status/documentation increment. Items 01–20 are preserved byte-for-byte; their earlier pending-status statements remain historical records, not current task status.
+
+[release-evidence.md](release-evidence.md) maps every A-01–A-15 row to named backend scenarios and revision-specific successful CI evidence, with explicit live/browser/operator/team handoffs. It documents the existing offline POC, disposable-schema simulated approval/retry/conflict demo, fixture replay and deployed authorized-export/recovery commands. It distinguishes public historical receipt recovery, synthetic accounting and simulated confirmation from the missing live trace. README, PRD, assignment board and affected handoff guides now reflect PR #24's merge; no milestone is marked release-complete.
+
+The `recovery-result.json` from GitHub run `38218166043`, artifact `11732947385`, is retained unchanged at [evidence/m7-recovery-4c47e4b.json](evidence/m7-recovery-4c47e4b.json). Retrieval verified the ZIP against GitHub's published digest and the retained JSON SHA-256 `6466446d3ff7c67976695fcc66e201e6a17923745e67ed61a3a4b363ea6a6ce9`. The source run targets clean revision `4c47e4bf9f3c603c9ae6853c82de1fb0f207d8da`, as originally recorded in Item 20. Its 24 check groups, four role/export checkpoints, stable history hashes, `live_confirmation=false` and `release_complete=false` were checked. Foundation/web run `38218166014` and container run `38218166043` were confirmed successful; their timestamps and job links are in the index. This is verification of existing evidence, not a new container or full-suite run.
+
+### Recorded validation
+
+On local macOS 27.0.1 arm64, Python 3.12.14 and Rust 1.99.0, command verification completed by **2026-10-12T12:09:30Z**, baseline `f2436a9` plus documentation-only working-tree changes:
+
+- `make poc` passed with the real built verifier: 100,000-zatoshi valid recovery, tampered evidence invalid, chain unavailable, no credited balance and the expected candidate projection.
+- `uv run --locked python scripts/record_replay_examples.py` reproduced all five checked-in CLI examples byte-for-byte; `git diff --exit-code -- fixtures/packets/replay-results.json` passed. The recorded exits/statuses were explicitly checked: valid 0/REPRODUCED, tampered 1/FAILED, scoped and missing-version 2/LIMITED, unsupported-version 3/UNSUPPORTED.
+- Direct installed `replay-case` invocations reproduced complete-v1 and complete-v2 with exit 0/REPRODUCED; scoped returned the expected exit 2/LIMITED.
+- Acceptance IDs and named test functions were checked against the repository; local documentation links/anchors, retained artifact integrity, historical-log preservation and `git diff --check` were checked for this documentation-only change.
+
+The local commands used the existing Cargo cache in offline mode and a temporary uv cache; no RPC was configured or contacted. The database demo and full container/database/application suites were not rerun locally for this documentation slice; their attributable previous results remain E-01/E-02 in the index. Repository PR CI remains required. No production code, frontend, contracts, fixtures, dependencies or workflow configuration changed. Full M7.2 still requires the operator's live endpoint and M3.1 approval trace, P4 actual-browser evidence, and operator/team release artifacts. This consolidation slice still requires final PR review, CI and merge.

@@ -1,8 +1,8 @@
 # zecsolve
 
-**Person 4 frontend integration (October 12):** Session access, merchant workflows, grants, scoped submissions/reviewer reports and authorized packets are implemented and browser-validated locally. See [frontend handoff](docs/frontend.md). Branch publication, PR/CI review and merge remain pending.
+**Person 4 frontend integration (October 12):** The user resumed frontend work and authorized local implementation while GitHub authentication was unavailable. M6 integration and actual-backend browser evidence are available on `feat/m6-frontend-integration`; see [frontend handoff](docs/frontend.md). Publication, PR/CI review and merge remain pending.
 
-**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration and evidence in [frontend.md](docs/frontend.md) supersede that partial implementation status; review/CI/merge still govern completion.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status; review/CI/merge still govern completion.
 
 Resolve shielded-payment exceptions with scoped evidence and explainable merchant decisions.
 
@@ -157,13 +157,13 @@ Implemented: pinned verifier integration; fixture provenance; bounded subprocess
 
 The trusted read-only Zebra adapter, idempotent refresh route, and later reorganization review are implemented. [Live endpoint validation](docs/chain.md) remains pending.
 
-Current milestone status: **M1/M2 backend complete; M3 live validation pending; M4/M5 backend merged; M6 locally implemented and browser-validated, pending publication/PR/CI/merge; M7 release incomplete.** See [frontend evidence](docs/frontend.md), the [assignment board](docs/IMPLEMENTATION_PLAN.md) and [backend recovery evidence](docs/recovery.md). Development proof and full release acceptance remain separate.
+Current milestone status: **M1/M2 backend complete; M3 adapter implemented with live validation pending; M4.0–M4.5 and M5.0–M5.2 merged; M6 locally implemented and browser-validated by Person 4, pending publication/PR/CI/merge; M7 release incomplete.** P2 scoped reports, packet contracts, replay and export merged in PRs #20–#23. M7.1 backend deployment preparation merged in PR #17 and M7.2 backend recovery in PR #19. Person 3's [recovery integration](docs/recovery.md) merged in PR #24, covering deployed scoped reports, exports and offline replay. The [release evidence index](docs/release-evidence.md) links acceptance scenarios, retained CI evidence, offline demo commands and remaining owners. Live validation, P4 publication/review/CI/merge and final release evidence remain outstanding. Follow the [assignment dependencies and definition of done](docs/IMPLEMENTATION_PLAN.md#definition-of-done); [DEVELOPMENT.md](docs/DEVELOPMENT.md) preserves historical results.
 
 The deployed app blocks credit approval while offline; a server-configured trusted RPC source enables the policy-gated path. [The isolated M2 demo](docs/resolutions.md#isolated-first-slice-demo) proves atomic allocation using explicitly simulated confirmations; reports identify simulated decision history and no live inclusion is claimed. Assigning or merging a feature does not close the separate live-validation or full-release gates.
 
 The current Rust wrapper accepts mainnet receipt v0 and v5 transaction branches NU5 through NU6.2. Orchard has a real historical fixture test. The Sapling recovery path uses the upstream library but does not yet have an end-to-end historical Sapling fixture in this repository. No Ironwood compatibility is claimed.
 
-The POC token is a development access gate, not multi-merchant authorization. Only use the public fixtures until the scoped-access and private-storage milestone is complete. See [docs/security.md](docs/security.md).
+The POC token is a development access gate, not multi-merchant authorization. Use public fixtures for the current demo; private-customer use still requires retention/deletion terms and operator deployment controls. See [docs/security.md](docs/security.md).
 
 ## Attribution
 

@@ -1,8 +1,8 @@
 # zecsolve teammate guide
 
-**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration and evidence in [frontend.md](docs/frontend.md) supersede that partial implementation status; review/CI/merge still govern completion.
+**Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 local integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status; review/CI/merge still govern completion.
 
-This guide explains the foundation and backend milestones completed through October 11. Use [README.md](README.md) for runnable setup commands.
+This guide explains the foundation and backend milestones completed through October 12. Use [README.md](README.md) for runnable setup commands.
 
 ## What we are building
 
@@ -28,7 +28,7 @@ The originals were relocated without rewriting their contents. In particular, en
 | Rules | Aggregate approved balances, candidate projection, mismatch/conflict findings, persisted invoice policy | Real-node integration validation; the trusted RPC adapter is implemented and offline remains the default |
 | Access | Merchant credentials, customer/reviewer grants, consent selection, HTTPS browser sessions and authorization rechecks | P4 browser disclosure/acceptance |
 | Frontend | Initial Vue implementation in PR #12; Person 4 owns it | Remaining actual-backend and browser integration |
-| Export | CasePacketV1, authorized snapshot export and offline historical replay | P4 download flow and release rehearsal |
+| Export | CasePacketV1, authorized snapshot export and offline historical replay | P3 export/replay recovery integration, P4 download flow and final release rehearsal |
 
 The POC runs without PostgreSQL; readiness requires a migrated database, verifier executable, and configured evidence encryption key. Database tests use public fixtures or synthetic rows. They prove the implemented workflow/database behavior; simulated RPC responses do not establish live chain inclusion.
 
@@ -132,11 +132,13 @@ Use Alembic for future changes. Do not call `Base.metadata.create_all()` at appl
 | Owner / work stream | First deliverable | Integration boundary |
 |---|---|---|
 | Person 1 — access | M4.0–M4.2 access foundation, grants and sessions merged | Own shared auth/models/migrations; consumers reuse the same authorization context |
-| Person 2 — reports/export | M4.5/M5 backend implemented; see task board for PR integration | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
-| Person 3 — workflow/integration/release | Listing, submissions, deployment/recovery preparation merged; live validation needs an endpoint | Own submission services and deployment; consume access contracts and Person 4's built app |
-| Person 4 — all frontend | M6.0 Vue shell when frontend work is resumed | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
+| Person 2 — reports/export | M4.5/M5 backend merged in PRs #20–#23 | Own disclosure projections, packet contract, replay and export; private merchant storage already exists |
+| Person 3 — workflow/integration/release | Listing, submissions and deployment/recovery/export integration merged, including PR #24; consolidate release evidence while live validation awaits an endpoint | Own submission services and deployment; consume access contracts and Person 4's built app |
+| Person 4 — all frontend | Local M6 integration and browser evidence complete; publication/review/CI/merge pending | Own UI/client/types/styles/accessibility/build and browser tests; actual-backend integration required for completion |
 
-These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. Person 4's M6 scope was explicitly resumed on October 12 and is locally implemented/browser-validated; publication/PR/CI/merge remain pending. See [frontend evidence](docs/frontend.md). No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
+These are the user's four numbered assignment slots; record the actual contributor when claiming a task. The [assignment board and task cards](docs/IMPLEMENTATION_PLAN.md#3-ownership-and-feature-tasks) define branch names, prerequisites, ownership, exclusions, interfaces and acceptance checks. Person 4's M6 scope was explicitly resumed on October 12 and is locally integrated/browser-validated; publication/PR/CI/merge remain pending. See [frontend evidence](docs/frontend.md). No teammates have been messaged. Agree and merge prerequisite contracts before dependent implementation; serialize shared integration files. Keep CipherPay, notifications, browser WASM, signatures and live checkout outside this P0 path. A historical Sapling fixture is a separate future coverage item, not a substitute for M3.1 live validation.
+
+Person 3 maintains the [release evidence index](docs/release-evidence.md): recorded A-01–A-15 scenarios, sanitized CI recovery results, offline demo steps and operator/P4/team handoffs. Full M7 remains incomplete until its required gates pass.
 
 ## Before handing off a change
 
