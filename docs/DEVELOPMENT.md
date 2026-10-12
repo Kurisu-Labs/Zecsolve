@@ -569,3 +569,85 @@ On local macOS 27.0.1 arm64, Python 3.12.14 and Rust 1.99.0, command verificatio
 - Acceptance IDs and named test functions were checked against the repository; local documentation links/anchors, retained artifact integrity, historical-log preservation and `git diff --check` were checked for this documentation-only change.
 
 The local commands used the existing Cargo cache in offline mode and a temporary uv cache; no RPC was configured or contacted. The database demo and full container/database/application suites were not rerun locally for this documentation slice; their attributable previous results remain E-01/E-02 in the index. Repository PR CI remains required. No production code, frontend, contracts, fixtures, dependencies or workflow configuration changed. Full M7.2 still requires the operator's live endpoint and M3.1 approval trace, P4 actual-browser evidence, and operator/team release artifacts. This consolidation slice still requires final PR review, CI and merge.
+
+
+## Item 22 — M3.1 live fixture and merchant approval validation
+
+Person 3 started October 12, 2026 from `4066ec8bf25f10372e3900bf0ba8f02bd00ccf7e`.
+Remote branches and open PRs were checked before publishing
+`docs/m3-live-validation`. There were no open PRs; Person 4's active
+`feat/m6-frontend-integration` owns frontend implementation and also edits shared
+status paragraphs. This slice changes M3 status only in those documents; preserve
+both owners' updates when integrating. Items 01–21 remain byte-for-byte historical
+records. The operator explicitly selected the QuickNode public documentation
+endpoint and existing public receipt; no new payment or provider account was needed.
+
+The opt-in `scripts/validate_live_chain.py` harness and repeatable procedure were
+committed/pushed as `f8a594fa7364a47fd94d961054b1f88429195b90` before execution.
+It invokes the ordinary authenticated FastAPI routes through an in-process
+TestClient, the actual Rust verifier and the server-configured ZebraObserver.
+There is no injected observer, authority function or HTTP mock. Outbound RPC uses
+actual HTTPS; API ingress/TLS/browser/container acceptance is outside this run.
+
+### Recorded live validation
+
+The unchanged [JSON trace](evidence/m3-live-f8a594f.json) records clean `f8a594f`,
+**2026-10-12T13:23:24.163901+00:00 through 13:23:30.760930+00:00**, Darwin 27.0.0
+arm64, Python 3.12.14, PostgreSQL 17.11 (Homebrew), and migrations through `0009`.
+The matching verifier was built with Rust 1.99.0 using `cargo build --locked
+-p zecsolve-verifier`; its binary hash is retained in the trace. The command was:
+
+```sh
+uv run --locked python scripts/validate_live_chain.py --output docs/evidence/m3-live-f8a594f.json
+```
+
+The actual invocation used the installed `.venv/bin/python` from the locked
+environment. `ZECSOLVE_TEST_DATABASE_URL` selected a fresh loopback-only PostgreSQL
+instance on port 55439; RPC settings came from the ignored local `.env`. Source
+`quicknode-public-demo`, timeout 30 seconds, tip age limit 900 seconds; no Basic
+authentication. Neither database URL nor RPC URL/credentials are in the JSON.
+
+- Real receipt recovery: `VALID`, 100,000 zatoshis; initial verification remains
+  `UNAVAILABLE`/offline and has zero approved credit.
+- Live node: `/Zebra:6.4.2/`, version `6040200`. All four required methods succeeded.
+  Mainnet block 3,361,512 had 153,734 confirmations at tip 3,515,245; decoded raw
+  bytes matched the verified transaction. Adapter synchronization, stable-tip,
+  header/transaction consistency and tip-freshness checks passed.
+- Anonymous refresh returned 401; authenticated refresh returned 201 and an
+  identical same-key retry returned 200 with `Idempotency-Replayed: true`.
+- Merchant `APPROVE_OUTPUT` returned 201 with a distinct fresh live observation,
+  authorized source and `eligible_for_credit=true`. Observation age at evaluation
+  was 2.600470 seconds against the 60-second policy; confirmations exceeded 10.
+  Resolution `3dfad984-1cf8-446a-9eeb-25db004291b2` and all safe references are retained.
+- Approval retry returned the identical decision with 200/replay header. There
+  was one decision, 100,000 credited and 100,000 outstanding on the synthetic
+  200,000-zatoshi invoice. No ZEC was sent. The random schema was removed and its
+  absence checked; ephemeral credentials and encryption key were not retained.
+
+Trace SHA-256:
+`c7e9c885978313878a97c31a6c986f26339d9d8768b77ac27845e29d0486c2b1`.
+The JSON is public-fixture/synthetic application data plus real provider
+observations, not private customer data or an independent consensus proof.
+`full_release_complete=false` remains explicit. See [chain.md](chain.md#recorded-live-run)
+for the difference between the successful decision and the report's unchanged
+initial-offline candidate projection.
+
+### Repository validation
+
+At the same `f8a594f` revision, `make test lint` passed outside the sandbox:
+12 Rust tests, 275 non-PostgreSQL Python tests; Rust formatting/Clippy and Python
+lint/formatting passed. The preceding sandboxed run had 270 Python passes and
+five short-timeout subprocess failures in the existing address/process tests;
+the unchanged full suite then passed outside the sandbox. Both outcomes are
+recorded, and no production timeout or test was weakened. The existing
+Starlette/httpx deprecation warning remains.
+
+`python -m pytest apps/api/tests/test_rpc_workflow.py -q` passed all 10 PostgreSQL
+regressions against the disposable instance. These are deterministic synthetic
+RPC tests, separately from the real live run above. No application, schema,
+contract, frontend or workflow configuration changed. CI remains offline and
+must pass for the PR. The `f8a594f` branch [CI run](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38255318490) passed. Evidence schema/reference/hash checks, secret-field review,
+243 local documentation links/anchors, historical-log preservation and
+`git diff --check` passed before publication. Full release still requires P4/browser,
+deployed-target/operator and team artifacts. M3.1 acceptance is demonstrated;
+review, CI and merge remain the task-completion gate.
