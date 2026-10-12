@@ -4,6 +4,8 @@ This increment supplies a bounded TLS deployment for the current backend and Per
 
 The existing `compose.yaml`, `make api`, and development POC retain their behavior. Use the separate [deployment Compose file](../infra/compose.deployment.yaml) and the `deployment` target in [Dockerfile.vercel](../Dockerfile.vercel) for this composition. Development Compose explicitly selects `development`; Vercel selects the final `vercel` stage. The Compose deployment runs `python -m zecsolve.deployment`, which applies forward migrations and starts one bounded Uvicorn process. Application/authentication services are reused without introducing another identity or permission model.
 
+The actual public-fixture target now uses [Vercel containers and Neon](vercel-deployment.md). The controls below describe the Compose profile; they are not claims about Vercel ingress or resource settings.
+
 ## Layout and limits
 
 Only the unprivileged nginx ingress publishes ports. It terminates TLS, redirects HTTP to the configured HTTPS hostname/port, and proxies `/api`, `/health`, and the frontend to FastAPI. The API and database have no published host ports. A separate internal network isolates database traffic; the API retains outbound connectivity for an operator-configured trusted RPC source.

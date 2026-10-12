@@ -876,3 +876,74 @@ changed. No live RPC call was made.
 
 The diagnostics/investigation slice still requires final PR review, CI and merge.
 Passing repetitions do not prove the original intermittent failure is fixed.
+
+## Item 26 — Vercel public-fixture deployment
+
+Person 3 continued from merged PR #30 (`9757a9f`) after fetching remote branches
+and checking open PRs. `feat/vercel-deployment` was published before changes.
+The operator requested an actual deployment, selected their free Vercel account
+and explicitly approved a private 30-day demo merchant and public-receipt test.
+No paid plan was enabled and no ZEC was sent.
+
+The shared Docker recipe moved to `Dockerfile.vercel`, with explicit Compose
+development/deployment targets and a final Vercel stage. A dedicated runtime
+adapter checks platform context, exact HTTPS origin, evidence configuration,
+verified PostgreSQL TLS and current schema before serving. Migrations remain an
+explicit operator release action. P1 identity/schema and P2 packet contracts are
+unchanged; P4's existing locked build is consumed without frontend source edits.
+Vercel Services explicitly routes the entire origin to this one container.
+
+The first provider deployment served 404 despite its Ready status; explicit
+container-service routing fixed this. Bundled libpq could not verify Neon using
+`sslrootcert=system` on the tested machines. The adapter uses the packaged
+`certifi` CA bundle with `sslmode=verify-full`; certificate and hostname checking
+remain enabled. Configuration, code and these corrections were pushed as
+focused increments `ce1fe28` and `c721aea`.
+
+### Validation and actual target
+
+- The actual AMD64 Vercel image built the Rust verifier, Python API and Vue app.
+  `https://zecsolve.vercel.app` serves deployment
+  `dpl_9KuhxWXxFjhPX8fCZSZ4XUXFYBoU`, application revision
+  `c721aea6ee2e3b7379bd19d90f70fbecb6f06da2`; image digest and regional
+  configuration are in the [operator guide](vercel-deployment.md).
+- A separate Neon Free database was migrated through `0009` over verified TLS.
+  The pooled URL is used by the application; the unpooled URL by operator tools.
+  Production secrets are excluded from Git and both image/upload contexts.
+- Twelve public checks passed: HTTPS app/SPA and ready dependencies, anonymous
+  API rejection, disabled POC/docs, protected session exchange and forwarded
+  protocol/host probes. Real HTTPS cookie sessions then passed customer
+  claim/evidence and retry, offline receipt recovery, actual QuickNode refresh,
+  a fresh eligible approval and identical approval retry. One decision credited
+  100,000 of 200,000 zatoshis. Authorized merchant packet replay was
+  `REPRODUCED`; scoped reviewer replay was `LIMITED`. Customer report/export/
+  approval were denied. Test grants were revoked and their sessions rejected;
+  logout invalidated the merchant test session. The approved user credential
+  remains in an ignored private file.
+- Browser smoke verified sign-in, listing, case detail and session restoration
+  against the hosted origin. A P4 follow-up is recorded: a historical offline
+  chain finding appears alongside a later confirmed observation/approved credit.
+  This is not a claim that the full hosted browser/UI acceptance suite passed.
+- Local lint and 33 focused deployment checks passed; one database test was
+  deselected in the focused run. The full disposable PostgreSQL suite passed
+  238 tests at the initial increment. Native `make test` passed 12 Rust and
+  313 Python tests but encountered the same five macOS 0.2-second helper
+  timeout failures recorded previously; it was not a full local pass.
+- All foundation, web and simulated-browser jobs passed in
+  [CI 38283817789](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38283817789)
+  on deployed `c721aea`, including lint, full Linux test/database suites, POC,
+  release rehearsal and frontend build/type/contract checks. The separate
+  [CI 38283817800](https://github.com/Kurisu-Labs/zecsolve/actions/runs/38283817800)
+  passed packaged deployment/browser/recovery. These Compose scenarios are
+  attributed separately from the hosted HTTP/browser-smoke checks.
+- [Sanitized hosted evidence](evidence/vercel-deployment-c721aea.json) records
+  actual UTC times, HTTP outcomes, packet hashes and remaining gates. Credentials,
+  keys, connection strings, raw packets and private diagnostics are not retained
+  in the repository. Items 01–25 and earlier JSON evidence remain unchanged.
+
+This deployment is a public-fixture demo. Hosted backup/restore, independent
+key custody, provider storage controls and host-wide rate/capacity acceptance
+remain operator tasks. Reviewed P4 screenshots and team release artifacts
+remain separate. Vercel Hobby organization-Git restrictions require manual CLI
+releases; Git pushes do not deploy automatically. Full M7/private-customer
+release is not complete. This slice requires its final PR checks and merge.

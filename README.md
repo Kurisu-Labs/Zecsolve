@@ -1,5 +1,7 @@
 # zecsolve
 
+**Hosted demo (October 13 local / October 12 UTC):** [zecsolve.vercel.app](https://zecsolve.vercel.app) runs the complete app on Vercel Hobby with Neon Free. Public checks and the authorized historical-receipt workflow passed, including live RPC approval and export/replay. See the [deployment record](docs/vercel-deployment.md) for the exact revision, private access handoff, operating limits and remaining release gates. PR #30 merged the CI diagnostics follow-up.
+
 **Person 4 frontend integration (October 12):** M6 integration and actual-backend browser evidence merged in [PR #26](https://github.com/Kurisu-Labs/zecsolve/pull/26); see [frontend handoff](docs/frontend.md). P3 browser CI and the packaged deployment rehearsal merged in [PR #28](https://github.com/Kurisu-Labs/zecsolve/pull/28). The final release bundle and demo rehearsal merged in [PR #29](https://github.com/Kurisu-Labs/zecsolve/pull/29); operator/team handoffs remain open.
 
 **Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
@@ -83,7 +85,9 @@ docker compose up --build
 
 The backend image builds Rust in a separate stage, runs Python as an unprivileged user, and applies migrations before serving. Local ports bind only to loopback. Container runtime validation is separate from the native test suite.
 
-## Deployment preparation
+## Deployment
+
+The [Vercel deployment guide](docs/vercel-deployment.md) describes the live same-origin demo, verified Neon TLS, explicit migrations, private operator access and manual releases. Git pushes do not automatically deploy it.
 
 The separate [M7.1 deployment composition](docs/deployment.md) serves the built Vue app and API through TLS, with ingress limits, private API/database ports, non-root resource limits, and secret-safe runtime logs. Its production entry point disables the public POC and documentation routes. Run `python3 scripts/check_deployment.py` with Docker/Compose and OpenSSL for an isolated actual-container rehearsal.
 
