@@ -22,6 +22,7 @@ from zecsolve.schemas.evidence import (
 )
 from zecsolve.schemas.grant import GrantCreatedV1, GrantCreateRequest, GrantListV1
 from zecsolve.schemas.invoice import InvoiceCreateRequest, InvoiceSnapshotV1
+from zecsolve.schemas.packet import CasePacketV1
 from zecsolve.schemas.resolution import (
     DecisionObservationV2,
     MerchantCaseReportV1,
@@ -44,6 +45,7 @@ from zecsolve.schemas.workflow_verification import (
 
 root = Path(__file__).resolve().parents[1]
 for name, model in (
+    ("case-packet", CasePacketV1),
     ("reviewer-report", ReviewerReportV1),
     ("reviewer-evidence", ReviewerEvidenceV1),
     ("evidence-content", EvidenceContentV1),
