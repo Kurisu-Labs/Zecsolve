@@ -370,3 +370,36 @@ Linux CI on `4eb8d7f` subsequently passed all **12 Rust, 237 Python and 211 Post
 The first container attempt correctly rejected a wrong evidence key but exposed a harness exception-type mismatch; the assertion now checks the service's wrapped error codes and the full rehearsal passed afterward. The initial command used the system Python 3.9, which cannot run the existing harness; the documented command uses the repository environment. Neither failed attempt is counted as passing evidence.
 
 **Scope remains backend preparation.** Client response loss is modeled after a committed result, not every crash location. The bounded archive helper is not a production backup/retention/PITR service; external key custody, volume encryption and recovery of writes after the selected backup remain operator responsibilities. M3.1 live validation, P2 scoped reports/export/replay, P4 actual-backend browser results/screenshots, and the complete release/demo evidence remain outstanding. Final review, CI and PR merge are still required for this increment; full M7.2 is not complete.
+
+## Item 16 — scoped reviewer reports (M4.5)
+
+Person 2 implementation by Codex on `feat/m4-scoped-reports`, based on main
+`38d9422`. The branch was published before implementation and the first tested
+increment was pushed as `6900cc9`. Report and evidence reads consume the merged
+P1 authorization and P3 consent handoffs. Explicit reviewer models omit private
+nested snapshots, actor identities and unselected/unconsented records; merchant
+reports retain their contract. Exact-component evidence reads reauthorize after
+decryption. No frontend, migration, export or live RPC work is included.
+
+Local Linux x86_64, Python 3.14.7, Rust 1.99.0 and isolated PostgreSQL 18.6 schemas:
+`make lint` passed; `make test` passed all 12 Rust and 237 Python tests. The first
+28 focused report/submission scenarios passed. The subsequent foreign-allocation
+and decision-disclosure check passed (two selected cases including the foreign
+merchant HTTP role). Test development corrected fixture assumptions about memo
+binding, the refresh route and a synthetic fixture dictionary key; none required
+weakening production permissions. The existing Starlette/httpx deprecation warning
+remains. Full database and final-head CI results are recorded below before merge.
+
+See [scoped-reports.md](scoped-reports.md) for P4/M5 integration, the field matrix,
+original-content sensitivity and projection/replay limits. Live-chain validation
+and browser acceptance remain pending independently.
+
+The full initial database run passed 218 tests and found one pre-M4.5 session
+assertion still treating every reviewer report as merchant-only. That regression
+now checks merchant-only case detail and separately asserts the newly permitted
+case-only reviewer report while retaining customer denial.
+
+At 2026-10-12T03:29Z, all 15 affected session/reviewer PostgreSQL scenarios passed
+on the corrected working tree. Final lint/format/schema and diff checks passed.
+CI on the first increment reproduced the same obsolete session assertion; the
+final branch includes its scoped-access correction and awaits fresh CI.

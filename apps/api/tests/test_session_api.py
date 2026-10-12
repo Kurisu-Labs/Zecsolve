@@ -101,12 +101,20 @@ def test_grant_sessions_cannot_enter_merchant_routes(database, session_api, veri
         headers = {"Origin": ORIGIN, "X-CSRF-Token": api.cookies.get(CSRF)}
         for method, path, body in [
             ("get", "/api/cases", None),
-            ("get", f"/api/cases/{case.case_id}/report", None),
+            ("get", f"/api/cases/{case.case_id}", None),
             ("post", f"/api/cases/{case.case_id}/verify", {}),
             ("post", f"/api/cases/{case.case_id}/resolve", {}),
             ("post", f"/api/cases/{case.case_id}/grants", {}),
         ]:
             assert api.request(method, path, headers=headers, json=body).status_code == 403
+        report = api.get(f"/api/cases/{case.case_id}/report")
+        if scope["role"] == "reviewer":
+            assert report.status_code == 200
+            assert report.json()["schema_version"] == "reviewer-report-v1"
+            assert report.json()["sections"] == ["case"]
+            assert "invoice" not in report.json()
+        else:
+            assert report.status_code == 403
         GrantService(database).revoke(principal, case.case_id, created.grant.grant_id)
         assert api.get("/api/session").status_code == 401
 

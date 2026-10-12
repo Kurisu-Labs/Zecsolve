@@ -296,3 +296,69 @@ def test_route_role_matrix_and_exact_component_response(
             assert api.get(f"/api/cases/{uuid.uuid4()}/report").status_code == 404
             GrantService(database).revoke(merchant, case, grant.grant.grant_id)
             assert api.get(f"/api/cases/{case}/report").status_code == 401
+
+
+def test_reviewer_foreign_conflict_is_opaque_and_decisions_require_selected_evidence(
+    database, root, submissions
+):
+    from sqlalchemy import insert
+    from test_postgres import allocation, seed
+    from zecsolve.db.models import OutputAllocation
+    from zecsolve.schemas.resolution import ResolveRequest
+    from zecsolve.services.resolutions import ResolutionService
+
+    evidence, _, merchant, case, _, customer, request = submissions
+    chosen, _ = evidence.submit(
+        customer, case, request.model_copy(update={"share_with_reviewers": True}), "chosen"
+    )
+    hidden, _ = evidence.submit(customer, case, request, "hidden")
+    verifier = VerificationService(
+        database,
+        evidence.cipher,
+        VerifierAdapter(root / "target/debug/zecsolve-verifier"),
+        evidence.slots,
+    )
+    attempt, _ = verifier.verify(
+        merchant, case, CaseVerifyRequest(evidence_id=chosen.evidence_id), "chosen"
+    )
+    private, _ = verifier.verify(
+        merchant, case, CaseVerifyRequest(evidence_id=hidden.evidence_id), "hidden"
+    )
+    decision, _ = ResolutionService(database).resolve(
+        merchant,
+        case,
+        ResolveRequest(
+            action="REJECT_EVIDENCE",
+            verification_id=private.verification_id,
+            expected_case_version=private.case_version,
+            reason="PRIVATE_DECISION_REASON",
+        ),
+        "reject",
+    )
+    public, _ = ResolutionService(database).resolve(
+        merchant,
+        case,
+        ResolveRequest(
+            action="REQUEST_EVIDENCE",
+            expected_case_version=decision.case_version,
+            reason="Please supply more evidence",
+        ),
+        "request",
+    )
+    foreign = seed(database)[0]
+    record = allocation(foreign)
+    record.update(txid=attempt.result.output.txid, output_index=attempt.result.output.output_index)
+    with database.begin() as connection:
+        connection.execute(insert(OutputAllocation).values(**record))
+    _, actor = reviewer(database, merchant, case, SECTIONS, [chosen.evidence_id])
+    report = CaseReportService(database).get(actor, case)
+    assert "DUPLICATE_CLAIM" in report.balances.findings
+    assert [item.resolution_id for item in report.decisions] == [public.resolution_id]
+    serialized = report.model_dump_json()
+    for secret in (
+        str(foreign["invoice_id"]),
+        "PRIVATE_DECISION_REASON",
+        str(private.verification_id),
+        str(decision.resolution_id),
+    ):
+        assert secret not in serialized
