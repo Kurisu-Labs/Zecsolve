@@ -10,7 +10,8 @@
     "typecheck": "vue-tsc --noEmit",
     "types:api": "node scripts/types.mjs",
     "test": "node --test tests/*.test.mjs",
-    "types:check": "node scripts/types.mjs --check"
+    "types:check": "node scripts/types.mjs --check",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.0",
@@ -22,6 +23,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/vite": "^4.1.0",
     "@types/three": "^0.180.0",
     "@vitejs/plugin-vue": "^6.0.0",

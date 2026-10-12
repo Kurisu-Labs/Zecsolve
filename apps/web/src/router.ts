@@ -18,6 +18,8 @@ export const router = createRouter({
     { path: '/cases/:id', name: 'case', component: () => import('./pages/CaseDetailPage.vue'), props: true },
     { path: '/submit/:id', name: 'submit', component: () => import('./pages/SubmitEvidencePage.vue'), props: true },
     { path: '/report/:id', name: 'report', component: () => import('./pages/ReportPage.vue'), props: true },
+    { path: '/cases/:id/grants', name: 'grants', component: () => import('./pages/GrantsPage.vue'), props: true },
+    { path: '/review/:id', name: 'review', component: () => import('./pages/ReviewerPage.vue'), props: true },
     { path: '/connect', name: 'connect', component: () => import('./pages/ConnectPage.vue') },
     { path: '/:pathMatch(.*)*', name: 'missing', component: () => import('./pages/NotFoundPage.vue') },
   ],

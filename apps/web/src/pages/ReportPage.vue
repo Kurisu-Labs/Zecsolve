@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
-import { cases } from '@/api/store'
+import ExportButton from '@/components/ExportButton.vue'
+import { cases, session } from '@/api/store'
 import { latestObservation } from '@/api/workflow'
 import type { CaseReport } from '@/api/types'
 import { formatZat, formatZec } from '@/lib/money'
@@ -30,6 +31,8 @@ const selected = computed(() =>
 const observation = computed(() => report.value ? latestObservation(report.value) : undefined)
 const findingLabels = computed(() => report.value?.balances.findings.map((f) => findingView[f]?.label ?? f).join('; '))
 
+function printReport() { window.print() }
+
 function download() {
   if (!report.value) return
   const blob = new Blob([JSON.stringify(report.value, null, 2)], { type: 'application/json' })
@@ -47,8 +50,8 @@ function download() {
     <div class="toolbar shell">
       <RouterLink :to="`/cases/${id}`" class="btn btn-quiet">Back to case</RouterLink>
       <div class="row">
-        <button type="button" class="btn" @click="download">Download report JSON</button>
-        <button type="button" class="btn" onclick="window.print()">Print</button>
+        <ExportButton v-if="session.mode === 'live'" :id="id" /><button v-else type="button" class="btn" @click="download">Download demo report (not a replay packet)</button>
+        <button type="button" class="btn" @click="printReport">Print</button>
       </div>
     </div>
 

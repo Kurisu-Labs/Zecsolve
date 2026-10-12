@@ -42,7 +42,7 @@ async function leave(demo = false) {
       <form v-else class="form" @submit.prevent="signIn">
         <label for="token" class="label">Access code</label>
         <input id="token" v-model="token" class="field mono" type="password" autocomplete="off" required />
-        <button class="btn btn-primary" :disabled="busy || !token.trim()">{{ busy ? 'Connecting…' : 'Sign in' }}</button>
+        <button class="btn btn-primary" :disabled="busy || !token.trim()">{{ busy ? 'Connectingâ€¦' : 'Sign in' }}</button>
       </form>
       <p v-if="error || session.error" class="error" role="alert">{{ error || session.error }}</p>
     </section>

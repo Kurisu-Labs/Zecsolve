@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { approvalReady, decisionRequest, latestObservation } from '@/api/workflow'
+import { ApiError } from '@/api/client'
 import { cases, session } from '@/api/store'
 import type { CaseReport, ResolveAction } from '@/api/types'
 import { formatZat } from '@/lib/money'
@@ -26,6 +27,8 @@ const reason = ref('')
 const confirming = ref(false)
 const busy = ref<'chain' | 'decide' | null>(null)
 const error = ref<string | null>(null)
+
+watch(() => props.report.case.version, () => { confirming.value = false })
 
 watch(eligible, (now) => {
   if (!now && action.value === 'APPROVE_OUTPUT') action.value = 'REQUEST_EVIDENCE'
@@ -70,6 +73,7 @@ async function decide() {
     emit('changed', `${actionView[action.value].done}.`)
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
+    if (e instanceof ApiError && e.status === 409) { confirming.value = false; emit('changed', 'The case changed or this decision is not eligible. Review the refreshed case before another decision.') }
   } finally {
     busy.value = null
   }
@@ -98,7 +102,7 @@ async function decide() {
     <template v-if="!closed">
       <p v-if="session.mode === 'live'">Approval requests are evaluated by the server; a recovered candidate is not approved credit.</p>
       <form class="form" @submit.prevent="confirming = true">
-        <fieldset>
+        <fieldset :disabled="busy !== null">
           <legend class="legend">Action</legend>
           <label v-for="a in actions" :key="a" class="option" :class="{ off: !!disabledReason(a), on: action === a }">
             <input v-model="action" type="radio" name="action" :value="a" :disabled="!!disabledReason(a)" />
@@ -118,6 +122,7 @@ async function decide() {
             maxlength="2000"
             placeholder="For example: customer paid half; asked for a second receipt for the rest."
             required
+            :disabled="busy !== null"
           />
         </label>
 
