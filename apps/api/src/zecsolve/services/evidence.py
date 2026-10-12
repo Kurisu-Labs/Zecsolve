@@ -28,6 +28,7 @@ from zecsolve.schemas.evidence import (
 )
 from zecsolve.services.audit import load_event_chain
 from zecsolve.services.cases import CaseService, load_owned_case
+from zecsolve.services.disclosure import project_evidence
 from zecsolve.services.submissions import (
     actor_columns,
     actor_name,
@@ -37,7 +38,6 @@ from zecsolve.services.submissions import (
 )
 from zecsolve.services.workflow import (
     WorkflowError,
-    authorize_merchant,
     transaction,
     validate_idempotency_key,
 )
@@ -159,20 +159,20 @@ class EvidenceService:
 
     def get(self, principal, case_id, evidence_id):
         with transaction(self.engine) as session:
-            authorize_merchant(session, principal)
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
             result = self.metadata(session, principal, case_id, evidence_id)
-            authorize_merchant(session, principal)
-            return result
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
+            return result if isinstance(principal, MerchantPrincipal) else project_evidence(result)
 
     def read_content(self, principal, case_id, evidence_id):
         with transaction(self.engine) as session:
-            authorize_merchant(session, principal)
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
             metadata = self.metadata(session, principal, case_id, evidence_id)
             row = session.get(EvidenceContent, evidence_id)
             if row is None:
                 raise WorkflowError(409, "EVIDENCE_CONTENT_UNAVAILABLE")
             sealed = EncryptedEvidence(row.key_id, row.nonce, row.ciphertext)
-            authorize_merchant(session, principal)
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
         with self.crypto_slot():
             plaintext = self.cipher.decrypt(
                 sealed, merchant_id=principal.merchant_id, case_id=case_id, evidence_id=evidence_id
@@ -208,7 +208,7 @@ class EvidenceService:
         ):
             raise WorkflowError(409, "EVIDENCE_INTEGRITY_ERROR")
         with transaction(self.engine) as session:
-            authorize_merchant(session, principal)
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
             self.metadata(session, principal, case_id, evidence_id)
             if (
                 session.scalar(
@@ -219,7 +219,7 @@ class EvidenceService:
                 is None
             ):
                 raise WorkflowError(409, "EVIDENCE_CONTENT_UNAVAILABLE")
-            authorize_merchant(session, principal)
+            authorize_case_access(session, principal, case_id, "evidence:read", evidence_id)
         return request
 
     def submit(

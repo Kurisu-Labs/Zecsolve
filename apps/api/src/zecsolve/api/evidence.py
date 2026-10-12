@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from zecsolve.api.workflow import execute
 from zecsolve.auth.credentials import MerchantPrincipal
 from zecsolve.auth.dependencies import require_actor, require_merchant
+from zecsolve.schemas.disclosure import EvidenceContentV1, ReviewerEvidenceV1
 from zecsolve.schemas.evidence import (
     EvidenceStoredV1,
     EvidenceStoredV2,
@@ -60,11 +61,26 @@ def submit_evidence(
     )
 
 
-@router.get("/{evidence_id}", response_model=EvidenceStoredV1 | EvidenceStoredV2)
+@router.get(
+    "/{evidence_id}", response_model=EvidenceStoredV1 | EvidenceStoredV2 | ReviewerEvidenceV1
+)
 def get_evidence(
     case_id: uuid.UUID,
     evidence_id: uuid.UUID,
-    principal: Principal,
+    principal: Annotated[object, Depends(require_actor)],
     workflow: Annotated[EvidenceService, Depends(service)],
 ):
     return execute(lambda: workflow.get(principal, case_id, evidence_id), "EVIDENCE")
+
+
+@router.get("/{evidence_id}/content", response_model=EvidenceContentV1)
+def get_evidence_content(
+    case_id: uuid.UUID,
+    evidence_id: uuid.UUID,
+    principal: Annotated[object, Depends(require_actor)],
+    workflow: Annotated[EvidenceService, Depends(service)],
+):
+    content = execute(lambda: workflow.read_content(principal, case_id, evidence_id), "EVIDENCE")
+    return EvidenceContentV1(
+        evidence_id=evidence_id, receipt_json=content.receipt_json, raw_tx_hex=content.raw_tx_hex
+    )
