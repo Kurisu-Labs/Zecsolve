@@ -42,7 +42,11 @@ def main():
     )
     options = parser.parse_args()
     (ROOT / ".cache").mkdir(exist_ok=True)
-    for name in ("deployment-result.json", "recovery-result.json"):
+    for name in (
+        "deployment-result.json",
+        "recovery-result.json",
+        "browser-deployment-result.json",
+    ):
         (ROOT / ".cache" / name).unlink(missing_ok=True)
     directory = Path(tempfile.mkdtemp(prefix="deployment-", dir=ROOT / ".cache"))
     project = "zecsolve-smoke-" + secrets.token_hex(4)
@@ -325,7 +329,13 @@ print(json.dumps(result))
             )
             state.chmod(0o600)
             time.sleep(3)  # Drain preceding checks from the real ingress bucket.
-            browser = run_suite(directory / "browser", state, origin, ingress=True)
+            browser = run_suite(
+                directory / "browser",
+                state,
+                origin,
+                ingress=True,
+                result_path=ROOT / ".cache/browser-deployment-result.json",
+            )
             passed("eight real-browser scenarios through packaged frontend and nginx TLS ingress")
             logs = run(compose + ["logs", "--no-color", "api", "ingress"])
             assert browser_merchant["token"] not in logs
@@ -354,6 +364,12 @@ print(json.dumps(result))
             (ROOT / ".cache/recovery-result.json").write_text(json.dumps(report, indent=2) + "\n")
         (ROOT / ".cache/deployment-result.json").write_text(json.dumps(report, indent=2) + "\n")
         success = True
+    except Exception:
+        if options.browser:
+            from browser_acceptance import write_setup_failure
+
+            write_setup_failure(ROOT / ".cache/browser-deployment-result.json", ingress=True)
+        raise
     finally:
         if success or not options.keep_on_failure:
             run(compose + ["down", "--volumes", "--remove-orphans"])
