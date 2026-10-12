@@ -110,7 +110,7 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 | [M4.3 — Case listing](#m4-3) | Person 3 | `feat/m4-case-listing` | Existing merchant case backend on main | Done: PR #13 merged |
 | [M4.4 — Customer submissions](#m4-4) | Person 3 | `feat/m4-customer-submissions` | M4.2 merged, including the M4.0 persistence interfaces | Done: PR #18 merged |
 | [M4.5 — Scoped reports](#m4-5) | Person 2 | `feat/m4-scoped-reports` | M4.2 and M4.4 merged | Done: PR #20 merged |
-| [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | In progress: Codex |
+| [M5.0 — Packet contract](#m5-0) | Person 2 | `feat/m5-packet-contract` | M4.0 merged | Implemented locally; GitHub suspension blocks push/CI/PR |
 | [M5.1 — Replay command](#m5-1) | Person 2 | `feat/m5-replay-case` | M5.0 merged | Waiting |
 | [M5.2 — Authorized export](#m5-2) | Person 2 | `feat/m5-case-export` | M4.5 and M5.1 merged | Waiting |
 | [M6.0 — Application foundation](#m6-0) | Person 4 | `feat/m6-web-foundation` | Frontend explicitly resumed; existing workflow contracts | Deferred |
@@ -220,14 +220,14 @@ The links below lead to the scope and acceptance card for each branch. DEVELOPME
 
 #### M5.0 — Packet contract
 
-- **Owner:** Person 2. **Branch:** `feat/m5-packet-contract`. **Status:** In progress: Codex; M4.0/M4.5 merged.
+- **Owner:** Person 2. **Branch:** `feat/m5-packet-contract`. **Status:** Implemented locally; GitHub suspension blocks push/CI/PR.
 - **Prerequisites:** M4.0 merged.
 - **Goal:** Freeze the common packet format consumed by both exporter and replay.
 - **Owned code:** Packet schemas, integrity/canonicalization contract, public/synthetic complete and scoped fixtures, and schema tests.
 - **Exclusions:** No database exporter, permission implementation, CLI execution, fabricated live evidence, or revision of historical hashes.
 - **Public interfaces:** `CasePacketV1`: exact encoded inputs/hashes, invoice/policy, provenance, observations, verifier/rules versions, evaluation/allocation context, decisions/events, integrity manifest, and explicit disclosure/replay scope.
 - **Acceptance checks:** Complete and limited fixtures validate; original-file and decoded-transaction hashes stay distinct; omitted/redacted inputs and foreign conflicts are explicit. Current and historical supported record formats have contract coverage.
-- **Validation evidence:** Pending: generated packet schema, documented version/hash profile, fixture provenance and schema validation results. All cards also require the common definition of done below.
+- **Validation evidence:** [Packet contract](packets.md), [public/synthetic fixtures](../fixtures/packets/README.md) and [Item 17](DEVELOPMENT.md#item-17--packet-contract-m50) record generated schema/hash profile and 13 passing contract tests. Remote integration is blocked by account suspension. All cards also require the common definition of done below.
 
 <a id="m5-1"></a>
 
