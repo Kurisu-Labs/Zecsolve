@@ -10,12 +10,6 @@ Resolve shielded-payment exceptions with scoped evidence and explainable merchan
 
 The October 10 foundation runs real Glasspane output recovery against a bundled historical Zcash mainnet transaction. The valid receipt recovers **100,000 zatoshis (0.001 ZEC)**; the tampered receipt fails. Chain confirmation remains `UNAVAILABLE` because this proof of concept is offline.
 
-Start with [TEAM_GUIDE.md](TEAM_GUIDE.md) for the codebase tour and next tasks. Original product documents are preserved in [instructions/](instructions/).
-
-For assignments, use the [four-person feature board](docs/IMPLEMENTATION_PLAN.md#feature-board) and [task cards](docs/IMPLEMENTATION_PLAN.md#task-cards): Person 1 owns access/auth/schema, Person 2 reports/export/replay, Person 3 submission backend/live validation/release, and **Person 4 all frontend work**. Each task names its branch, prerequisites, code boundary and completion checks. PR #26 completes the resumed frontend implementation and records browser acceptance; P3 completed shared CI/deployment integration in PR #28 and owns final release evidence. Listed branches do not establish completion.
-
-Before taking a task, read [CONTRIBUTING.md](CONTRIBUTING.md): check active work, publish your task branch before implementation, push progress there, and open a PR when ready.
-
 ## Run the proof of concept
 
 Prerequisites: an existing Rust/Cargo installation (tested with 1.99.0), Python 3.12+ (tested with 3.14.7), uv, a C compiler/linker, and make. This project uses your installed stable Rust toolchain. The first build downloads locked dependencies; subsequent fixture verification needs no network.
