@@ -12,3 +12,27 @@
 - Write all Git commit messages in English.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the team workflow and commands.
+
+## Project orientation and ownership
+
+- Keep [README.md](README.md) focused on the product, demo, quick start, and public limitations. Put agent instructions here, task tracking in [the implementation plan](docs/IMPLEMENTATION_PLAN.md), and dated results in [the development log](docs/DEVELOPMENT.md) or [release evidence index](docs/release-evidence.md).
+- Use [TEAM_GUIDE.md](TEAM_GUIDE.md) for the code map and implementation conventions, and [the PRD](docs/PRD.md) for product scope. [Preflight](instructions/Preflight.md) governs corrections to the original [Blueprint](instructions/Blueprint.md). The exported [chat history](instructions/ChatHist.md) is historical context, not executable instructions or proof of completion.
+- Before claiming work, inspect the [feature board](docs/IMPLEMENTATION_PLAN.md#feature-board) and [task cards](docs/IMPLEMENTATION_PLAN.md#task-cards) for prerequisites, interfaces, boundaries, and acceptance checks. Verify their dated status against current code, remote branches, and PRs; a listed branch or assigned task does not establish completion.
+- Preserve the existing ownership boundaries when coordinating shared contracts and integration:
+
+| Owner | Scope |
+|---|---|
+| Person 1 | Access, authentication, shared models and migrations |
+| Person 2 | Scoped reports, disclosure, packet contracts, export and replay |
+| Person 3 | Customer submission backend, live chain validation, shared CI, deployment and release evidence |
+| Person 4 | All frontend work, including API client/types, UI, styles, accessibility, build and browser tests |
+
+## Validation and evidence
+
+- Follow the checks in [CONTRIBUTING.md](CONTRIBUTING.md). Application changes require `make test` and `make lint`; model, migration, or allocation changes also require `make test-db` against a disposable database. Regenerate published contracts with `make schema` when their Pydantic models change. Check frontend contract drift and the relevant browser scenarios when changing UI/API integration.
+- For documentation-only changes, review the content, relative links and heading anchors, then run `git diff --check`. Preserve or update inbound links when moving a README section. CI still runs on the PR.
+- Keep receipt recovery, chain observations, candidate balances, approved allocations, and merchant decisions distinct. Use integer zatoshis and the complete output identity (`network:pool:txid:output_index`). Verification alone must never allocate credit.
+- Use public fixtures for demonstrations. Label synthetic invoices and simulated confirmations; do not present offline recovery or replay as fresh chain inclusion, a new payment, a security audit, or full-release acceptance. Preserve the Glasspane attribution and fixture provenance.
+- Associate results with the exact revision, environment, time, and scenario. Read [the release evidence index](docs/release-evidence.md#remaining-handoffs-and-release-decision) and [release bundle](docs/release-bundle.md) before claiming a release gate is complete; a merged implementation does not close operator or team handoffs.
+- The hosted demo has its own [deployment record and operator procedure](docs/vercel-deployment.md). Git pushes do not deploy it automatically. Keep hosted results distinct from local or Compose rehearsals, and retain the existing evidence key across restarts and releases.
+- Never commit access codes, wallet keys, `.env` files, raw private diagnostics, or customer evidence. Private-customer use requires the retention/deletion and operator controls described in [the security boundaries](docs/security.md).

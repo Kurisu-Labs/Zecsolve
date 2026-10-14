@@ -2,7 +2,7 @@
 
 **Historical frontend handoff (October 11):** [PR #12](https://github.com/Kurisu-Labs/zecsolve/pull/12) supplied the initial app. The October 12 merged integration in [frontend.md](docs/frontend.md) supersedes that partial implementation status. PR #26 is merged; full release has separate gates.
 
-This guide explains the foundation and backend milestones completed through October 12. Use [README.md](README.md) for runnable setup commands.
+This guide explains the foundation and backend milestones completed through October 12. Use [README.md](README.md) for the project overview and [Getting started](docs/getting-started.md) for runnable setup commands.
 
 ## What we are building
 
